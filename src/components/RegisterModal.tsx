@@ -138,7 +138,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="w-full px-3 py-2.5 text-sm border border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
+                className="w-full px-3 py-2.5 text-sm border text-gray-400 border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
               >
                 <option value="buyer">Buyer</option>
                 <option value="provider">Service Provider</option>
@@ -157,7 +157,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                 value={formData.businessName}
                 onChange={handleChange}
                 placeholder="Your company or organization"
-                className="w-full px-3 py-2.5 text-sm border border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
+                className="w-full px-3 py-2.5 text-sm border border-gray-200 text-gray-400 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
               />
             </div>
 
@@ -172,7 +172,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="contact@example.com"
-                className="w-full px-3 py-2.5 text-sm border border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
+                className="w-full px-3 py-2.5 text-sm border text-gray-400 border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
               />
             </div>
 
@@ -188,7 +188,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="At least 8 characters"
-                className="w-full px-3 py-2.5 text-sm border border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
+                className="w-full px-3 py-2.5 text-sm border text-gray-400 border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
               />
             </div>
 
@@ -207,7 +207,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                     value={formData.hourlyRate}
                     onChange={handleChange}
                     placeholder="85.00"
-                    className="w-full px-3 py-2.5 text-sm border border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
+                    className="w-full px-3 py-2.5 text-sm border text-gray-400 border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
                   />
                 </div>
 
@@ -223,7 +223,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                       value={formData.experienceYears}
                       onChange={handleChange}
                       placeholder="8"
-                      className="w-full px-3 py-2.5 text-sm border border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
+                      className="w-full px-3 py-2.5 text-sm border text-gray-400 border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
                     />
                   </div>
                   <div>
@@ -236,7 +236,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                       value={formData.portfolioUrl}
                       onChange={handleChange}
                       placeholder="your-site.com"
-                      className="w-full px-3 py-2.5 text-sm border border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
+                      className="w-full px-3 py-2.5 text-sm border text-gray-400 border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
                     />
                   </div>
                 </div>
