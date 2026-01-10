@@ -1,3 +1,6 @@
+// src/components/dashboard/SubscriptionAlert.tsx
+import Link from 'next/link';
+
 export default function SubscriptionAlert() {
   return (
     <div className="border border-red-200 bg-red-50 rounded-xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -9,9 +12,12 @@ export default function SubscriptionAlert() {
           Your account does not have an active subscription. Please subscribe to unlock full features, including submitting quotes for jobs.
         </p>
       </div>
-      <button className="bg-red-600 hover:bg-red-700 text-white font-medium px-8 py-3 rounded-lg transition">
+      <Link 
+        href="/dashboard/subscribe"
+        className="bg-red-600 hover:bg-red-700 text-white font-medium px-8 py-3 rounded-lg transition text-center"
+      >
         Subscribe Now
-      </button>
+      </Link>
     </div>
   );
 }
