@@ -57,8 +57,6 @@ export default async function ProviderDashboard() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-12">
-      <h1 className="text-4xl font-bold text-gray-900">Dashboard</h1>
-
       {!hasSubscription && <SubscriptionAlert />}
 
       <CreditsOverview

@@ -9,7 +9,7 @@ export default function SubscriptionAlert() {
           <span className="text-2xl">⚠</span> Subscription Required!
         </p>
         <p className="text-red-600 mt-1">
-          Your account does not have an active subscription. Please subscribe to unlock full features, including submitting quotes for jobs.
+          Your account does not have an active subscription. Please subscribe to unlock full features.
         </p>
       </div>
       <Link 
