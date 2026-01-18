@@ -119,26 +119,22 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-      <div ref={modalRef} className="bg-white rounded-2xl shadow-2xl w-full max-w-sm border border-gray-100">
-        <div className="p-6 max-h-[85vh] overflow-y-auto scrollbar-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+      <div ref={modalRef} className="w-full max-w-sm bg-white border border-gray-100 rounded-2xl shadow-2xl">
+        <div className="p-6 max-h-[85vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-5">
-            <h2 className="text-xl font-bold text-gray-900">Register</h2>
-            <button onClick={onClose} className="text-xl text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition">
-              ×
-            </button>
+            <h2 className="text-xl font-bold text-gray-900 text-center w-full">Register</h2>
+            <button onClick={onClose} className="p-1 text-xl text-gray-400 hover:text-gray-600">×</button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5 uppercase tracking-wide">
-                Register as
-              </label>
+              <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">Register as</label>
               <select
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="w-full px-3 py-2.5 text-sm border text-gray-400 border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
+                className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-black"
               >
                 <option value="buyer">Buyer</option>
                 <option value="provider">Service Provider</option>
@@ -147,7 +143,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
 
             {/* Always show Business Name */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5 uppercase tracking-wide">
+              <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">
                 Organization Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -157,14 +153,12 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                 value={formData.businessName}
                 onChange={handleChange}
                 placeholder="Your company or organization"
-                className="w-full px-3 py-2.5 text-sm border border-gray-200 text-gray-400 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
+                className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-black"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5 uppercase tracking-wide">
-                Email
-              </label>
+              <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">Email</label>
               <input
                 type="email"
                 name="email"
@@ -172,14 +166,12 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="contact@example.com"
-                className="w-full px-3 py-2.5 text-sm border text-gray-400 border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
+                className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-black"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5 uppercase tracking-wide">
-                Password
-              </label>
+              <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">Password</label>
               <input
                 type="password"
                 name="password"
@@ -187,17 +179,15 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                 minLength={8}
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="At least 8 characters"
-                className="w-full px-3 py-2.5 text-sm border text-gray-400 border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
+                placeholder="••••••••"
+                className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-black"
               />
             </div>
 
             {formData.role === 'provider' && (
               <>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5 uppercase tracking-wide">
-                    Hourly Rate ($)
-                  </label>
+                  <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">Hourly Rate ($)</label>
                   <input
                     type="number"
                     name="hourlyRate"
@@ -207,15 +197,13 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                     value={formData.hourlyRate}
                     onChange={handleChange}
                     placeholder="85.00"
-                    className="w-full px-3 py-2.5 text-sm border text-gray-400 border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
+                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-black"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1.5 uppercase tracking-wide">
-                      Experience (yrs)
-                    </label>
+                    <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">Experience (yrs)</label>
                     <input
                       type="number"
                       name="experienceYears"
@@ -223,20 +211,18 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                       value={formData.experienceYears}
                       onChange={handleChange}
                       placeholder="8"
-                      className="w-full px-3 py-2.5 text-sm border text-gray-400 border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
+                      className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-black"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1.5 uppercase tracking-wide">
-                      Portfolio
-                    </label>
+                    <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">Portfolio</label>
                     <input
                       type="url"
                       name="portfolioUrl"
                       value={formData.portfolioUrl}
                       onChange={handleChange}
                       placeholder="your-site.com"
-                      className="w-full px-3 py-2.5 text-sm border text-gray-400 border-gray-200 bg-white/80 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 hover:border-gray-300"
+                      className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-black"
                     />
                   </div>
                 </div>
@@ -246,23 +232,21 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm uppercase tracking-wide"
+              className="w-full py-3 text-sm font-semibold text-white uppercase rounded-xl bg-blue-600 hover:bg-blue-700 transition-all disabled:opacity-50"
             >
               {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
 
           {message && (
-            <p className={`text-center mt-4 text-xs font-medium px-3 py-2 rounded-lg ${message.includes('successful') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+            <p className={`mt-4 text-xs font-medium text-center p-2 rounded-lg ${message.includes('successful') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
               {message}
             </p>
           )}
 
-          <p className="text-center mt-4 text-xs text-gray-600">
+          <p className="mt-4 text-xs text-center text-gray-600">
             Already have an account?{' '}
-            <button onClick={onSwitchToLogin} className="text-blue-600 font-medium hover:text-blue-700 hover:underline transition-colors">
-              Sign in
-            </button>
+            <button onClick={onSwitchToLogin} className="font-medium text-blue-600 hover:underline">Sign in</button>
           </p>
         </div>
       </div>
