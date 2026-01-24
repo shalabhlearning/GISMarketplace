@@ -14,7 +14,7 @@ type UserRole = 'buyer' | 'provider';
 interface FormData {
   role: UserRole;
   businessName: string; // Now always required
-  email: string;
+  identifier: string;
   password: string;
   hourlyRate: string;
   experienceYears: string;
@@ -25,7 +25,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
   const [formData, setFormData] = useState<FormData>({
     role: 'buyer',
     businessName: '',
-    email: '',
+    identifier: '',
     password: '',
     hourlyRate: '',
     experienceYears: '',
@@ -70,9 +70,16 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
       return;
     }
 
+    // Require identifier
+    if (!formData.identifier.trim()) {
+      setMessage('Provide an email or phone number');
+      setLoading(false);
+      return;
+    }
+
     const payload: {
       userType: UserRole;
-      email: string;
+      identifier: string;
       password: string;
       organizationName: string;
       hourlyRate?: string;
@@ -80,7 +87,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
       portfolioUrl?: string;
     } = {
       userType: formData.role,
-      email: formData.email,
+      identifier: formData.identifier.trim(),
       password: formData.password,
       organizationName: formData.businessName.trim(),
     };
@@ -158,14 +165,14 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
             </div>
 
             <div>
-              <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">Email</label>
+              <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">Email or Phone Number</label>
               <input
-                type="email"
-                name="email"
+                type="text"
+                name="identifier"
                 required
-                value={formData.email}
+                value={formData.identifier}
                 onChange={handleChange}
-                placeholder="contact@example.com"
+                placeholder="contact@example.com or +1234567890"
                 className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-black"
               />
             </div>

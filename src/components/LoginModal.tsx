@@ -13,7 +13,7 @@ export default function LoginModal({
   onClose,
   onSwitchToRegister,
 }: LoginModalProps) {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -40,12 +40,18 @@ export default function LoginModal({
     setLoading(true);
     setMessage('');
 
+    if (!identifier.trim()) {
+      setMessage('Provide an email or phone number');
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: email.trim(),
+          identifier: identifier.trim(),
           password,
         }),
       });
@@ -91,13 +97,13 @@ export default function LoginModal({
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">Email</label>
+              <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">Email or Phone Number</label>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
                 required
-                placeholder="your@email.com"
+                placeholder="your@email.com or +1234567890"
                 className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-black"
               />
             </div>

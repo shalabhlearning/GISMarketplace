@@ -6,23 +6,25 @@ import { randomBytes } from 'crypto';
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const { identifier, password } = await req.json();
 
-    if (!email || !password) {
+    if (!identifier || !password) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: 'Identifier (email or phone) and password are required' },
         { status: 400 }
       );
     }
 
+    const trimmedIdentifier = identifier.trim();
+
     const users: any[] = await query(
-      'SELECT user_id, password_hash, user_type FROM user WHERE email = ? AND status = "active"',
-      [email.trim()]
+      'SELECT user_id, password_hash, user_type FROM user WHERE (email = ? OR phone_number = ?) AND status = "active"',
+      [trimmedIdentifier, trimmedIdentifier]
     );
 
     if (!users.length) {
       return NextResponse.json(
-        { error: 'Invalid email or password' },
+        { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
@@ -32,7 +34,7 @@ export async function POST(req: NextRequest) {
     const isValid = await bcrypt.compare(password, user.password_hash);
     if (!isValid) {
       return NextResponse.json(
-        { error: 'Invalid email or password' },
+        { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
@@ -51,7 +53,7 @@ export async function POST(req: NextRequest) {
       message: 'Login successful!',
       user: {
         userId: user.user_id,
-        email,
+        identifier: trimmedIdentifier,
         userType: user.user_type,
       },
     });

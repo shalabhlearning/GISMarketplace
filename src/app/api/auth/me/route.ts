@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
     const rows: any = await query(
       `
-      SELECT u.user_id, u.email, u.user_type
+      SELECT u.user_id, u.email, u.phone_number, u.user_type
       FROM sessions s
       JOIN user u ON u.user_id = s.user_id
       WHERE s.session_token = ? AND s.expires > NOW()
