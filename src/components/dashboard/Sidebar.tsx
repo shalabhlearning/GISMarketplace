@@ -2,21 +2,23 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  Home, 
-  FileText, 
-  CheckSquare, 
-  Award, 
-  Clock, 
-  PlusCircle, 
-  MessageSquare, 
-  Users, 
-  Briefcase, 
-  Receipt 
+import { useTransition } from 'react';
+import {
+  Home,
+  FileText,
+  CheckSquare,
+  Award,
+  Clock,
+  PlusCircle,
+  MessageSquare,
+  Users,
+  Briefcase,
+  Receipt,
 } from 'lucide-react';
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
 
   // Determine if we are on the buyer or provider side
   const isBuyer = pathname.startsWith('/dashboard/buyer');
@@ -48,7 +50,7 @@ export default function Sidebar() {
           {isBuyer ? 'B' : 'P'}
         </div>
         <span className="font-bold text-xl text-gray-900 tracking-tight">
-            {isBuyer ? 'BuyerHub' : 'ProviderHub'}
+          {isBuyer ? 'BuyerHub' : 'ProviderHub'}
         </span>
       </div>
 
@@ -56,6 +58,7 @@ export default function Sidebar() {
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
+
           return (
             <Link
               key={item.name}
@@ -72,12 +75,32 @@ export default function Sidebar() {
           );
         })}
       </nav>
-      
-      {/* Footer / Settings Link */}
+
+      {/* Logout Button with loading state */}
       <div className="p-4 border-t border-gray-50">
-        <button className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-500 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors">
-            Log Out
-        </button>
+        <form
+          action="/api/auth/logout"
+          method="POST"
+          onSubmit={(e) => {
+            e.preventDefault();
+            startTransition(() => {
+              // Trigger form submission
+              (e.currentTarget as HTMLFormElement).submit();
+            });
+          }}
+        >
+          <button
+            type="submit"
+            disabled={isPending}
+            className={`w-full flex items-center gap-3 px-4 py-3 text-sm rounded-xl transition-colors ${
+              isPending
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'text-gray-500 hover:bg-red-50 hover:text-red-600'
+            }`}
+          >
+            {isPending ? 'Logging out...' : 'Log Out'}
+          </button>
+        </form>
       </div>
     </aside>
   );

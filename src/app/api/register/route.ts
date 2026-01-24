@@ -1,4 +1,3 @@
-// src/app/api/register/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { query } from '@/lib/db';
@@ -8,38 +7,46 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const {
-      userType, // 'buyer' or 'provider'
+      userType,           // 'buyer' or 'provider'
       identifier,
       password,
       organizationName,
       hourlyRate,
       experienceYears,
       portfolioUrl,
+      isDummy = false     // ← NEW: support dummy mode
     } = body;
 
-    if (!userType || !identifier || !password) {
-      return NextResponse.json({ error: 'User type, identifier (email or phone number), and password are required' }, { status: 400 });
+    // Skip required field validation in dummy mode
+    if (!isDummy) {
+      if (!userType || !identifier || !password) {
+        return NextResponse.json(
+          { error: 'User type, identifier (email or phone number), and password are required' },
+          { status: 400 }
+        );
+      }
+
+      if (!['buyer', 'provider'].includes(userType)) {
+        return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
+      }
     }
 
-    if (!['buyer', 'provider'].includes(userType)) {
-      return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
-    }
+    // Trim identifier for consistency
+    const trimmedIdentifier = identifier?.trim() || '';
 
-    // Detect if identifier is email or phone
-    let email = null;
-    let phoneNumber = null;
-    if (identifier.includes('@') && identifier.includes('.')) {
-      email = identifier;
-      // Check if email exists
-      const existingEmail = await query('SELECT user_id FROM user WHERE email = ?', [email]);
-      if (Array.isArray(existingEmail) && existingEmail.length > 0) {
+    let email: string | null = null;
+    let phoneNumber: string | null = null;
+
+    if (trimmedIdentifier.includes('@') && trimmedIdentifier.includes('.')) {
+      email = trimmedIdentifier;
+      const existing = await query('SELECT user_id FROM user WHERE email = ?', [email]);
+      if (Array.isArray(existing) && existing.length > 0) {
         return NextResponse.json({ error: 'Email already registered' }, { status: 409 });
       }
     } else {
-      phoneNumber = identifier;
-      // Check if phone exists
-      const existingPhone = await query('SELECT user_id FROM user WHERE phone_number = ?', [phoneNumber]);
-      if (Array.isArray(existingPhone) && existingPhone.length > 0) {
+      phoneNumber = trimmedIdentifier;
+      const existing = await query('SELECT user_id FROM user WHERE phone_number = ?', [phoneNumber]);
+      if (Array.isArray(existing) && existing.length > 0) {
         return NextResponse.json({ error: 'Phone number already registered' }, { status: 409 });
       }
     }
@@ -47,19 +54,17 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 12);
     const userId = randomUUID();
 
-    // Start transaction manually
     const connection = await require('@/lib/db').default.getConnection();
     try {
       await connection.beginTransaction();
 
-      // Create user
       await connection.execute(
         'INSERT INTO user (user_id, email, phone_number, password_hash, user_type, status) VALUES (?, ?, ?, ?, ?, "active")',
-        [userId, email, phoneNumber, hashedPassword, userType]
+        [userId, email, phoneNumber, hashedPassword, userType || 'buyer'] // fallback for dummy
       );
 
       if (userType === 'provider') {
-        if (!organizationName || !hourlyRate) {
+        if (!isDummy && (!organizationName || !hourlyRate)) {
           throw new Error('Organization name and hourly rate required for providers');
         }
 
@@ -68,7 +73,13 @@ export async function POST(req: NextRequest) {
             provider_id, organization_name, hourly_rate, experience_years, 
             portfolio_url, subscription_status, rating
           ) VALUES (?, ?, ?, ?, ?, 'none', 0.0)`,
-          [userId, organizationName, parseFloat(hourlyRate), experienceYears ? parseInt(experienceYears) : null, portfolioUrl || null]
+          [
+            userId,
+            organizationName || null,
+            hourlyRate ? parseFloat(hourlyRate) : null,
+            experienceYears ? parseInt(experienceYears) : null,
+            portfolioUrl || null
+          ]
         );
       }
 
