@@ -7,21 +7,25 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const {
-      userType,           // 'buyer' or 'provider'
-      identifier,
+      userType,
+      email: rawEmail,
+      phoneNumber: rawPhoneNumber,
       password,
       organizationName,
       hourlyRate,
       experienceYears,
       portfolioUrl,
-      isDummy = false     // ← NEW: support dummy mode
+      dummyEmail = false,
+      dummyPhone = false,
     } = body;
 
-    // Skip required field validation in dummy mode
-    if (!isDummy) {
-      if (!userType || !identifier || !password) {
+    const isFullDummy = dummyEmail && dummyPhone;
+
+    // Validation (skip strict checks only if both are dummy)
+    if (!isFullDummy) {
+      if (!userType || !rawEmail || !rawPhoneNumber || !password) {
         return NextResponse.json(
-          { error: 'User type, identifier (email or phone number), and password are required' },
+          { error: 'User type, email, phone number, and password are required' },
           { status: 400 }
         );
       }
@@ -31,22 +35,24 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Trim identifier for consistency
-    const trimmedIdentifier = identifier?.trim() || '';
+    const email = rawEmail?.trim() || '';
+    const phoneNumber = rawPhoneNumber?.trim() || '';
 
-    let email: string | null = null;
-    let phoneNumber: string | null = null;
+    if (!email || !phoneNumber) {
+      return NextResponse.json({ error: 'Both email and phone number must be provided' }, { status: 400 });
+    }
 
-    if (trimmedIdentifier.includes('@') && trimmedIdentifier.includes('.')) {
-      email = trimmedIdentifier;
-      const existing = await query('SELECT user_id FROM user WHERE email = ?', [email]);
-      if (Array.isArray(existing) && existing.length > 0) {
+    // Uniqueness checks — skip for dummy channels
+    if (!dummyEmail) {
+      const existingEmail = await query('SELECT user_id FROM user WHERE email = ?', [email]);
+      if (Array.isArray(existingEmail) && existingEmail.length > 0) {
         return NextResponse.json({ error: 'Email already registered' }, { status: 409 });
       }
-    } else {
-      phoneNumber = trimmedIdentifier;
-      const existing = await query('SELECT user_id FROM user WHERE phone_number = ?', [phoneNumber]);
-      if (Array.isArray(existing) && existing.length > 0) {
+    }
+
+    if (!dummyPhone) {
+      const existingPhone = await query('SELECT user_id FROM user WHERE phone_number = ?', [phoneNumber]);
+      if (Array.isArray(existingPhone) && existingPhone.length > 0) {
         return NextResponse.json({ error: 'Phone number already registered' }, { status: 409 });
       }
     }
@@ -60,11 +66,11 @@ export async function POST(req: NextRequest) {
 
       await connection.execute(
         'INSERT INTO user (user_id, email, phone_number, password_hash, user_type, status) VALUES (?, ?, ?, ?, ?, "active")',
-        [userId, email, phoneNumber, hashedPassword, userType || 'buyer'] // fallback for dummy
+        [userId, email, phoneNumber, hashedPassword, userType]
       );
 
       if (userType === 'provider') {
-        if (!isDummy && (!organizationName || !hourlyRate)) {
+        if (!isFullDummy && (!organizationName || !hourlyRate)) {
           throw new Error('Organization name and hourly rate required for providers');
         }
 

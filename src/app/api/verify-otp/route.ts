@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import NodeCache from 'node-cache';
 
-// Global singleton cache (survives hot-reload in dev mode)
 const globalAny: any = global;
 const cache = globalAny.otpCache || new NodeCache({ stdTTL: 600 });
 if (!globalAny.otpCache) {
@@ -13,48 +12,43 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log('VERIFY OTP - Raw body received:', body);
 
-    const { identifier, otp, isDummy } = body;
+    const { email: rawEmail, phoneNumber: rawPhoneNumber, emailOtp, phoneOtp } = body;
 
-    if (!identifier || !otp) {
-      console.log('VERIFY OTP - Missing identifier or otp');
-      return NextResponse.json({ error: 'Identifier and OTP are required' }, { status: 400 });
+    if (!rawEmail || !rawPhoneNumber || !emailOtp || !phoneOtp) {
+      return NextResponse.json({ error: 'Email, phone number, email OTP, and phone OTP are required' }, { status: 400 });
     }
 
-    const trimmedIdentifier = (identifier || '').trim();
-    console.log('VERIFY OTP - Trimmed identifier:', trimmedIdentifier);
-    console.log('VERIFY OTP - Received OTP:', otp);
-    console.log('VERIFY OTP - isDummy:', !!isDummy);
+    const email = rawEmail.trim();
 
-    if (isDummy) {
-      console.log('VERIFY OTP - Running in DUMMY mode');
-      if (otp === '77777') {
-        console.log('VERIFY OTP - Dummy OTP correct → success');
-        return NextResponse.json({ success: true });
-      } else {
-        console.log('VERIFY OTP - Dummy OTP wrong');
-        return NextResponse.json({ error: 'Invalid OTP' }, { status: 400 });
+    // Normalize phone same as send-otp
+    let phoneNumber = rawPhoneNumber.trim();
+    if (!phoneNumber.startsWith('+')) {
+      if (/^[6-9]\d{9}$/.test(phoneNumber)) {
+        phoneNumber = '+91' + phoneNumber;
       }
     }
 
-    // Get stored OTP
-    const storedOtp = cache.get(trimmedIdentifier);
+    const storedEmailOtp = cache.get(email);
+    const storedPhoneOtp = cache.get(phoneNumber);
 
-    console.log('VERIFY OTP - Stored OTP from cache:', storedOtp);
-    console.log('VERIFY OTP - Cache has key?', cache.has(trimmedIdentifier));
+    console.log('VERIFY OTP - Stored Email OTP:', storedEmailOtp);
+    console.log('VERIFY OTP - Stored Phone OTP:', storedPhoneOtp);
+    console.log('VERIFY OTP - Received Email OTP:', emailOtp);
+    console.log('VERIFY OTP - Received Phone OTP:', phoneOtp);
 
-    if (storedOtp === otp) {
-      console.log('VERIFY OTP - OTP MATCHED → SUCCESS');
-      cache.del(trimmedIdentifier);
+    if (storedEmailOtp === emailOtp && storedPhoneOtp === phoneOtp) {
+      console.log('VERIFY OTP - BOTH OTPS MATCHED → SUCCESS');
+      cache.del(email);
+      cache.del(phoneNumber);
       return NextResponse.json({ success: true });
     } else {
-      console.log('VERIFY OTP - OTP DID NOT MATCH or expired');
-      return NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 400 });
+      console.log('VERIFY OTP - ONE OR BOTH OTPS INVALID or expired');
+      return NextResponse.json({ error: 'Invalid or expired OTP(s)' }, { status: 400 });
     }
   } catch (err: any) {
     console.error('VERIFY OTP ROUTE CRASHED:', err);
-    console.error('Error stack:', err.stack);
     return NextResponse.json(
-      { error: 'Server error while verifying OTP. Please try again.' },
+      { error: 'Server error while verifying OTP(s). Please try again.' },
       { status: 500 }
     );
   }
