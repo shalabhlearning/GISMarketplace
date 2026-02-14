@@ -1,4 +1,4 @@
-// src/app/api/proposal/create/route.ts
+// src/app/api/proposal/create/route.ts (Credit system temporarily disabled)
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { randomUUID } from 'crypto';
@@ -8,15 +8,37 @@ import fs from 'fs/promises';
 export async function POST(req: NextRequest) {
   try {
     const sessionToken = req.cookies.get('session_token')?.value;
-    if (!sessionToken) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const [sessionRows] = await db.query(
-      'SELECT user_id FROM sessions WHERE session_token = ? AND expires > NOW()',
+    console.log('╔════════════════════════════════════════════╗');
+    console.log('║ PROPOSAL CREATE REQUEST RECEIVED          ║');
+    console.log('╟────────────────────────────────────────────╢');
+    console.log('║ Cookie "session_token" present? ', !!sessionToken ? 'YES' : 'NO');
+    console.log('║ Token value (first 10 chars): ', sessionToken ? sessionToken.slice(0, 10) + '...' : 'none');
+    console.log('╚════════════════════════════════════════════╝');
+
+    if (!sessionToken) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const sessionRows: any[] = await db.query(
+      `SELECT s.user_id, u.user_type 
+       FROM sessions s 
+       JOIN user u ON s.user_id = u.user_id 
+       WHERE s.session_token = ? AND s.expires > NOW()`,
       [sessionToken]
     );
-    if (!sessionRows.length) return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
 
-    const providerId = sessionRows[0].user_id;
+    console.log('Found session rows:', sessionRows.length);
+
+    if (!sessionRows.length) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+    }
+
+    const { user_id: providerId, user_type } = sessionRows[0];
+
+    if (user_type !== 'provider') {
+      return NextResponse.json({ error: 'Only providers can submit quotes' }, { status: 403 });
+    }
 
     const formData = await req.formData();
 
@@ -36,7 +58,7 @@ export async function POST(req: NextRequest) {
       references,
     });
 
-    // Attachments
+    // Attachments handling
     const attachments: string[] = [];
     const files = formData.getAll('proposal_attachments') as File[];
     const uploadDir = path.join(process.cwd(), 'public/uploads/proposals');
@@ -50,35 +72,22 @@ export async function POST(req: NextRequest) {
       attachments.push(`/uploads/proposals/${filename}`);
     }
 
-    const creditsUsed = 500;
+    // CREDIT SYSTEM DISABLED FOR NOW
+    // No balance check
+    // No debit entry
+    // credits_used = 0 in proposal
 
-    // Check balance
-    const [ledger] = await db.query(`
-      SELECT COALESCE(SUM(CASE WHEN type = 'credit' THEN credits ELSE -credits END), 0) AS balance
-      FROM creditledger WHERE provider_id = ?
-    `, [providerId]);
-    const balance = Number((ledger as any)?.balance || 0);
-    if (balance < creditsUsed) {
-      return NextResponse.json({ error: 'Insufficient credits' }, { status: 400 });
-    }
-
-    // Insert proposal
+    // Insert proposal (credits_used = 0)
     const proposalId = randomUUID();
     await db.query(`
       INSERT INTO proposal 
       (proposal_id, project_id, provider_id, bid_amount, proposal_message, status, credits_used)
-      VALUES (?, ?, ?, ?, ?, 'submitted', ?)
-    `, [proposalId, projectId, providerId, bidAmount, proposalDetails + '\nAttachments: ' + JSON.stringify(attachments), creditsUsed]);
-
-    // Debit credits
-    await db.query(`
-      INSERT INTO creditledger (id, provider_id, credits, type, reason)
-      VALUES (?, ?, ?, 'debit', ?)
-    `, [randomUUID(), providerId, creditsUsed, `Quote submission for project ${projectId}`]);
+      VALUES (?, ?, ?, ?, ?, 'submitted', 0)
+    `, [proposalId, projectId, providerId, bidAmount, proposalDetails + '\nAttachments: ' + JSON.stringify(attachments)]);
 
     return NextResponse.json({ success: true, message: 'Quote submitted successfully!' });
   } catch (err: any) {
     console.error('Proposal error:', err);
-    return NextResponse.json({ error: 'Failed to submit quote' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to submit quote', details: err.message }, { status: 500 });
   }
 }

@@ -36,7 +36,7 @@ export default function Sidebar() {
   const providerMenuItems = [
     { name: 'Dashboard', icon: Home, href: '/dashboard/provider' },
     { name: 'Available Quotes', icon: FileText, href: '/dashboard/provider/available' },
-    { name: 'Submitted Quotes', icon: CheckSquare, href: '/dashboard/provider/submitted' },
+    { name: 'Submitted Quotes', icon: CheckSquare, href: '/dashboard/provider/quotes' },
     { name: 'Awarded Quotes', icon: Award, href: '/dashboard/provider/awarded' },
     { name: 'Ongoing RFP', icon: Clock, href: '/dashboard/provider/ongoing' },
   ];

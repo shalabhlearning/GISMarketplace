@@ -68,7 +68,7 @@ export default function RfpTable({
                         {r.status?.toUpperCase() || 'UNKNOWN'}
                       </span>
                     </td>
-                    <td className="px-6 py-5 text-center font-medium">
+                    <td className="px-6 py-5 text-center font-medium text-gray-600">
                       {isBuyer ? (
                         <span className="text-blue-600">{r.quotes_count || 0} quotes</span>
                       ) : (
