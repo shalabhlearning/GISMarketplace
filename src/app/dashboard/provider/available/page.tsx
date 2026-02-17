@@ -30,7 +30,6 @@ export default async function AvailableRfPsPage() {
     <DashboardShell title="Available RFPs">
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Available RFPs</h1>
           <p className="mt-2 text-gray-600">
             Browse all currently open public requests for proposals ({(rfps as any[]).length} found).
           </p>
