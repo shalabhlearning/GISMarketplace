@@ -4,8 +4,9 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export async function logoutAction() {
+  const cookieStore = await cookies();
   // Delete the session cookie
-  cookies().delete('session_token');
+  cookieStore.delete('session_token');
 
   // Redirect to homepage
   redirect('/');

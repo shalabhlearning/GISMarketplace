@@ -3,12 +3,13 @@ import { Plus } from 'lucide-react';
 
 export default function CreateRfpHero({ hasSubscription }: { hasSubscription: boolean }) {
   const handleCreateClick = () => {
-    if (!hasSubscription) {
-      alert("Please subscribe to an active plan to initiate a New RFP.");
-      window.location.href = '/dashboard/subscribe';
-      return;
-    }
-    window.location.href = '/dashboard/buyer/create-rfp';
+    // Temporarily bypass subscription check for dev/testing
+    // if (!hasSubscription) {
+    //   alert("Please subscribe to an active plan to initiate a New RFP.");
+    //   window.location.href = '/dashboard/subscribe';
+    //   return;
+    // }
+    window.location.href = '/dashboard/buyer/create';  // Direct to create page
   };
 
   return (
