@@ -1,4 +1,3 @@
-// src/app/dashboard/buyer/page.tsx
 import { redirect } from 'next/navigation';
 import db from '@/lib/db';
 import DashboardShell from '@/components/dashboard/DashboardShell';
@@ -7,11 +6,24 @@ import CreateRfpHero from '@/components/dashboard/CreateRfpHero';
 import RfpTable from '@/components/dashboard/RfpTable';
 import SubscriptionAlert from '@/components/dashboard/SubscriptionAlert';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
 
 async function getCurrentUser() {
-  // TODO: replace with real session logic (using cookies + /api/auth/me)
-  // For now using hardcoded value from your code
-  return { id: '7e2b5874-ddc9-11f0-8727-001a7dda7113', type: 'buyer' };
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get('session_token')?.value;
+  if (!sessionToken) return null;
+
+  const sessionRows: any[] = await db.query(
+    `SELECT s.user_id, u.user_type 
+     FROM sessions s 
+     JOIN user u ON s.user_id = u.user_id 
+     WHERE s.session_token = ? AND s.expires > NOW()`,
+    [sessionToken]
+  );
+
+  if (!sessionRows.length) return null;
+
+  return { id: sessionRows[0].user_id, type: sessionRows[0].user_type };
 }
 
 export default async function BuyerDashboard() {
