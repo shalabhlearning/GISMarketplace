@@ -81,6 +81,14 @@ export async function POST(req: NextRequest) {
           portfolioUrl || null
         ]
       );
+
+      // Assign initial 100 credits for provider
+      const ledgerId = randomUUID();
+      await query(
+        `INSERT INTO creditledger (id, provider_id, credits, type, reason) 
+         VALUES (?, ?, 100, 'credit', 'Initial credits')`,
+        [ledgerId, userId]
+      );
     }
 
     if (userType === 'buyer') {

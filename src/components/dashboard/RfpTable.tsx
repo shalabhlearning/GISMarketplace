@@ -35,13 +35,14 @@ export default function RfpTable({
                   {isBuyer ? 'Quotes Received' : 'Budget'}
                 </th>
                 <th className="px-6 py-4 text-center font-semibold">Date</th>
+                <th className="px-6 py-4 text-center font-semibold">Credits Required</th>
                 <th className="px-6 py-4 text-center font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {rfps.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-16 text-gray-400 italic">
+                  <td colSpan={6} className="text-center py-16 text-gray-400 italic">
                     No RFPs found.
                   </td>
                 </tr>
@@ -83,6 +84,9 @@ export default function RfpTable({
                             year: 'numeric', month: 'short', day: 'numeric'
                           }) 
                         : '—'}
+                    </td>
+                    <td className="px-6 py-5 text-center font-medium text-gray-600">
+                      20
                     </td>
                     <td className="px-6 py-5 text-center">
                       <button 

@@ -72,18 +72,42 @@ export async function POST(req: NextRequest) {
       attachments.push(`/uploads/proposals/${filename}`);
     }
 
-    // CREDIT SYSTEM DISABLED FOR NOW
-    // No balance check
-    // No debit entry
-    // credits_used = 0 in proposal
+    // Check current credits
+    // Check current credits
+const creditRows: any[] = await db.query(
+  `SELECT COALESCE(SUM(CASE 
+     WHEN type = 'credit' THEN credits 
+     WHEN type = 'debit' THEN -credits 
+   END), 0) AS total_credits
+   FROM creditledger 
+   WHERE provider_id = ?`,
+  [providerId]
+);
 
-    // Insert proposal (credits_used = 0)
+const total_credits = creditRows[0]?.total_credits || 0;
+
+if (total_credits < 20) {
+  return NextResponse.json(
+    { error: 'Insufficient credits. Need at least 20 credits to submit a proposal.' },
+    { status: 403 } // better status
+  );
+}
+
+    // Insert proposal (credits_used = 20)
     const proposalId = randomUUID();
     await db.query(`
       INSERT INTO proposal 
       (proposal_id, project_id, provider_id, bid_amount, proposal_message, status, credits_used)
-      VALUES (?, ?, ?, ?, ?, 'submitted', 0)
+      VALUES (?, ?, ?, ?, ?, 'submitted', 20)
     `, [proposalId, projectId, providerId, bidAmount, proposalDetails + '\nAttachments: ' + JSON.stringify(attachments)]);
+
+    // Debit 20 credits
+    const ledgerId = randomUUID();
+    await db.query(
+      `INSERT INTO creditledger (id, provider_id, credits, type, reason) 
+       VALUES (?, ?, 20, 'debit', 'Proposal submission')`,
+      [ledgerId, providerId]
+    );
 
     return NextResponse.json({ success: true, message: 'Quote submitted successfully!' });
   } catch (err: any) {
