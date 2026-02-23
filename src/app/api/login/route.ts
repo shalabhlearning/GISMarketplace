@@ -1,4 +1,4 @@
-// src/app/api/login/route.ts
+// src/app/api/login/route.ts (FINAL FIX: Delete old sessions + reliable cookie)
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { query } from '@/lib/db';
@@ -39,9 +39,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create session
+    // FINAL FIX: Delete ALL old sessions for this user
+    await query('DELETE FROM sessions WHERE user_id = ?', [user.user_id]);
+
+    // Create fresh session
     const sessionToken = randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
 
     await query(
       'INSERT INTO sessions (session_token, user_id, expires) VALUES (?, ?, ?)',
@@ -58,17 +61,17 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Reliable cookie settings (localhost + production safe)
     response.cookies.set('session_token', sessionToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production', // false on localhost
       sameSite: 'lax',
-      path: '/',
-      expires,
+      path: '/', // Critical - sent to /api routes
+      maxAge: 30 * 24 * 60 * 60, // 30 days
     });
 
-    await query('UPDATE user SET last_login = NOW() WHERE user_id = ?', [
-      user.user_id,
-    ]);
+    // Update last login
+    await query('UPDATE user SET last_login = NOW() WHERE user_id = ?', [user.user_id]);
 
     return response;
   } catch (err) {
