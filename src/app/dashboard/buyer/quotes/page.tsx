@@ -18,18 +18,21 @@ async function getCurrentUser() {
   );
 
   if (!sessionRows.length) return null;
-
   return { id: sessionRows[0].user_id, type: sessionRows[0].user_type };
 }
 
-export default async function ReceivedQuotesPage() {
+export default async function ReceivedQuotesPage({
+  searchParams,
+}: {
+  searchParams: { project_id?: string };
+}) {
   const user = await getCurrentUser();
   if (!user || user.type !== 'buyer') redirect('/login');
 
   const buyerId = user.id;
+  const filterProjectId = searchParams.project_id;
 
-  // Fetch all proposals for the buyer's projects
-  const quotes = await db.query(`
+  let sql = `
     SELECT 
       p.proposal_id,
       p.project_id,
@@ -44,15 +47,26 @@ export default async function ReceivedQuotesPage() {
     JOIN projectrequest pr ON p.project_id = pr.project_id
     JOIN providerprofile pp ON p.provider_id = pp.provider_id
     WHERE pr.buyer_id = ?
-    ORDER BY p.created_at DESC
-  `, [buyerId]);
+  `;
+  const params: any[] = [buyerId];
+
+  if (filterProjectId) {
+    sql += ` AND p.project_id = ?`;
+    params.push(filterProjectId);
+  }
+
+  sql += ` ORDER BY p.created_at DESC`;
+
+  const quotes = await db.query(sql, params);
 
   return (
     <DashboardShell title="Received Quotes">
       <div className="space-y-8">
         <div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Received Vendor Quotes</h2>
-          <p className="text-gray-600">Compare vendor proposals and select the best fit for your requirements.</p>
+          <p className="text-gray-600">
+            {filterProjectId ? "Quotes for this specific RFP" : "Compare vendor proposals and select the best fit for your requirements."}
+          </p>
         </div>
 
         <QuoteTable quotes={quotes as any[]} />

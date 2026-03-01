@@ -69,13 +69,16 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
     setLoading(true);
     setMessage('');
 
+    const trimmedEmail = formData.email.trim();
+    const trimmedPhone = formData.phoneNumber.trim();
+
     if (!formData.businessName.trim()) {
       setMessage('Organization name is required');
       setLoading(false);
       return;
     }
 
-    if (!formData.email.trim() || !formData.phoneNumber.trim()) {
+    if (!trimmedEmail || !trimmedPhone) {
       setMessage('Both email and phone number are required');
       setLoading(false);
       return;
@@ -87,18 +90,38 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
       return;
     }
 
-    const trimmedEmail = formData.email.trim();
-    const trimmedPhone = formData.phoneNumber.trim();
-
     try {
-      const res = await fetch('/api/send-otp', {
+      // 🔴 STEP 1: CHECK IF USER EXISTS
+      const checkRes = await fetch('/api/check-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: trimmedEmail, phoneNumber: trimmedPhone, dummyEmail, dummyPhone }),
+        body: JSON.stringify({
+          email: trimmedEmail,
+          phoneNumber: trimmedPhone,
+        }),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
+      if (!checkRes.ok) {
+        const data = await checkRes.json();
+        setMessage(data.error || 'User already exists');
+        setLoading(false);
+        return;
+      }
+
+      // 🟢 STEP 2: If user does NOT exist → send OTP
+      const otpRes = await fetch('/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: trimmedEmail,
+          phoneNumber: trimmedPhone,
+          dummyEmail,
+          dummyPhone,
+        }),
+      });
+
+      if (!otpRes.ok) {
+        const data = await otpRes.json();
         setMessage(data.error || 'Failed to send OTP(s)');
         setLoading(false);
         return;

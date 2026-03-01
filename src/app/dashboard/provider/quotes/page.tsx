@@ -1,5 +1,4 @@
 // src/app/dashboard/provider/quotes/page.tsx
-
 export const dynamic = 'force-dynamic';
 
 import db from '@/lib/db';
@@ -23,156 +22,101 @@ async function getCurrentProviderId(sessionToken: string | undefined) {
   return rows.length > 0 ? rows[0].user_id : null;
 }
 
-async function getSubmittedQuotes(providerId: string) {
-  const quotes: any[] = await db.query(
-    `SELECT 
+export default async function SubmittedQuotesPage() {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get('session_token')?.value;
+
+  const providerId = await getCurrentProviderId(sessionToken);
+  if (!providerId) notFound();
+
+  const quotes = await db.query(`
+    SELECT 
       p.proposal_id,
       p.project_id,
       p.bid_amount,
       p.proposal_message,
+      p.status,
+      p.credits_used,
+      p.created_at AS submitted,
       pr.title AS project_title,
-      pr.description AS project_description,
       bp.organization_name AS buyer_name
     FROM proposal p
     JOIN projectrequest pr ON p.project_id = pr.project_id
     LEFT JOIN buyerprofile bp ON pr.buyer_id = bp.buyer_id
     WHERE p.provider_id = ?
-    ORDER BY p.proposal_id DESC`,
-    [providerId]
-  );
-
-  return quotes;
-}
-
-export default async function SubmittedQuotesPage({
-  searchParams,
-}: {
-  searchParams: { search?: string };
-}) {
-
-  // ✅ Correct way to read cookies in Next.js 14+
-  const cookieStore = await cookies();
-  const sessionToken = cookieStore.get('session_token')?.value;
-
-  const providerId = await getCurrentProviderId(sessionToken);
-
-  if (!providerId) {
-    notFound();
-  }
-
-  let quotes = await getSubmittedQuotes(providerId);
-
-  const search = searchParams?.search || '';
-
-  if (search) {
-    const lowerSearch = search.toLowerCase();
-    quotes = quotes.filter((q: any) =>
-      q.project_title?.toLowerCase().includes(lowerSearch) ||
-      q.buyer_name?.toLowerCase().includes(lowerSearch)
-    );
-  }
+    ORDER BY p.created_at DESC
+  `, [providerId]);
 
   return (
     <DashboardShell title="Submitted Quotes">
-      <div className="space-y-6">
+      <div className="space-y-8 text-gray-900">
+        <h1 className="text-3xl font-bold">Submitted Quotes</h1>
 
-        {/* Header + Search */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Submitted Quotes
-          </h1>
-
-          <form method="GET" className="w-full sm:w-96">
-            <input
-              type="text"
-              name="search"
-              placeholder="Search quotes by job title or client..."
-              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 text-gray-900"
-              defaultValue={search}
-            />
-          </form>
-        </div>
-
-        {/* Quotes List */}
         {quotes.length === 0 ? (
-          <div className="text-center py-16 text-gray-500">
+          <div className="text-center py-16 text-gray-500 bg-white rounded-2xl border border-gray-100">
             No submitted quotes found.
           </div>
         ) : (
-          <div className="space-y-6">
-            {quotes.map((quote: any) => {
+          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[1000px] text-gray-900">
+                <thead className="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider">
+                  <tr>
+                    <th className="px-6 py-4 text-left font-semibold">Project</th>
+                    <th className="px-6 py-4 text-left font-semibold">Client</th>
+                    <th className="px-6 py-4 text-center font-semibold">Amount</th>
+                    <th className="px-6 py-4 text-center font-semibold">Technical</th>
+                    <th className="px-6 py-4 text-center font-semibold">Delivery</th>
+                    <th className="px-6 py-4 text-center font-semibold">Milestones</th>
+                    <th className="px-6 py-4 text-center font-semibold">Status</th>
+                    <th className="px-6 py-4 text-center font-semibold">Submitted</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 text-gray-900">
+                  {quotes.map((q: any) => {
+                    let details: any = {};
+                    try {
+                      const start = q.proposal_message.indexOf('{');
+                      const end = q.proposal_message.lastIndexOf('}') + 1;
+                      if (start !== -1) details = JSON.parse(q.proposal_message.substring(start, end));
+                    } catch {}
 
-              let details: any = {};
-              try {
-                const jsonStart = quote.proposal_message.indexOf('{');
-                const jsonEnd = quote.proposal_message.lastIndexOf('}') + 1;
-                if (jsonStart !== -1 && jsonEnd !== -1) {
-                  const jsonStr = quote.proposal_message.substring(jsonStart, jsonEnd);
-                  details = JSON.parse(jsonStr);
-                }
-              } catch (e) {
-                console.error('Parse proposal details error:', e);
-              }
-
-              return (
-                <div
-                  key={quote.proposal_id}
-                  className="bg-white rounded-2xl shadow-md overflow-hidden"
-                >
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900">
-                          {quote.project_title || 'Untitled Project'}
-                        </h3>
-                        <p className="text-sm text-gray-600 mt-1">
-                          Client: {quote.buyer_name || 'Unknown'} | 
-                          Submitted: {new Date(quote.submitted_at).toLocaleDateString()} | 
-                          Amount: ${Number(quote.bid_amount).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-
-                    <details className="mt-4">
-                      <summary className="cursor-pointer text-blue-600 hover:text-blue-800 font-medium mb-2">
-                        Quote Details
-                      </summary>
-
-                      <div className="mt-3 pl-4 border-l-4 border-gray-200 space-y-4 text-gray-900">
-                        
-                        <div>
-                          <p className="font-medium">Technical Proposal</p>
-                          <p className="mt-1 whitespace-pre-wrap">
-                            {details.technical || 'No technical details'}
-                          </p>
-                        </div>
-
-                        <div>
-                          <p className="font-medium">Delivery Plan</p>
-                          <p className="mt-1 whitespace-pre-wrap">
-                            {details.delivery || 'No delivery plan'}
-                          </p>
-                        </div>
-
-                        {details.milestones?.length > 0 && (
-                          <div>
-                            <p className="font-medium">Milestones</p>
-                            <ul className="list-disc pl-5 mt-1">
-                              {details.milestones.map((m: any, i: number) => (
-                                <li key={i}>
-                                  {m.title} - ${m.amount} - Due: {m.dueDate}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-
-                      </div>
-                    </details>
-                  </div>
-                </div>
-              );
-            })}
+                    return (
+                      <tr key={q.proposal_id} className="hover:bg-gray-50/50">
+                        <td className="px-6 py-5 font-medium">{q.project_title}</td>
+                        <td className="px-6 py-5">{q.buyer_name || '—'}</td>
+                        <td className="px-6 py-5 text-center font-medium">
+                          ${Number(q.bid_amount).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-5 text-sm max-w-[220px] truncate">
+                          {details.technical || '—'}
+                        </td>
+                        <td className="px-6 py-5 text-sm max-w-[180px] truncate">
+                          {details.delivery || '—'}
+                        </td>
+                        <td className="px-6 py-5 text-center text-sm">
+                          {details.milestones?.length || 0}
+                        </td>
+                        <td className="px-6 py-5 text-center">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
+                            q.status === 'submitted' 
+                              ? 'bg-blue-100 text-blue-700 border border-blue-200' 
+                              : 'bg-green-100 text-green-700 border border-green-200'
+                          }`}>
+                            {q.status.toUpperCase()}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5 text-center text-sm">
+                          {new Date(q.submitted).toLocaleDateString('en-US', { 
+                            year: 'numeric', month: 'short', day: 'numeric' 
+                          })}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>

@@ -13,7 +13,7 @@ export default function CreateRfpHero({ hasSubscription }: { hasSubscription: bo
   };
 
   return (
-    <div className="bg-blue-50 rounded-3xl p-8 border border-blue-100 flex flex-col md:flex-row justify-between items-center gap-6">
+    <div className="bg-blue-50 rounded-3xl p-5 border border-blue-100 flex flex-col md:flex-row justify-between items-center gap-6">
       <div className="max-w-md">
         <h2 className="text-2xl font-bold text-blue-900 mb-2">Initiate a New Request for Proposal</h2>
         <p className="text-blue-700/80">

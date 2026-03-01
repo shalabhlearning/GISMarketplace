@@ -1,7 +1,9 @@
+// src/app/dashboard/provider/page.tsx
 export const dynamic = 'force-dynamic';
 
 import db from '@/lib/db';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import SubscriptionAlert from '@/components/dashboard/SubscriptionAlert';
 import CreditsOverview from '@/components/dashboard/CreditsOverview';
@@ -13,7 +15,7 @@ export default async function ProviderDashboard() {
   const sessionToken = cookieStore.get('session_token')?.value;
 
   if (!sessionToken) {
-    return <div>Unauthorized</div>;
+    redirect('/login');
   }
 
   const sessionRows: any[] = await db.query(
@@ -25,9 +27,12 @@ export default async function ProviderDashboard() {
   );
 
   if (!sessionRows.length || sessionRows[0].user_type !== 'provider') {
-    return <div>Unauthorized</div>;
+    redirect('/login');
   }
 
+  const providerId = sessionRows[0].user_id;
+
+  // ✅ Fetch only RFPs where this provider has NOT submitted a quote
   const rfps = await db.query(`
     SELECT 
       pr.project_id,
@@ -45,19 +50,29 @@ export default async function ProviderDashboard() {
       bp.organization_name AS buyer_name
     FROM projectrequest pr
     LEFT JOIN buyerprofile bp ON pr.buyer_id = bp.buyer_id
-    WHERE pr.status = 'open' AND pr.visibility = 'public'
+    WHERE pr.status = 'open' 
+      AND pr.visibility = 'public'
+      AND NOT EXISTS (
+        SELECT 1 FROM proposal 
+        WHERE project_id = pr.project_id 
+          AND provider_id = ?
+      )
     ORDER BY pr.created_at DESC
     LIMIT 8
-  `);
+  `, [providerId]);
 
-  const hasSubscription = true;
+  // Real subscription check (optional but recommended)
+  const subCheck = await db.query(
+    `SELECT subscription_status FROM providerprofile WHERE provider_id = ?`,
+    [providerId]
+  );
+  const hasSubscription = (subCheck?.[0] as any)?.subscription_status === 'active';
 
   return (
     <DashboardShell title="Provider Dashboard">
       <div className="space-y-12">
         {!hasSubscription && <SubscriptionAlert />}
 
-        {/* CreditsOverview now calculates its own values */}
         <CreditsOverview />
 
         <section>

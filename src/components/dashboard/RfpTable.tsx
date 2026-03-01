@@ -1,7 +1,7 @@
-// src/components/dashboard/RfpTable.tsx (No changes needed from previous - modal handles navigation)
 'use client';
 
 import { Eye } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import RfpDetailsModal from './RfpDetailsModal';
 
@@ -14,12 +14,17 @@ export default function RfpTable({
   hasSubscription: boolean;
   isBuyer?: boolean;
 }) {
+  const router = useRouter();
   const [selectedRfp, setSelectedRfp] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleViewRfp = (rfp: any) => {
-    setSelectedRfp(rfp);
-    setIsModalOpen(true);
+    if (isBuyer) {
+      router.push(`/dashboard/buyer/quotes?project_id=${rfp.project_id}`);
+    } else {
+      setSelectedRfp(rfp);
+      setIsModalOpen(true);
+    }
   };
 
   return (
@@ -54,11 +59,6 @@ export default function RfpTable({
                       <div className="text-xs text-gray-500 font-mono mt-0.5">
                         {r.project_id?.slice(0, 8).toUpperCase() || '—'}
                       </div>
-                      {r.buyer_name && (
-                        <div className="text-sm text-gray-600 mt-1">
-                          by {r.buyer_name}
-                        </div>
-                      )}
                     </td>
                     <td className="px-6 py-5 text-center">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
@@ -73,21 +73,13 @@ export default function RfpTable({
                       {isBuyer ? (
                         <span className="text-blue-600">{r.quotes_count || 0} quotes</span>
                       ) : (
-                        r.budget 
-                          ? `$${Number(r.budget).toLocaleString()}` 
-                          : 'Negotiable'
+                        r.budget ? `$${Number(r.budget).toLocaleString()}` : 'Negotiable'
                       )}
                     </td>
                     <td className="px-6 py-5 text-center text-sm text-gray-600">
-                      {r.created_at 
-                        ? new Date(r.created_at).toLocaleDateString('en-US', {
-                            year: 'numeric', month: 'short', day: 'numeric'
-                          }) 
-                        : '—'}
+                      {r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}
                     </td>
-                    <td className="px-6 py-5 text-center font-medium text-gray-600">
-                      20
-                    </td>
+                    <td className="px-6 py-5 text-center font-medium text-gray-600">20</td>
                     <td className="px-6 py-5 text-center">
                       <button 
                         onClick={() => handleViewRfp(r)}
