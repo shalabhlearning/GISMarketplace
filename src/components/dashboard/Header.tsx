@@ -1,4 +1,3 @@
-// src/components/dashboard/Header.tsx
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -61,11 +60,12 @@ export default function DashboardHeader() {
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Left: Logo */}
-`            <Link href={user?.user_type === 'buyer' ? '/dashboard/buyer' : '/dashboard/provider'}>
-            <div className="flex items-center gap-3">
-            </div>
-            </Link>
-`
+        <Link href={user?.user_type === 'buyer' ? '/Buyerpage' : '/Providerpage'}>
+          <div className="flex items-center gap-3">
+            {/* Your original empty div - kept exactly as you pasted */}
+          </div>
+        </Link>
+
         {/* Right: Profile Avatar + Clickable Dropdown */}
         <div className="relative">
           <div

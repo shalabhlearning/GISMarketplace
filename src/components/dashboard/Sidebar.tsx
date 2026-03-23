@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useTransition } from 'react';
 import {
@@ -17,28 +17,29 @@ import {
 } from 'lucide-react';
 
 export default function Sidebar() {
-  const pathname = usePathname();
+  const router = useRouter();
+  const pathname = router.pathname;
   const [isPending, startTransition] = useTransition();
 
-  // Determine if we are on the buyer or provider side
-  const isBuyer = pathname.startsWith('/dashboard/buyer');
+  // Determine buyer or provider based on actual page routes
+  const isBuyer = pathname.startsWith('/Buyer');
 
-  // Define menus for both roles
+  // Updated menu links to match your Pages Router files
   const buyerMenuItems = [
-    { name: 'Dashboard', icon: Home, href: '/dashboard/buyer' },
-    { name: 'Create RFP', icon: PlusCircle, href: '/dashboard/buyer/create' },
-    { name: 'Received Quotes', icon: MessageSquare, href: '/dashboard/buyer/quotes' },
-    { name: 'Awarded Providers', icon: Users, href: '/dashboard/buyer/providers' },
-    { name: 'Ongoing Projects', icon: Briefcase, href: '/dashboard/buyer/projects' },
-    { name: 'Invoices', icon: Receipt, href: '/dashboard/buyer/invoices' },
+    { name: 'Dashboard', icon: Home, href: '/Buyerpage' },
+    { name: 'Create RFP', icon: PlusCircle, href: '/BuyerCreatepage' },
+    { name: 'Received Quotes', icon: MessageSquare, href: '/BuyerQuotepage' },
+    { name: 'Awarded Providers', icon: Users, href: '/Buyerpage' },
+    { name: 'Ongoing Projects', icon: Briefcase, href: '/Buyerpage' },
+    { name: 'Invoices', icon: Receipt, href: '/Buyerpage' },
   ];
 
   const providerMenuItems = [
-    { name: 'Dashboard', icon: Home, href: '/dashboard/provider' },
-    { name: 'Available Projects', icon: FileText, href: '/dashboard/provider/available' },
-    { name: 'Submitted Quotes', icon: CheckSquare, href: '/dashboard/provider/quotes' },
-    { name: 'Awarded Projects', icon: Award, href: '/dashboard/provider/awarded' },
-    { name: 'Ongoing Projects', icon: Clock, href: '/dashboard/provider/ongoing' },
+    { name: 'Dashboard', icon: Home, href: '/Providerpage' },
+    { name: 'Available Projects', icon: FileText, href: '/ProviderAvailablepage' },
+    { name: 'Submitted Quotes', icon: CheckSquare, href: '/ProviderQuotepage' },
+    { name: 'Awarded Projects', icon: Award, href: '/Providerpage' },
+    { name: 'Ongoing Projects', icon: Clock, href: '/Providerpage' },
   ];
 
   const menuItems = isBuyer ? buyerMenuItems : providerMenuItems;
@@ -84,7 +85,6 @@ export default function Sidebar() {
           onSubmit={(e) => {
             e.preventDefault();
             startTransition(() => {
-              // Trigger form submission
               (e.currentTarget as HTMLFormElement).submit();
             });
           }}

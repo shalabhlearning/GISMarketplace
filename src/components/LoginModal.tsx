@@ -49,6 +49,7 @@ export default function LoginModal({
     try {
       const res = await fetch('/api/login', {
         method: 'POST',
+        credentials: 'include', // ✅ required
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           identifier: identifier.trim(),
@@ -61,20 +62,25 @@ export default function LoginModal({
       if (res.ok) {
         setMessage('Login successful! Redirecting...');
 
-        // Updated Redirection Logic
         setTimeout(() => {
-          if (data.user?.userType === 'provider') {
-            window.location.href = '/dashboard/provider';
-          } else if (data.user?.userType === 'buyer') {
-            window.location.href = '/dashboard/buyer';
+          const userType = data?.user?.userType;
+
+          console.log('User type:', userType);
+
+          // ✅ FIXED ROUTES BASED ON YOUR STRUCTURE
+          if (userType === 'provider') {
+            window.location.assign('/Providerpage');
+          } else if (userType === 'buyer') {
+            window.location.assign('/Buyerpage');
           } else {
-            window.location.href = '/';
+            window.location.assign('/');
           }
         }, 800);
       } else {
         setMessage(data.error || 'Login failed');
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
       setMessage('Network error. Please try again.');
     } finally {
       setLoading(false);
@@ -91,13 +97,22 @@ export default function LoginModal({
       >
         <div className="p-6 max-h-[85vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-5">
-            <h2 className="text-xl font-bold text-gray-900 text-center w-full">Welcome back</h2>
-            <button onClick={onClose} className="p-1 text-xl text-gray-400 hover:text-gray-600">×</button>
+            <h2 className="text-xl font-bold text-gray-900 text-center w-full">
+              Welcome back
+            </h2>
+            <button
+              onClick={onClose}
+              className="p-1 text-xl text-gray-400 hover:text-gray-600"
+            >
+              ×
+            </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">Email or Phone Number</label>
+              <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">
+                Email or Phone Number
+              </label>
               <input
                 type="text"
                 value={identifier}
@@ -107,8 +122,11 @@ export default function LoginModal({
                 className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-black"
               />
             </div>
+
             <div>
-              <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">Password</label>
+              <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">
+                Password
+              </label>
               <input
                 type="password"
                 value={password}
@@ -118,6 +136,7 @@ export default function LoginModal({
                 className="w-full px-3 py-2.5 text-black text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
+
             <button
               type="submit"
               disabled={loading}
@@ -128,14 +147,25 @@ export default function LoginModal({
           </form>
 
           {message && (
-            <p className={`mt-4 text-xs font-medium text-center p-2 rounded-lg ${message.includes('successful') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+            <p
+              className={`mt-4 text-xs font-medium text-center p-2 rounded-lg ${
+                message.includes('successful')
+                  ? 'bg-green-50 text-green-700'
+                  : 'bg-red-50 text-red-700'
+              }`}
+            >
               {message}
             </p>
           )}
 
           <p className="mt-4 text-xs text-center text-gray-600">
             Don’t have an account?{' '}
-            <button onClick={onSwitchToRegister} className="font-medium text-blue-600 hover:underline">Register</button>
+            <button
+              onClick={onSwitchToRegister}
+              className="font-medium text-blue-600 hover:underline"
+            >
+              Register
+            </button>
           </p>
         </div>
       </div>
