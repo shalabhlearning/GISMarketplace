@@ -1,6 +1,6 @@
 -- =============================================
 -- GISMarketplace - Latest Schema Export
--- Generated on: 2026-03-24T14:48:33.294Z
+-- Generated on: 2026-03-29T05:21:57.220Z
 -- =============================================
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -96,15 +96,41 @@ CREATE TABLE `proposal` (
   `provider_id` char(36) NOT NULL,
   `bid_amount` decimal(10,2) NOT NULL,
   `proposal_message` text NOT NULL,
-  `status` enum('submitted','accepted','rejected','withdrawn') NOT NULL DEFAULT 'submitted',
+  `status` enum('draft','submitted','accepted','rejected','withdrawn') DEFAULT 'draft',
   `credits_used` int DEFAULT '0',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `technical` text,
+  `delivery` text,
+  `milestones` json DEFAULT NULL,
+  `case_studies` json DEFAULT NULL,
+  `references_json` json DEFAULT NULL,
+  `attachments` json DEFAULT NULL,
   PRIMARY KEY (`proposal_id`),
   KEY `idx_proposal_project` (`project_id`),
   KEY `idx_proposal_provider` (`provider_id`),
   KEY `idx_proposal_status` (`status`),
   CONSTRAINT `proposal_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `projectrequest` (`project_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `proposal_ibfk_2` FOREIGN KEY (`provider_id`) REFERENCES `providerprofile` (`provider_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Table: proposal_drafts
+DROP TABLE IF EXISTS `proposal_drafts`;
+CREATE TABLE `proposal_drafts` (
+  `draft_id` char(36) NOT NULL,
+  `project_id` char(36) NOT NULL,
+  `provider_id` char(36) NOT NULL,
+  `bid_amount` decimal(10,2) DEFAULT NULL,
+  `technical` text,
+  `delivery` text,
+  `milestones` json DEFAULT NULL,
+  `case_studies` json DEFAULT NULL,
+  `references_json` json DEFAULT NULL,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`draft_id`),
+  UNIQUE KEY `unique_draft` (`project_id`,`provider_id`),
+  KEY `provider_id` (`provider_id`),
+  CONSTRAINT `proposal_drafts_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `projectrequest` (`project_id`) ON DELETE CASCADE,
+  CONSTRAINT `proposal_drafts_ibfk_2` FOREIGN KEY (`provider_id`) REFERENCES `providerprofile` (`provider_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Table: providerprofile
@@ -149,6 +175,26 @@ CREATE TABLE `review` (
   CONSTRAINT `review_ibfk_2` FOREIGN KEY (`reviewer_id`) REFERENCES `user` (`user_id`) ON DELETE RESTRICT,
   CONSTRAINT `review_ibfk_3` FOREIGN KEY (`reviewee_id`) REFERENCES `user` (`user_id`) ON DELETE RESTRICT,
   CONSTRAINT `review_chk_1` CHECK ((`rating` between 1 and 5))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Table: rfp_drafts
+DROP TABLE IF EXISTS `rfp_drafts`;
+CREATE TABLE `rfp_drafts` (
+  `draft_id` varchar(255) NOT NULL,
+  `buyer_id` varchar(255) DEFAULT NULL,
+  `title` text,
+  `description` text,
+  `budget` decimal(10,2) DEFAULT NULL,
+  `currency` varchar(10) DEFAULT NULL,
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `submission_deadline` datetime DEFAULT NULL,
+  `visibility` varchar(20) DEFAULT NULL,
+  `contact_person` text,
+  `contact_email` text,
+  `credits` int DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`draft_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Table: servicecategory
@@ -201,7 +247,7 @@ CREATE TABLE `sessions` (
   UNIQUE KEY `session_token` (`session_token`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `sessions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=155 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=164 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Table: subscriptionplan
 DROP TABLE IF EXISTS `subscriptionplan`;
