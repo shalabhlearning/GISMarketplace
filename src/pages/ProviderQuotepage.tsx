@@ -39,27 +39,27 @@ export default function ProviderQuotepage() {
         <h1 className="text-3xl font-bold">Submitted Quotes</h1>
 
         {quotes.length === 0 ? (
-          <div className="text-center py-16 text-gray-500 bg-white rounded-2xl border border-gray-100">
+          <div className="text-center py-20 text-gray-400 italic bg-white rounded-3xl border border-gray-100 shadow-sm">
             No submitted quotes found.
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[1000px] text-gray-900">
-                <thead className="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider">
-                  <tr>
-                    <th className="px-6 py-4 text-left font-semibold">Project</th>
-                    <th className="px-6 py-4 text-left font-semibold">Client</th>
-                    <th className="px-6 py-4 text-center font-semibold">Amount</th>
-                    <th className="px-6 py-4 text-center font-semibold">Technical</th>
-                    <th className="px-6 py-4 text-center font-semibold">Delivery</th>
-                    <th className="px-6 py-4 text-center font-semibold">Milestones</th>
-                    <th className="px-6 py-4 text-center font-semibold">Status</th>
-                    <th className="px-6 py-4 text-center font-semibold">Submitted</th>
+              <table className="w-full min-w-[1000px]">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-100">
+                    <th className="px-8 py-5 text-left text-xs font-bold text-gray-800 uppercase tracking-wider">PROJECT</th>
+                    <th className="px-6 py-5 text-left text-xs font-bold text-gray-800 uppercase tracking-wider">CLIENT</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-800 uppercase tracking-wider">AMOUNT</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-800 uppercase tracking-wider">TECHNICAL</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-800 uppercase tracking-wider">DELIVERY</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-800 uppercase tracking-wider">MILESTONES</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-800 uppercase tracking-wider">STATUS</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-800 uppercase tracking-wider">SUBMITTED</th>
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-gray-100 text-gray-900">
+                <tbody className="divide-y divide-gray-100">
                   {quotes.map((q: any) => {
                     let details: any = {};
                     try {
@@ -70,43 +70,54 @@ export default function ProviderQuotepage() {
                       }
                     } catch {}
 
-                    const statusClass =
-                      q.status === 'submitted'
-                        ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                        : q.status === 'accepted'
-                        ? 'bg-green-100 text-green-700 border border-green-200'
+                    const statusStyles =
+                      q.status === 'accepted'
+                        ? 'bg-emerald-600 text-white'
                         : q.status === 'rejected'
-                        ? 'bg-red-100 text-red-700 border border-red-200'
-                        : 'bg-gray-100 text-gray-700 border border-gray-200';
+                        ? 'bg-red-600 text-white'
+                        : 'bg-blue-600 text-white';
 
                     return (
-                      <tr key={q.proposal_id} className="hover:bg-gray-50/50">
-                        <td className="px-6 py-5 font-medium">{q.project_title}</td>
-                        <td className="px-6 py-5">{q.buyer_name || '—'}</td>
-                        <td className="px-6 py-5 text-center font-medium">
+                      <tr key={q.proposal_id} className="hover:bg-gray-50/70 transition-colors">
+
+                        <td className="px-8 py-6">
+                          <div className="font-medium text-gray-900">{q.project_title}</div>
+                          <div className="text-sm text-gray-500 font-mono mt-1 tracking-tight">
+                            {q.project_id?.slice(0, 8)?.toUpperCase()}
+                          </div>
+                        </td>
+
+                        <td className="px-6 py-6 font-medium text-gray-900">
+                          {q.buyer_name || '—'}
+                        </td>
+
+                        <td className="px-6 py-6 text-center font-medium text-gray-900">
                           ${Number(q.bid_amount).toLocaleString()}
                         </td>
-                        <td className="px-6 py-5 text-sm max-w-[220px] truncate">
+
+                        <td className="px-6 py-6 text-center text-gray-600 max-w-[220px] truncate">
                           {details.technical || '—'}
                         </td>
-                        <td className="px-6 py-5 text-sm max-w-[180px] truncate">
+
+                        <td className="px-6 py-6 text-center text-gray-600">
                           {details.delivery || '—'}
                         </td>
-                        <td className="px-6 py-5 text-center text-sm">
+
+                        <td className="px-6 py-6 text-center font-medium text-gray-900">
                           {details.milestones?.length || 0}
                         </td>
-                        <td className="px-6 py-5 text-center">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${statusClass}`}
-                          >
+
+                        <td className="px-6 py-6 text-center">
+                          <span className={`inline-flex items-center px-5 py-1.5 text-xs font-semibold rounded-full uppercase tracking-wider ${statusStyles}`}>
                             {q.status.toUpperCase()}
                           </span>
                         </td>
-                        <td className="px-6 py-5 text-center text-sm">
+
+                        <td className="px-6 py-6 text-center text-gray-600">
                           {new Date(q.submitted).toLocaleDateString('en-US', {
-                            year: 'numeric',
                             month: 'short',
                             day: 'numeric',
+                            year: 'numeric',
                           })}
                         </td>
                       </tr>

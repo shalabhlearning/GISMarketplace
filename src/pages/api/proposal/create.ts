@@ -11,6 +11,9 @@ export const config = {
   },
 };
 
+const getField = (field: any) =>
+  Array.isArray(field) ? field[0] : field;
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -38,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { user_id: providerId, user_type } = sessionRows[0];
 
     if (user_type !== 'provider') {
-      return res.status(403).json({ error: 'Only providers can submit quotes' });
+      return res.status(403).json({ error: 'Only providers allowed' });
     }
 
     const form = formidable({ multiples: true });
@@ -50,17 +53,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     });
 
-    const projectId = fields.project_id;
-    const bidAmount = parseFloat(fields.bid_amount || '0');
+    const projectId = getField(fields.project_id);
+    const bidAmount = parseFloat(getField(fields.bid_amount) || '0');
+
+    const safeParse = (value: any, fallback: any) => {
+      try {
+        return JSON.parse(getField(value) || JSON.stringify(fallback));
+      } catch {
+        return fallback;
+      }
+    };
 
     const proposalDetails = JSON.stringify({
-      technical: fields.technical || '',
-      delivery: fields.delivery || '',
-      milestones: JSON.parse(fields.milestones || '[]'),
-      caseStudies: JSON.parse(fields.case_studies || '[]'),
-      references: JSON.parse(fields.references || '[]'),
+      technical: getField(fields.technical) || '',
+      delivery: getField(fields.delivery) || '',
+      milestones: safeParse(fields.milestones, []),
+      caseStudies: safeParse(fields.case_studies, []),
+      references: safeParse(fields.references, []),
     });
 
+    // FILE UPLOAD
     const attachments: string[] = [];
     const uploadDir = path.join(process.cwd(), 'public/uploads/proposals');
     await fs.mkdir(uploadDir, { recursive: true });
@@ -79,24 +91,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       attachments.push(`/uploads/proposals/${newFilename}`);
     }
 
-    const creditRows: any[] = await db.query(
-      `SELECT COALESCE(SUM(CASE 
-         WHEN type = 'credit' THEN credits 
-         WHEN type = 'debit' THEN -credits 
-       END), 0) AS total_credits
-       FROM creditledger 
-       WHERE provider_id = ?`,
-      [providerId]
-    );
-
-    const total_credits = creditRows[0]?.total_credits || 0;
-
-    if (total_credits < 20) {
-      return res.status(403).json({
-        error: 'Insufficient credits. Need at least 20 credits.',
-      });
-    }
-
+    // INSERT PROPOSAL
     const proposalId = randomUUID();
 
     await db.query(
@@ -106,21 +101,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       [proposalId, projectId, providerId, bidAmount, proposalDetails]
     );
 
+    // ✅ DELETE DRAFT
     await db.query(
-      `INSERT INTO creditledger (id, provider_id, credits, type, reason) 
-       VALUES (?, ?, 20, 'debit', 'Proposal submission')`,
-      [randomUUID(), providerId]
+      `DELETE FROM proposal_drafts 
+       WHERE project_id = ? AND provider_id = ?`,
+      [projectId, providerId]
     );
 
     return res.status(200).json({
       success: true,
       message: 'Quote submitted successfully!',
     });
+
   } catch (err: any) {
     console.error(err);
-    return res.status(500).json({
-      error: 'Failed to submit quote',
-      details: err.message,
-    });
+    return res.status(500).json({ error: 'Failed to submit quote' });
   }
 }

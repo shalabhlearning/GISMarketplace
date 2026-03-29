@@ -59,10 +59,14 @@ export default function DashboardHeader() {
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Left: Logo */}
+        {/* Left: Logo + Title */}
         <Link href={user?.user_type === 'buyer' ? '/Buyerpage' : '/Providerpage'}>
-          <div className="flex items-center gap-3">
-            {/* Your original empty div - kept exactly as you pasted */}
+          <div className="flex items-center gap-3 cursor-pointer">
+            {/* Main Heading */}
+            <h1 className="text-3xl font-bold text-gray-800 ">
+              GIS Marketplace
+            </h1>
+
           </div>
         </Link>
 

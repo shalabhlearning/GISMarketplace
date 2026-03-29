@@ -44,6 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           SELECT 1 FROM proposal 
           WHERE project_id = pr.project_id 
             AND provider_id = ?
+            AND status = 'submitted'   -- ✅ FIX
         )` : ''}
       ORDER BY pr.created_at DESC
       `,

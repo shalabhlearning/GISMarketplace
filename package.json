@@ -6,7 +6,9 @@
     "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:export": "tsx export-latest-schema.ts",
+    "db:setup": "tsx apply-schema.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -44,6 +46,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

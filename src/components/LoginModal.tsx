@@ -49,7 +49,7 @@ export default function LoginModal({
     try {
       const res = await fetch('/api/login', {
         method: 'POST',
-        credentials: 'include', // ✅ required
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           identifier: identifier.trim(),
@@ -67,8 +67,10 @@ export default function LoginModal({
 
           console.log('User type:', userType);
 
-          // ✅ FIXED ROUTES BASED ON YOUR STRUCTURE
-          if (userType === 'provider') {
+          // ✅ ONLY CHANGE: added admin case
+          if (userType === 'admin') {
+            window.location.assign('/admin');
+          } else if (userType === 'provider') {
             window.location.assign('/Providerpage');
           } else if (userType === 'buyer') {
             window.location.assign('/Buyerpage');

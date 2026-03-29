@@ -41,8 +41,8 @@ export async function proxy(req: NextRequest) {
   }
 
   // Role-based access control
-  const isBuyerRoute = pathname.startsWith('/dashboard/buyer');
-  const isProviderRoute = pathname.startsWith('/dashboard/provider');
+  const isBuyerRoute = pathname.startsWith('/pages/Buyerpage');
+  const isProviderRoute = pathname.startsWith('/pages/Providerpage');
 
   if (isBuyerRoute && user.user_type !== 'buyer') {
     return NextResponse.redirect(new URL('/', req.url));

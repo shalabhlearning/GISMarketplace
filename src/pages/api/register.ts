@@ -11,52 +11,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const {
       userType,
-      email: rawEmail,
-      phoneNumber: rawPhoneNumber,
+      email,
+      phoneNumber,
       password,
       organizationName,
       hourlyRate,
       experienceYears,
       portfolioUrl,
-      dummyEmail = false,
-      dummyPhone = false,
     } = req.body;
 
-    const isFullDummy = dummyEmail && dummyPhone;
-
-    if (!isFullDummy) {
-      if (!userType || !rawEmail || !rawPhoneNumber || !password) {
-        return res.status(400).json({
-          error: 'User type, email, phone number, and password are required',
-        });
-      }
-
-      if (!['buyer', 'provider'].includes(userType)) {
-        return res.status(400).json({ error: 'Invalid role' });
-      }
+    // ✅ FIX: allow admin
+    if (!['buyer', 'provider', 'admin'].includes(userType)) {
+      return res.status(400).json({ error: 'Invalid role' });
     }
 
-    const email = rawEmail?.trim() || '';
-    const phoneNumber = rawPhoneNumber?.trim() || '';
-
-    if (!email || !phoneNumber) {
+    if (!email || !phoneNumber || !password) {
       return res.status(400).json({
-        error: 'Both email and phone number must be provided',
+        error: 'Email, phone number, and password are required',
       });
     }
 
-    if (!dummyEmail) {
-      const existing = await query('SELECT user_id FROM user WHERE email = ?', [email]);
-      if (existing.length > 0) {
-        return res.status(409).json({ error: 'Email already registered' });
-      }
-    }
+    const cleanEmail = email.trim();
+    const cleanPhone = phoneNumber.trim();
 
-    if (!dummyPhone) {
-      const existing = await query('SELECT user_id FROM user WHERE phone_number = ?', [phoneNumber]);
-      if (existing.length > 0) {
-        return res.status(409).json({ error: 'Phone number already registered' });
-      }
+    // Check existing
+    const existing = await query(
+      'SELECT user_id FROM user WHERE email = ? OR phone_number = ?',
+      [cleanEmail, cleanPhone]
+    );
+
+    if (existing.length > 0) {
+      return res.status(409).json({
+        error: 'User already exists',
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -64,14 +51,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     await query(
       'INSERT INTO user (user_id, email, phone_number, password_hash, user_type, status) VALUES (?, ?, ?, ?, ?, "active")',
-      [userId, email, phoneNumber, hashedPassword, userType]
+      [userId, cleanEmail, cleanPhone, hashedPassword, userType]
     );
+
+    // 👇 Only create profile for buyer/provider
+    if (userType === 'buyer') {
+      await query(
+        'INSERT INTO buyerprofile (buyer_id, organization_name, rating) VALUES (?, ?, 0.0)',
+        [userId, organizationName || null]
+      );
+    }
 
     if (userType === 'provider') {
       await query(
         `INSERT INTO providerprofile (
-          provider_id, organization_name, hourly_rate, experience_years, 
-          portfolio_url, subscription_status, rating
+          provider_id, organization_name, hourly_rate, experience_years, portfolio_url, subscription_status, rating
         ) VALUES (?, ?, ?, ?, ?, 'none', 0.0)`,
         [
           userId,
@@ -89,21 +83,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
     }
 
-    if (userType === 'buyer') {
-      await query(
-        'INSERT INTO buyerprofile (buyer_id, organization_name, rating) VALUES (?, ?, 0.0)',
-        [userId, organizationName || null]
-      );
-    }
+    // ❌ Admin → no extra table needed
 
     return res.status(200).json({
       success: true,
       message: 'Account created successfully!',
     });
   } catch (error: any) {
-    console.error('Registration error:', error);
+    console.error(error);
     return res.status(500).json({
-      error: error.message || 'Registration failed',
+      error: 'Registration failed',
     });
   }
 }

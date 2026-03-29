@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import BuyerStats from '@/components/buyer/BuyerStats';
 import CreateRfpHero from '@/components/buyer/CreateRfpHero';
-import RfpTable from '@/components/provider/RfpTable';
+import RfpTable from '@/components/provider/RfpTable';   // Note: You can keep the name or rename later
 import SubscriptionAlert from '@/components/subscription/SubscriptionAlert';
 
 export default function Buyerpage() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [stats, setStats] = useState<any>({});
-  const [rfps, setRfps] = useState<any[]>([]);
+  const [myRfps, setMyRfps] = useState<any[]>([]);     // Changed name for clarity
   const [hasSubscription, setHasSubscription] = useState(false);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function Buyerpage() {
 
         setUser(data.user);
 
-        // fetch dashboard data
+        // Fetch buyer-specific dashboard data (stats + their own RFPs)
         const dashboardRes = await fetch('/api/buyer/dashboard', {
           credentials: 'include',
         });
@@ -35,8 +35,8 @@ export default function Buyerpage() {
         const dashboardData = await dashboardRes.json();
 
         setStats(dashboardData.stats || {});
-        setRfps(dashboardData.rfps || []);
-        setHasSubscription(dashboardData.hasSubscription);
+        setMyRfps(dashboardData.rfps || []);           // Only buyer's RFPs
+        setHasSubscription(dashboardData.hasSubscription || false);
       } catch (err) {
         console.error(err);
       } finally {
@@ -47,12 +47,13 @@ export default function Buyerpage() {
     init();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <div className="p-8">Loading your dashboard...</div>;
 
   return (
     <DashboardShell title="Buyer Dashboard">
-      <div className="space-y-12">
+      <div className="space-y-12 px-6 py-8">
         {!hasSubscription && <SubscriptionAlert />}
+
         <CreateRfpHero hasSubscription={hasSubscription} />
 
         <section>
@@ -67,9 +68,15 @@ export default function Buyerpage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Recent RFPs</h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">My RFPs</h2>
+            <p className="text-sm text-gray-500">
+              {myRfps.length} RFP{myRfps.length !== 1 ? 's' : ''} created by you
+            </p>
+          </div>
+          
           <RfpTable
-            rfps={rfps}
+            rfps={myRfps}
             hasSubscription={hasSubscription}
             isBuyer={true}
           />
