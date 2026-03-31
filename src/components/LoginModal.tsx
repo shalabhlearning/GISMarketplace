@@ -20,7 +20,6 @@ export default function LoginModal({
 
   const modalRef = useRef<HTMLDivElement>(null);
 
-  /* Close on outside click */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
@@ -65,15 +64,12 @@ export default function LoginModal({
         setTimeout(() => {
           const userType = data?.user?.userType;
 
-          console.log('User type:', userType);
-
-          // ✅ ONLY CHANGE: added admin case
           if (userType === 'admin') {
             window.location.assign('/admin');
           } else if (userType === 'provider') {
-            window.location.assign('/Providerpage');
+            window.location.assign('/provider');
           } else if (userType === 'buyer') {
-            window.location.assign('/Buyerpage');
+            window.location.assign('/buyer');
           } else {
             window.location.assign('/');
           }

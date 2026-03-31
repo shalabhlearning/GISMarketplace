@@ -1,15 +1,11 @@
 'use client';
+
 import { Plus } from 'lucide-react';
 
 export default function CreateRfpHero({ hasSubscription }: { hasSubscription: boolean }) {
   const handleCreateClick = () => {
-    // Temporarily bypass subscription check for dev/testing
-    // if (!hasSubscription) {
-    //   alert("Please subscribe to an active plan to initiate a New RFP.");
-    //   window.location.href = '/Subscribepage';
-    //   return;
-    // }
-    window.location.href = '/BuyerCreatepage';  // ← Fixed to your actual Pages Router path
+    // You can re-enable subscription check later
+    window.location.href = '/buyer/create';
   };
 
   return (

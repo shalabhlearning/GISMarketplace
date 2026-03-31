@@ -1,6 +1,6 @@
-// src/components/dashboard/DashboardShell.tsx (unchanged except import name)
+// src/components/dashboard/DashboardShell.tsx
 import Sidebar from './Sidebar';
-import DashboardHeader from './Header';  // ← make sure this points to the file above
+import DashboardHeader from './Header';
 
 export default function DashboardShell({
   children,
@@ -14,7 +14,7 @@ export default function DashboardShell({
       <Sidebar />
 
       <div className="flex-1 flex flex-col">
-        <DashboardHeader />  {/* ← This is now your top bar */}
+        <DashboardHeader />
 
         <main className="flex-1 p-6 md:p-8 lg:p-10 overflow-x-hidden">
           <div className="max-w-7xl mx-auto space-y-10">

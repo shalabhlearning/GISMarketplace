@@ -1,3 +1,4 @@
+// src/components/admin/RfpTable.tsx
 export default function RfpTable({ rfps, onSelect }: any) {
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">

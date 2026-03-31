@@ -21,7 +21,7 @@ export default function StatsCards() {
         r.budget && parseFloat(r.budget) > 100000
       ).length || 0;
 
-      // Stats API (Option A)
+      // Stats API
       const statsRes = await fetch('/api/admin/rfp/stats');
       const statsData = await statsRes.json();
 

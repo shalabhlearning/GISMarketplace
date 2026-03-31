@@ -1,4 +1,4 @@
-// src/components/dashboard/SubscriptionAlert.tsx
+// src/components/subscription/SubscriptionAlert.tsx
 import Link from 'next/link';
 
 export default function SubscriptionAlert() {
@@ -13,7 +13,7 @@ export default function SubscriptionAlert() {
         </p>
       </div>
       <Link 
-        href="/Subscribepage"
+        href="/subscribe"
         className="bg-red-600 hover:bg-red-700 text-white font-medium px-8 py-3 rounded-lg transition text-center"
       >
         Subscribe Now

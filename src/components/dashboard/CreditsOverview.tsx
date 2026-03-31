@@ -23,7 +23,7 @@ export default function CreditsOverview() {
         const res = await fetch('/api/provider/stats', { credentials: 'include' });
         if (!res.ok) throw new Error();
         const data = await res.json();
-        setCredits(data.credits || credits);
+        setCredits(data.credits || { total: 0, utilized: 0, balance: 0 });
       } catch (err) {
         console.error('Failed to load credits', err);
       } finally {

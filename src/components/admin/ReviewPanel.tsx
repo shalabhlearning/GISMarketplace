@@ -1,3 +1,4 @@
+// src/components/admin/ReviewPanel.tsx
 export default function ReviewPanel({ rfp, onClose, onAction }: any) {
   const attachments = rfp.attachments
     ? typeof rfp.attachments === 'string'

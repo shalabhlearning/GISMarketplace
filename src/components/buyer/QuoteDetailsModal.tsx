@@ -34,6 +34,7 @@ export default function QuoteDetailsModal({ quote, isOpen, onClose }: QuoteDetai
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ proposal_id: quote.proposal_id }),
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -42,10 +43,10 @@ export default function QuoteDetailsModal({ quote, isOpen, onClose }: QuoteDetai
       }
 
       onClose();
-      router.refresh();
+      router.refresh();   // Refresh current page to show updated status
     } catch (err: any) {
       console.error('Award error:', err);
-      alert(err.message);
+      alert(err.message || 'Failed to award contract');
     } finally {
       setLoading(false);
     }
@@ -68,9 +69,9 @@ export default function QuoteDetailsModal({ quote, isOpen, onClose }: QuoteDetai
           <div>
             <div className="text-3xl font-bold">{quote.provider_name} Quote for {quote.rfp_title}</div>
             <div className="text-sm font-mono mt-2 text-gray-700">
-              Quote ID: QT-{quote.proposal_id.slice(0, 8).toUpperCase()}
+              Quote ID: QT-{quote.proposal_id?.slice(0, 8).toUpperCase()}
             </div>
-            <div className="mt-2 text-lg">Status: {quote.status.toUpperCase()}</div>
+            <div className="mt-2 text-lg">Status: {quote.status?.toUpperCase()}</div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -100,12 +101,14 @@ export default function QuoteDetailsModal({ quote, isOpen, onClose }: QuoteDetai
             <h3 className="text-lg font-semibold mb-4">Payment Milestones</h3>
             {milestones.length > 0 ? (
               <div className="space-y-4">
-                {milestones.map((milestone: { phase: string; percentage: number }, idx: number) => (
+                {milestones.map((milestone: any, idx: number) => (
                   <div key={idx} className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
                     <CheckCircle className="w-5 h-5 text-green-600" />
                     <div>
-                      <div className="font-medium">{milestone.phase}</div>
-                      <div className="text-sm text-gray-600">{milestone.percentage}% of total quote</div>
+                      <div className="font-medium">{milestone.phase || milestone.title}</div>
+                      <div className="text-sm text-gray-600">
+                        {milestone.percentage ? `${milestone.percentage}% of total quote` : ''}
+                      </div>
                     </div>
                   </div>
                 ))}

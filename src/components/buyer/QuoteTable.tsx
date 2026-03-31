@@ -73,8 +73,6 @@ export default function QuoteTable({ quotes = [] }: QuoteTableProps) {
 
                   return (
                     <tr key={q.proposal_id} className="hover:bg-gray-50/70 transition-colors">
-                      
-                      {/* RFP */}
                       <td className="px-8 py-6">
                         <div className="font-medium text-gray-900">{q.rfp_title}</div>
                         <div className="text-sm text-gray-500 font-mono mt-1 tracking-tight">
@@ -82,7 +80,6 @@ export default function QuoteTable({ quotes = [] }: QuoteTableProps) {
                         </div>
                       </td>
 
-                      {/* Provider */}
                       <td className="px-6 py-6">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-700 font-medium">
@@ -92,29 +89,24 @@ export default function QuoteTable({ quotes = [] }: QuoteTableProps) {
                         </div>
                       </td>
 
-                      {/* Amount */}
                       <td className="px-6 py-6 text-center font-medium text-gray-900">
                         ${Number(q.bid_amount).toLocaleString()}
                       </td>
 
-                      {/* Timeline */}
                       <td className="px-6 py-6 text-center text-gray-600">
                         {timeline}
                       </td>
 
-                      {/* Docs */}
                       <td className="px-6 py-6 text-center font-medium text-gray-900">
                         {docsCount}
                       </td>
 
-                      {/* Status */}
                       <td className="px-6 py-6 text-center">
                         <span className={`inline-flex items-center px-5 py-1.5 text-xs font-semibold rounded-full uppercase tracking-wider ${statusStyles}`}>
                           {q.status.toUpperCase()}
                         </span>
                       </td>
 
-                      {/* Date */}
                       <td className="px-6 py-6 text-center text-gray-600">
                         {new Date(q.submitted).toLocaleDateString('en-US', {
                           month: 'short',
@@ -123,7 +115,6 @@ export default function QuoteTable({ quotes = [] }: QuoteTableProps) {
                         })}
                       </td>
 
-                      {/* Actions */}
                       <td className="px-8 py-6 text-center">
                         <button
                           onClick={() => handleViewQuote(q)}

@@ -8,7 +8,7 @@ interface RegisterModalProps {
   onSwitchToLogin: () => void;
 }
 
-type UserRole = 'buyer' | 'provider';
+type UserRole = 'buyer' | 'provider' | 'admin';
 
 interface FormData {
   role: UserRole;
@@ -43,7 +43,6 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
 
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Close modal when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
@@ -87,7 +86,6 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
     }
 
     try {
-      // Step 1: Check if user exists
       const checkRes = await fetch('/api/check-user', {
         method: 'POST',
         credentials: 'include',
@@ -102,7 +100,6 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
         return;
       }
 
-      // Step 2: Send OTPs
       const otpRes = await fetch('/api/send-otp', {
         method: 'POST',
         credentials: 'include',
@@ -146,7 +143,6 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
     const trimmedPhone = formData.phoneNumber.trim();
 
     try {
-      // Verify OTPs
       const verifyRes = await fetch('/api/verify-otp', {
         method: 'POST',
         credentials: 'include',
@@ -166,7 +162,6 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
         return;
       }
 
-      // Register user
       const registerPayload = {
         userType: formData.role,
         email: trimmedEmail,
@@ -176,8 +171,6 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
         hourlyRate: formData.role === 'provider' ? formData.hourlyRate : undefined,
         experienceYears: formData.role === 'provider' ? formData.experienceYears : undefined,
         portfolioUrl: formData.role === 'provider' ? formData.portfolioUrl : undefined,
-        dummyEmail,
-        dummyPhone,
       };
 
       const registerRes = await fetch('/api/register', {
@@ -194,7 +187,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
         setTimeout(() => {
           onClose();
           onSwitchToLogin();
-        }, 2000);
+        }, 1500);
       } else {
         setMessage(registerData.error || 'Registration failed');
       }
@@ -354,7 +347,6 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                 </>
               )}
 
-              {/* Dummy Mode Checkboxes - Dev Only */}
               <div className="space-y-2 pt-2">
                 <div className="flex items-center text-gray-500 gap-2">
                   <input
@@ -389,7 +381,6 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
               </button>
             </form>
           ) : (
-            // OTP Verification Form
             <>
               <button
                 onClick={handleBackToRegistration}
@@ -466,4 +457,4 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
       </div>
     </div>
   );
-} 
+}

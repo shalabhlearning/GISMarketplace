@@ -1,48 +1,44 @@
 'use client';
 
-import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { useTransition } from 'react';
-import {
-  Home,
-  FileText,
-  CheckSquare,
-  Award,
-  Clock,
-  PlusCircle,
-  MessageSquare,
-  Users,
-  Briefcase,
-  Receipt,
-} from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 export default function Sidebar() {
-  const router = useRouter();
-  const pathname = router.pathname;
-  const [isPending, startTransition] = useTransition();
+  const pathname = usePathname();
 
-  // Determine buyer or provider based on actual page routes
-  const isBuyer = pathname.startsWith('/Buyer');
+  const isBuyer = pathname?.startsWith('/buyer');
 
-  // Updated menu links to match your Pages Router files
   const buyerMenuItems = [
-    { name: 'Dashboard', icon: Home, href: '/Buyerpage' },
-    { name: 'Create RFP', icon: PlusCircle, href: '/BuyerCreatepage' },
-    { name: 'Received Quotes', icon: MessageSquare, href: '/BuyerQuotepage' },
-    { name: 'Awarded Providers', icon: Users, href: '/Buyerpage' },
-    { name: 'Ongoing Projects', icon: Briefcase, href: '/Buyerpage' },
-    { name: 'Invoices', icon: Receipt, href: '/Buyerpage' },
+    { name: 'Dashboard', href: '/buyer' },
+    { name: 'Create RFP',href: '/buyer/create' },
+    { name: 'Received Quotes',href: '/buyer/quote' },
+    { name: 'Awarded Providers',href: '/buyer' },
+    { name: 'Ongoing Projects',href: '/buyer' },
+    { name: 'Invoices',href: '/buyer' },
   ];
 
   const providerMenuItems = [
-    { name: 'Dashboard', icon: Home, href: '/Providerpage' },
-    { name: 'Available Projects', icon: FileText, href: '/ProviderAvailablepage' },
-    { name: 'Submitted Quotes', icon: CheckSquare, href: '/ProviderQuotepage' },
-    { name: 'Awarded Projects', icon: Award, href: '/Providerpage' },
-    { name: 'Ongoing Projects', icon: Clock, href: '/Providerpage' },
+    { name: 'Dashboard',href: '/provider' },
+    { name: 'Available Projects', href: '/provider/available' },
+    { name: 'Submitted Quotes', href: '/provider/quote' },
+    { name: 'Awarded Projects', href: '/provider' },
+    { name: 'Ongoing Projects', href: '/provider' },
   ];
 
   const menuItems = isBuyer ? buyerMenuItems : providerMenuItems;
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      window.location.href = '/';   // Clean redirect to home
+    } catch (err) {
+      console.error(err);
+      window.location.href = '/';
+    }
+  };
 
   return (
     <aside className="w-64 bg-white border-r h-screen flex flex-col sticky top-0 shadow-sm">
@@ -57,7 +53,6 @@ export default function Sidebar() {
 
       <nav className="px-4 space-y-1 flex-1">
         {menuItems.map((item) => {
-          const Icon = item.icon;
           const isActive = pathname === item.href;
 
           return (
@@ -70,37 +65,20 @@ export default function Sidebar() {
                   : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <Icon className={`w-5 h-5 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
+              <span className="text-xl">{item.icon}</span>
               <span className="text-sm">{item.name}</span>
             </Link>
           );
         })}
       </nav>
 
-      {/* Logout Button with loading state */}
       <div className="p-4 border-t border-gray-50">
-        <form
-          action="/api/auth/logout"
-          method="POST"
-          onSubmit={(e) => {
-            e.preventDefault();
-            startTransition(() => {
-              (e.currentTarget as HTMLFormElement).submit();
-            });
-          }}
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 text-sm rounded-xl transition-colors text-gray-500 hover:bg-red-50 hover:text-red-600"
         >
-          <button
-            type="submit"
-            disabled={isPending}
-            className={`w-full flex items-center gap-3 px-4 py-3 text-sm rounded-xl transition-colors ${
-              isPending
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'text-gray-500 hover:bg-red-50 hover:text-red-600'
-            }`}
-          >
-            {isPending ? 'Logging out...' : 'Log Out'}
-          </button>
-        </form>
+          Log Out
+        </button>
       </div>
     </aside>
   );

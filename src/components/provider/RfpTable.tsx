@@ -20,8 +20,10 @@ export default function RfpTable({
 
   const handleViewRfp = (rfp: any) => {
     if (isBuyer) {
-      router.push(`/dashboard/buyer/quotes?project_id=${rfp.project_id}`);
+      // For buyer, go to quotes page with filter (if needed)
+      router.push(`/buyer/quote`);
     } else {
+      // For provider, open modal
       setSelectedRfp(rfp);
       setIsModalOpen(true);
     }
@@ -53,7 +55,6 @@ export default function RfpTable({
               ) : (
                 rfps.map((r) => (
                   <tr key={r.project_id} className="hover:bg-gray-50/70 transition-colors">
-                    {/* RFP Details */}
                     <td className="px-8 py-6">
                       <div className="font-medium text-gray-900">{r.title || 'Untitled RFP'}</div>
                       <div className="text-sm text-gray-500 font-mono mt-1 tracking-tight">
@@ -61,12 +62,9 @@ export default function RfpTable({
                       </div>
                     </td>
 
-                    {/* Status */}
-                    {/* Inside RfpTable component - replace the Status column */}
-
                     <td className="px-6 py-6 text-center">
                       <span className={`inline-flex items-center px-5 py-1.5 text-xs font-semibold rounded-full uppercase tracking-wider
-    ${r.status === 'in_review' ? 'bg-amber-600 text-white' :
+                        ${r.status === 'in_review' ? 'bg-amber-600 text-white' :
                           r.status === 'open' ? 'bg-emerald-600 text-white' :
                             'bg-gray-600 text-white'}`}>
                         {r.status === 'in_review' ? 'UNDER REVIEW' :
@@ -74,28 +72,24 @@ export default function RfpTable({
                       </span>
                     </td>
 
-                    {/* Budget */}
                     <td className="px-6 py-6 text-center font-medium text-gray-900">
                       {r.budget ? `$${Number(r.budget).toLocaleString()}` : 'Negotiable'}
                     </td>
 
-                    {/* Date */}
                     <td className="px-6 py-6 text-center text-gray-600">
                       {r.created_at
                         ? new Date(r.created_at).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric'
-                        })
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                          })
                         : '—'}
                     </td>
 
-                    {/* Credits Required */}
                     <td className="px-6 py-6 text-center font-medium text-gray-900">
                       20
                     </td>
 
-                    {/* Actions */}
                     <td className="px-8 py-6 text-center">
                       <button
                         onClick={() => handleViewRfp(r)}
