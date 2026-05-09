@@ -17,9 +17,9 @@ export default function ProviderPage() {
     const init = async () => {
       try {
         const res = await fetch('/api/auth/me', { credentials: 'include' });
-        const data = await res.json();
+        const userData = await res.json();
 
-        if (!data.user || data.user.user_type !== 'provider') {
+        if (!userData.user || userData.user.user_type !== 'provider') {
           window.location.assign('/');
           return;
         }
@@ -30,10 +30,12 @@ export default function ProviderPage() {
 
         const dashboardData = await dashboardRes.json();
 
+        console.log("Dashboard API Response:", dashboardData);   // ← Check this in browser console
+
         setRfps(dashboardData.rfps || []);
-        setHasSubscription(dashboardData.hasSubscription);
+        setHasSubscription(dashboardData.hasSubscription || false);
       } catch (err) {
-        console.error(err);
+        console.error("Dashboard fetch error:", err);
       } finally {
         setLoading(false);
       }
@@ -54,13 +56,13 @@ export default function ProviderPage() {
         <section>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-800">
-              Available RFPs
+              Latest Available RFPs
             </h2>
             <Link
               href="/provider/available"
-              className="text-blue-600 hover:text-blue-800 font-medium"
+              className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
             >
-              View All →
+              View All <span aria-hidden="true">→</span>
             </Link>
           </div>
 

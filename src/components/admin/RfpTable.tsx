@@ -1,29 +1,89 @@
-// src/components/admin/RfpTable.tsx
-export default function RfpTable({ rfps, onSelect }: any) {
+'use client';
+
+import { useState, useEffect, useMemo } from 'react';
+
+type FilterType = 'all' | 'in_review' | 'open' | 'closed';
+
+export default function RfpTable({ onSelect }: { onSelect: (rfp: any) => void }) {
+  const [rfps, setRfps] = useState<any[]>([]);
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [loading, setLoading] = useState(true);
+
+  const fetchRfps = async (status: string = 'all') => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/admin/rfp/list?status=${status}`);
+      const data = await res.json();
+      setRfps(data.rfps || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch when filter changes
+  useEffect(() => {
+    fetchRfps(activeFilter);
+  }, [activeFilter]);
+
+  const filteredRfps = useMemo(() => rfps, [rfps]);
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'in_review':
+        return <span className="px-4 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-700">Pending Review</span>;
+      case 'open':
+        return <span className="px-4 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-700">Approved</span>;
+      case 'closed':
+        return <span className="px-4 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700">Rejected</span>;
+      default:
+        return <span className="px-4 py-1 text-xs font-medium rounded-full bg-gray-100">{status}</span>;
+    }
+  };
+
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Filter Tabs */}
       <div className="px-8 py-5 border-b flex items-center justify-between bg-gray-50">
         <div className="flex gap-8 text-sm font-medium">
-          <span className="text-blue-600 border-b-2 border-blue-600 pb-1">All</span>
-          <span className="text-gray-600 hover:text-gray-900 cursor-pointer">Pending Review</span>
-          <span className="text-gray-600 hover:text-gray-900 cursor-pointer">Approved</span>
-          <span className="text-gray-600 hover:text-gray-900 cursor-pointer">Rejected</span>
+          {[
+            { key: 'all', label: 'All' },
+            { key: 'in_review', label: 'Pending Review' },
+            { key: 'open', label: 'Approved' },
+            { key: 'closed', label: 'Rejected' },
+          ].map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setActiveFilter(key as FilterType)}
+              className={`pb-1 transition-colors ${
+                activeFilter === key 
+                  ? 'text-blue-600 border-b-2 border-blue-600' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
-        <div className="text-sm text-gray-500 flex items-center gap-1">
-          Sort by: Newest <span className="text-xs">▼</span>
+
+        <div className="text-sm text-gray-500">
+          {filteredRfps.length} submissions
         </div>
       </div>
 
-      {rfps.length === 0 ? (
+      {loading ? (
+        <div className="py-24 text-center">Loading...</div>
+      ) : filteredRfps.length === 0 ? (
         <div className="py-24 text-center text-gray-400 text-lg">
-          No RFPs in review queue
+          No RFPs found
         </div>
       ) : (
         <table className="w-full">
           <thead>
             <tr className="border-b bg-gray-50 text-xs uppercase text-gray-500">
               <th className="p-5 text-left font-medium">SUBMISSION ID</th>
-              <th className="p-5 text-left font-medium">RFP TITLE & CONTEXT</th>
+              <th className="p-5 text-left font-medium">RFP TITLE</th>
               <th className="p-5 text-left font-medium">BUYER</th>
               <th className="p-5 text-left font-medium">DATE</th>
               <th className="p-5 text-left font-medium">STATUS</th>
@@ -31,30 +91,26 @@ export default function RfpTable({ rfps, onSelect }: any) {
             </tr>
           </thead>
           <tbody className="divide-y text-sm">
-            {rfps.map((rfp: any) => (
+            {filteredRfps.map((rfp: any) => (
               <tr key={rfp.project_id} className="hover:bg-gray-50 transition-colors">
-                <td className="p-5 font-mono text-gray-600">{rfp.project_id.slice(0, 8)}...</td>
+                <td className="p-5 font-mono text-gray-600">{rfp.project_id?.slice(0, 8)}...</td>
                 <td className="p-5">
                   <div className="font-medium text-gray-900">{rfp.title}</div>
                   <div className="text-gray-500 text-xs line-clamp-1 mt-1">{rfp.description}</div>
                 </td>
                 <td className="p-5 text-gray-700">{rfp.buyer_name}</td>
                 <td className="p-5 text-gray-600">
-                  {new Date(rfp.created_at).toLocaleDateString('en-US', { 
-                    month: 'short', day: 'numeric', year: 'numeric' 
+                  {new Date(rfp.created_at).toLocaleDateString('en-US', {
+                    month: 'short', day: 'numeric', year: 'numeric'
                   })}
                 </td>
-                <td className="p-5">
-                  <span className="px-4 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-700">
-                    Pending
-                  </span>
-                </td>
+                <td className="p-5">{getStatusBadge(rfp.status)}</td>
                 <td className="p-5 text-right pr-10">
                   <button
                     onClick={() => onSelect(rfp)}
                     className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 ml-auto"
                   >
-                    Review <span>→</span>
+                    Review →
                   </button>
                 </td>
               </tr>

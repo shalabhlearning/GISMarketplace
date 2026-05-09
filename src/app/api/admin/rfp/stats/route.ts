@@ -4,13 +4,29 @@ import { query } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
-    const [approvedResult, topBuyerResult] = await Promise.all([
+    const [pendingResult, approvedResult, rejectedResult, topBuyerResult] = await Promise.all([
+      // Total Pending
       query(`
         SELECT COUNT(*) as count 
         FROM projectrequest 
-        WHERE status = 'open' 
-          AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        WHERE status = 'in_review'
       `),
+
+      // Total Approved (All time)
+      query(`
+        SELECT COUNT(*) as count 
+        FROM projectrequest 
+        WHERE status = 'open'
+      `),
+
+      // Total Rejected (All time)
+      query(`
+        SELECT COUNT(*) as count 
+        FROM projectrequest 
+        WHERE status = 'closed'
+      `),
+
+      // Top Buyer
       query(`
         SELECT bp.organization_name as buyer_name, COUNT(*) as count
         FROM projectrequest pr
@@ -23,7 +39,9 @@ export async function GET(req: NextRequest) {
     ]);
 
     return NextResponse.json({
-      approvedThisWeek: approvedResult[0]?.count || 0,
+      totalPending: pendingResult[0]?.count || 0,
+      totalApproved: approvedResult[0]?.count || 0,
+      totalRejected: rejectedResult[0]?.count || 0,
       topBuyer: topBuyerResult[0]?.buyer_name || 'No activity yet'
     });
   } catch (err) {

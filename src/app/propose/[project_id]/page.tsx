@@ -1,4 +1,3 @@
-// src/app/propose/[project_id]/page.tsx
 'use client';
 
 import { useParams } from 'next/navigation';
@@ -28,7 +27,8 @@ export default function ProposePage() {
 
         if (res.ok) {
           const data = await res.json();
-          setRfp(data);
+          // FIXED: Extract the actual rfp object
+          setRfp(data.rfp || data);
         } else {
           if (res.status === 404) {
             setError('RFP not found or no longer available.');
@@ -68,7 +68,7 @@ export default function ProposePage() {
   }
 
   return (
-    <DashboardShell title="Submit Quote">
+    <DashboardShell title={rfp.title || "Submit Quote"}>
       <SubmitQuoteForm rfp={rfp} />
     </DashboardShell>
   );

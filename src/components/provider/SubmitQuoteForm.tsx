@@ -50,7 +50,7 @@ export default function SubmitQuoteForm({ rfp }: { rfp: any }) {
 
   const handleSaveDraft = async () => {
     try {
-      const res = await fetch('/api/proposal/save-draft', {
+      const res = await fetch('/api/proposal/save-drafts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

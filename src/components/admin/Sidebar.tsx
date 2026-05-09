@@ -1,58 +1,69 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
 export default function Sidebar() {
+  const pathname = usePathname();
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      window.location.href = '/';
+    } catch (err) {
+      console.error(err);
+      window.location.href = '/';
+    }
+  };
+
   return (
-    <div className="w-72 bg-white border-r border-gray-200 h-screen flex flex-col">
+    <aside className="w-72 bg-white border-r border-gray-200 h-screen flex flex-col shadow-sm">
       {/* Logo */}
-      <div className="px-8 py-8 border-b border-gray-100">
-        <h1 className="text-2xl font-bold text-blue-600">AdminGate</h1>
+      <div className="px-8 py-7 border-b border-gray-100">
+        <h1 className="text-3xl font-bold text-blue-600">AdminGate</h1>
       </div>
 
-      {/* Main Menu */}
-      <div className="px-6 py-8">
-        <p className="text-xs uppercase tracking-widest text-gray-500 mb-4">MAIN MENU</p>
+      {/* Menu */}
+      <nav className="px-6 py-8 flex-1">
         
         <div className="space-y-1">
-          <div className="px-4 py-3 text-sm font-medium bg-blue-50 text-blue-700 rounded-2xl flex items-center gap-3">
+          <Link
+            href="/admin"
+            className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all ${
+              pathname === '/admin'
+                ? 'bg-blue-50 text-blue-700'
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
             RFP Review Queue
-          </div>
+          </Link>
 
-          <div className="px-4 py-3 text-sm text-gray-600 hover:bg-gray-100 rounded-2xl cursor-pointer flex items-center gap-3">
+          <Link
+            href="/admin/dashboard"
+            className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all ${
+              pathname === '/admin/dashboard'
+                ? 'bg-blue-50 text-blue-700'
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
             Dashboard
-          </div>
-
-          <div className="px-4 py-3 text-sm text-gray-600 hover:bg-gray-100 rounded-2xl cursor-pointer flex items-center gap-3">
-            Provider Directory
-          </div>
-
-          <div className="px-4 py-3 text-sm text-gray-600 hover:bg-gray-100 rounded-2xl cursor-pointer flex items-center gap-3">
-            Analytics
-          </div>
+          </Link>
         </div>
-      </div>
+      </nav>
 
-      {/* Settings */}
-      <div className="px-6 mt-auto pb-8">
-        <p className="text-xs uppercase tracking-widest text-gray-500 mb-4">SETTINGS</p>
-        
-        <div className="space-y-1">
-          <div className="px-4 py-3 text-sm text-gray-600 hover:bg-gray-100 rounded-2xl cursor-pointer flex items-center gap-3">
-            Governance Rules
-          </div>
-          <div className="px-4 py-3 text-sm text-gray-600 hover:bg-gray-100 rounded-2xl cursor-pointer flex items-center gap-3">
-            Audit Logs
-          </div>
-        </div>
-      </div>
+      {/* Bottom Section */}
+      <div className="mt-auto border-t border-gray-100 p-4">
 
-      {/* Bottom User Info */}
-      <div className="border-t border-gray-100 p-6 mt-auto">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-gray-300 rounded-full"></div>
-          <div>
-            <p className="font-medium text-sm">Alex Miller</p>
-            <p className="text-xs text-gray-500">Head Administrator</p>
-          </div>
-        </div>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 p-4 mb-8  text-sm font-medium text-red-600 hover:bg-red-50 rounded-2xl transition-colors"
+        >
+          Logout
+        </button>
       </div>
-    </div>
+    </aside>
   );
 }

@@ -5,20 +5,22 @@ export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const sessionToken = req.cookies.get('session_token')?.value;
 
-  // Public routes (no auth needed)
+  // ✅ Public routes (no auth required)
   const isPublicRoute = 
     path === '/' ||
     path.startsWith('/api/auth') ||
     path.startsWith('/api/login') ||
     path.startsWith('/api/register') ||
     path.startsWith('/api/send-otp') ||
-    path.startsWith('/api/verify-otp');
+    path.startsWith('/api/verify-otp') ||
+    path.startsWith('/api/rfp') ||           // ← ADD THIS
+    path.startsWith('/api/proposal');        // ← Already had this
 
   if (isPublicRoute) {
     return NextResponse.next();
   }
 
-  // No session token → redirect to home
+  // No session → redirect to login/home
   if (!sessionToken) {
     return NextResponse.redirect(new URL('/', req.url));
   }
@@ -49,11 +51,9 @@ export async function middleware(req: NextRequest) {
     if (path.startsWith('/admin') && user.user_type !== 'admin') {
       return NextResponse.redirect(new URL('/', req.url));
     }
-
     if (path.startsWith('/buyer') && user.user_type !== 'buyer') {
       return NextResponse.redirect(new URL('/', req.url));
     }
-
     if (path.startsWith('/provider') && user.user_type !== 'provider') {
       return NextResponse.redirect(new URL('/', req.url));
     }
@@ -73,5 +73,7 @@ export const config = {
     '/admin/:path*',
     '/propose/:path*',
     '/subscribe/:path*',
+    '/api/rfp/:path*',        // ← ADD THIS
+    '/api/proposal/:path*',
   ],
 };

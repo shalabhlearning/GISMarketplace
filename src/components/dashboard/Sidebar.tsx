@@ -19,7 +19,7 @@ export default function Sidebar() {
 
   const providerMenuItems = [
     { name: 'Dashboard',href: '/provider' },
-    { name: 'Available Projects', href: '/provider/available' },
+    { name: 'Available RFPs', href: '/provider/available' },
     { name: 'Submitted Quotes', href: '/provider/quote' },
     { name: 'Awarded Projects', href: '/provider' },
     { name: 'Ongoing Projects', href: '/provider' },
