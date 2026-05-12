@@ -1,20 +1,23 @@
-// next.config.ts
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
-  // Keep this (silences the mixed config warning)
+  // Important: Allow pdf-parse to work in Server Components / API Routes
+  experimental: {
+    serverComponentsExternalPackages: ['pdf-parse'],
+  },
+
+  // Turbopack config (if you're using it)
   turbopack: {
     resolveAlias: {
       net: false,
       tls: false,
       fs: false,
-      // If more appear later (dns, crypto, etc.), add them here
     },
   },
 
-  // Keep images
+  // Image configuration
   images: {
     remotePatterns: [
       {
@@ -24,7 +27,7 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Optional: keep webpack fallback as safety net for hybrid cases
+  // Webpack fallback (safety net)
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {

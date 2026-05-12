@@ -1,8 +1,8 @@
-// src/app/buyer/create/page.tsx
 'use client';
 
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Calendar,
   FileText,
@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 
 export default function CreateRFPPage() {
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -38,27 +40,22 @@ export default function CreateRFPPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<any>(null);
 
-  // ✅ NEW STATES
   const [drafts, setDrafts] = useState<any[]>([]);
   const [showDraftModal, setShowDraftModal] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // ✅ LOAD LATEST DRAFT
+  // Load latest draft
   useEffect(() => {
     const loadDraft = async () => {
       try {
         const res = await fetch('/api/rfp/get-draft', {
           credentials: 'include',
         });
-
         const data = await res.json();
-
-        console.log("🟢 LOADED DRAFT:", data);
 
         if (data) {
           const draft = Array.isArray(data) ? data[0] : data;
-
           setFormData((prev) => ({
             ...prev,
             title: draft.title || '',
@@ -112,31 +109,21 @@ export default function CreateRFPPage() {
     }));
   };
 
-  // ✅ SAVE DRAFT
   const handleSaveDraft = async () => {
     try {
-      console.log("📤 SENDING DRAFT:", formData);
-
       const res = await fetch('/api/rfp/save-draft', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          attachments: [],
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, attachments: [] }),
         credentials: 'include',
       });
 
       const data = await res.json();
 
-      console.log("🟢 RESPONSE:", data);
-
       if (res.ok) {
         setMessage({ text: 'Draft saved successfully!', type: 'success' });
       } else {
-        setMessage({ text: data.error, type: 'error' });
+        setMessage({ text: data.error || 'Failed to save draft', type: 'error' });
       }
     } catch (err) {
       console.error("❌ SAVE ERROR:", err);
@@ -144,7 +131,6 @@ export default function CreateRFPPage() {
     }
   };
 
-  // ✅ SUBMIT
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setLoading(true);
@@ -179,7 +165,15 @@ export default function CreateRFPPage() {
       const data = await res.json();
 
       if (res.ok) {
-        setMessage({ text: 'RFP created successfully! It is now in Admin Review Queue.', type: 'success' });
+        setMessage({
+          text: 'RFP created successfully! Redirecting to dashboard...',
+          type: 'success'
+        });
+
+        // Redirect to Buyer Dashboard after showing success message
+        setTimeout(() => {
+          router.push('/buyer');
+        }, 1500);
       } else {
         setMessage({ text: data.error || 'Failed to create RFP', type: 'error' });
       }
@@ -449,7 +443,6 @@ export default function CreateRFPPage() {
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-4 pt-10 border-t border-gray-100">
-
               <button
                 type="button"
                 onClick={handleSaveDraft}
@@ -463,14 +456,10 @@ export default function CreateRFPPage() {
                 type="button"
                 onClick={async () => {
                   try {
-                    console.log("📂 Fetching drafts...");
                     const res = await fetch('/api/rfp/get-drafts', {
                       credentials: 'include',
                     });
-
                     const data = await res.json();
-                    console.log("🟢 Drafts:", data);
-
                     setDrafts(Array.isArray(data) ? data : []);
                     setShowDraftModal(true);
                   } catch (err) {
@@ -491,80 +480,15 @@ export default function CreateRFPPage() {
                 {loading ? 'Publishing...' : 'Publish RFP'}
               </button>
             </div>
-
           </form>
 
-          {/* MESSAGE */}
+          {/* Message */}
           {message && (
-            <p
-              className={`text-center mt-6 ${message.type === 'success' ? 'text-green-600' : 'text-red-600'
-                }`}
-            >
+            <p className={`text-center mt-6 font-medium ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
               {message.text}
             </p>
           )}
-
         </div>
-
-        {/* 🔥 DRAFT MODAL */}
-        {showDraftModal && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-            <div className="bg-white w-full max-w-2xl rounded-2xl p-6 shadow-xl">
-
-              <h2 className="text-xl font-bold text-black mb-4">Saved Drafts</h2>
-
-              {drafts.length === 0 && (
-                <p className="text-gray-500">No drafts found</p>
-              )}
-
-              {drafts.length > 0 && (
-                <div className="space-y-3 max-h-[400px] overflow-y-auto">
-                  {drafts.map((d, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => {
-                        console.log("📥 Loading draft:", d);
-
-                        setFormData({
-                          title: d.title || '',
-                          description: d.description || '',
-                          budget: d.budget || '',
-                          currency: d.currency || 'USD',
-                          startDate: d.start_date || '',
-                          endDate: d.end_date || '',
-                          submissionDeadline: d.submission_deadline || '',
-                          visibility: d.visibility || 'public',
-                          contactPerson: d.contact_person || '',
-                          contactEmail: d.contact_email || '',
-                          credits: d.credits || '0',
-                          attachments: [],
-                        });
-
-                        setShowDraftModal(false);
-                      }}
-                      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
-                    >
-                      <p className="font-medium text-gray-900">
-                        {d.title || 'Untitled Draft'}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {d.description ? d.description.slice(0, 80) : 'No description'}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <button
-                onClick={() => setShowDraftModal(false)}
-                className="mt-5 px-5 py-2 bg-gray-800 rounded-lg hover:bg-gray-500"
-              >
-                Close
-              </button>
-
-            </div>
-          </div>
-        )}
 
         {/* Live Preview Sidebar */}
         <div className="lg:block hidden">
@@ -610,13 +534,7 @@ export default function CreateRFPPage() {
                     <Calendar className="w-4 h-4 text-blue-600" /> Start Date
                   </div>
                   <div className="text-gray-900 font-medium">
-                    {formData.startDate
-                      ? new Date(formData.startDate).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })
-                      : '—'}
+                    {formData.startDate ? new Date(formData.startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}
                   </div>
                 </div>
 
@@ -625,13 +543,7 @@ export default function CreateRFPPage() {
                     <Calendar className="w-4 h-4 text-blue-600" /> End Date
                   </div>
                   <div className="text-gray-900 font-medium">
-                    {formData.endDate
-                      ? new Date(formData.endDate).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })
-                      : '—'}
+                    {formData.endDate ? new Date(formData.endDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}
                   </div>
                 </div>
               </div>
@@ -641,15 +553,9 @@ export default function CreateRFPPage() {
                   <Clock className="w-4 h-4 text-blue-600" /> Submission Deadline
                 </div>
                 <div className="text-gray-900 font-medium">
-                  {formData.submissionDeadline
-                    ? new Date(formData.submissionDeadline).toLocaleString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })
-                    : '—'}
+                  {formData.submissionDeadline ? new Date(formData.submissionDeadline).toLocaleString('en-US', {
+                    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                  }) : '—'}
                 </div>
               </div>
 
@@ -689,6 +595,57 @@ export default function CreateRFPPage() {
           </div>
         </div>
       </div>
+
+      {/* Draft Modal */}
+      {showDraftModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white w-full max-w-2xl rounded-2xl p-6 shadow-xl">
+            <h2 className="text-xl font-bold text-black mb-4">Saved Drafts</h2>
+
+            {drafts.length === 0 && <p className="text-gray-500">No drafts found</p>}
+
+            {drafts.length > 0 && (
+              <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                {drafts.map((d, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      setFormData({
+                        title: d.title || '',
+                        description: d.description || '',
+                        budget: d.budget || '',
+                        currency: d.currency || 'USD',
+                        startDate: d.start_date || '',
+                        endDate: d.end_date || '',
+                        submissionDeadline: d.submission_deadline || '',
+                        visibility: d.visibility || 'public',
+                        contactPerson: d.contact_person || '',
+                        contactEmail: d.contact_email || '',
+                        credits: d.credits || '0',
+                        attachments: [],
+                      });
+                      setShowDraftModal(false);
+                    }}
+                    className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                  >
+                    <p className="font-medium text-gray-900">{d.title || 'Untitled Draft'}</p>
+                    <p className="text-sm text-gray-500">
+                      {d.description ? d.description.slice(0, 80) : 'No description'}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <button
+              onClick={() => setShowDraftModal(false)}
+              className="mt-5 px-5 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </DashboardShell>
   );
 }
