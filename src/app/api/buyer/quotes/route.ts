@@ -1,51 +1,41 @@
 // src/app/api/buyer/quotes/route.ts
+// Now returns RFPs with quote counts (for the landing page cards)
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
     const sessionToken = req.cookies.get('session_token')?.value;
-
-    if (!sessionToken) {
-      return NextResponse.json({ quotes: [] }, { status: 401 });
-    }
+    if (!sessionToken) return NextResponse.json({ rfps: [] }, { status: 401 });
 
     const sessionRows: any[] = await query(
-      `SELECT user_id FROM sessions 
-       WHERE session_token = ? AND expires > NOW()`,
+      `SELECT user_id FROM sessions WHERE session_token = ? AND expires > NOW()`,
       [sessionToken]
     );
-
-    if (!sessionRows.length) {
-      return NextResponse.json({ quotes: [] }, { status: 401 });
-    }
+    if (!sessionRows.length) return NextResponse.json({ rfps: [] }, { status: 401 });
 
     const buyerId = sessionRows[0].user_id;
 
-    const quotes = await query(
-      `
-      SELECT 
-        p.proposal_id,
-        p.project_id,
-        p.bid_amount,
-        p.proposal_message,
-        p.status,
-        p.credits_used,
-        p.created_at AS submitted,
-        pr.title AS rfp_title,
-        u.email AS provider_name
-      FROM proposal p
-      JOIN projectrequest pr ON p.project_id = pr.project_id
-      JOIN user u ON p.provider_id = u.user_id
-      WHERE pr.buyer_id = ?
-      ORDER BY p.created_at DESC
-      `,
+    const rfps = await query(
+      `SELECT
+        pr.project_id,
+        pr.title,
+        pr.status,
+        pr.budget,
+        pr.submission_deadline,
+        pr.created_at,
+        COUNT(p.proposal_id) AS quotes_count
+       FROM projectrequest pr
+       LEFT JOIN proposal p ON p.project_id = pr.project_id
+       WHERE pr.buyer_id = ?
+       GROUP BY pr.project_id
+       ORDER BY pr.created_at DESC`,
       [buyerId]
     );
 
-    return NextResponse.json({ quotes });
+    return NextResponse.json({ rfps });
   } catch (err) {
     console.error('Buyer quotes fetch error:', err);
-    return NextResponse.json({ quotes: [] }, { status: 500 });
+    return NextResponse.json({ rfps: [] }, { status: 500 });
   }
 }

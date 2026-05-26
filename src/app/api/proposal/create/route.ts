@@ -1,7 +1,7 @@
-// src/app/api/proposal/create/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { randomUUID } from 'crypto';
+import { debitProviderCredits } from '@/lib/providerCredits';
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,12 +37,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if project exists
-    const projectCheck = await db.query("SELECT project_id FROM projectrequest WHERE project_id = ?", [projectId]);
+    const projectCheck = await db.query(
+      "SELECT project_id FROM projectrequest WHERE project_id = ?", 
+      [projectId]
+    );
     if (projectCheck.length === 0) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
-    // 🔥 NEW: Prevent duplicate submission
+    // Prevent duplicate submission
     const existingProposal = await db.query(
       `SELECT proposal_id FROM proposal 
        WHERE project_id = ? AND provider_id = ? AND status = 'submitted'`,
@@ -65,6 +68,7 @@ export async function POST(req: NextRequest) {
 
     const proposalId = randomUUID();
 
+    // Insert Proposal
     await db.query(
       `INSERT INTO proposal 
        (proposal_id, project_id, provider_id, bid_amount, proposal_message, status, credits_used)
@@ -72,7 +76,14 @@ export async function POST(req: NextRequest) {
       [proposalId, projectId, providerId, bidAmount, proposalDetails]
     );
 
-    console.log(`✅ Quote Submitted! Proposal ID: ${proposalId}`);
+    // Deduct 20 Credits
+    await debitProviderCredits(
+      providerId, 
+      20, 
+      `Proposal submission for project ${projectId}`
+    );
+
+    console.log(`✅ Quote Submitted! Proposal ID: ${proposalId} | 20 credits deducted`);
 
     return NextResponse.json({ 
       success: true, 

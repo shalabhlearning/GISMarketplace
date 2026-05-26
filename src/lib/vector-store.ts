@@ -2,111 +2,163 @@
 import PDFParser from 'pdf2json';
 import fs from 'fs/promises';
 import path from 'path';
-import { ChatGroq } from "@langchain/groq";
+import { ChatGroq } from '@langchain/groq';
+import { query } from '@/lib/db';
 
-export async function analyzeRfpWithRAG(projectId: string, attachmentPaths: string[]) {
-  try {
-    const pdfPaths = attachmentPaths.filter(p =>
-      typeof p === 'string' && p.toLowerCase().endsWith('.pdf')
-    );
+const llm = new ChatGroq({ model: 'llama-3.3-70b-versatile', temperature: 0.1 });
 
-    console.log(`📎 Total attachments: ${attachmentPaths.length}, PDFs found: ${pdfPaths.length}`);
+// ─────────────────────────────────────────────────────────────
+// Shared: extract text from PDF attachments
+// ─────────────────────────────────────────────────────────────
+async function extractPdfText(attachmentPaths: string[]): Promise<string> {
+  const pdfPaths = attachmentPaths.filter(p =>
+    typeof p === 'string' && p.toLowerCase().endsWith('.pdf')
+  );
 
-    if (pdfPaths.length === 0) {
-      throw new Error(`No PDF files found. Available attachments: ${attachmentPaths.join(', ')}`);
-    }
+  if (pdfPaths.length === 0) {
+    throw new Error(`No PDF attachments found. Got: ${attachmentPaths.join(', ')}`);
+  }
 
-    let fullText = '';
+  let fullText = '';
 
-    for (const relPath of pdfPaths) {
-      const fullPath = path.join(process.cwd(), "public", relPath);
-      console.log(`📄 Reading: ${fullPath}`);
+  for (const relPath of pdfPaths) {
+    const fullPath = path.join(process.cwd(), 'public', relPath);
+    const buffer = await fs.readFile(fullPath);
+    const pdfParser = new PDFParser();
 
-      const buffer = await fs.readFile(fullPath);
-      const pdfParser = new PDFParser();
-
-      const pageText = await new Promise<string>((resolve, reject) => {
-        pdfParser.on("pdfParser_dataReady", (pdfData: any) => {
-          let text = '';
-          pdfData.Pages.forEach((page: any) => {
-            page.Texts.forEach((textItem: any) => {
-              try {
-                if (textItem.R && textItem.R[0] && textItem.R[0].T) {
-                  text += decodeURIComponent(textItem.R[0].T) + ' ';
-                }
-              } catch {
-                text += ' ';
-              }
-            });
-            text += '\n\n';
-          });
-          resolve(text);
-        });
-
-        pdfParser.on("pdfParser_dataError", reject);
-        pdfParser.parseBuffer(buffer);
+    const pageText = await new Promise<string>((resolve, reject) => {
+      pdfParser.on('pdfParser_dataReady', (pdfData: any) => {
+        let text = '';
+        for (const page of pdfData.Pages) {
+          for (const item of page.Texts) {
+            try { text += decodeURIComponent(item.R?.[0]?.T ?? '') + ' '; } catch { text += ' '; }
+          }
+          text += '\n\n';
+        }
+        resolve(text);
       });
-
-      fullText += pageText + '\n\n';
-    }
-
-    if (!fullText.trim()) {
-      throw new Error("Could not extract meaningful text from PDF(s)");
-    }
-
-    console.log(`✅ Extracted ${fullText.length} characters from PDFs`);
-
-    const llm = new ChatGroq({
-      model: "llama-3.3-70b-versatile",
-      temperature: 0.1,
+      pdfParser.on('pdfParser_dataError', reject);
+      pdfParser.parseBuffer(buffer);
     });
 
-    const prompt = `
+    fullText += pageText + '\n\n';
+  }
+
+  if (!fullText.trim()) throw new Error('Could not extract text from PDF(s)');
+
+  console.log(`✅ Extracted ${fullText.length} chars from ${pdfPaths.length} PDF(s)`);
+  return fullText;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Shared: call LLM and parse JSON response
+// ─────────────────────────────────────────────────────────────
+async function callLlm(prompt: string): Promise<any> {
+  const response = await llm.invoke(prompt);
+  let content = typeof response.content === 'string'
+    ? response.content
+    : JSON.stringify(response.content);
+
+  content = content.replace(/```json|```/g, '').trim();
+  const start = content.indexOf('{');
+  const end = content.lastIndexOf('}');
+  if (start === -1 || end === -1) throw new Error('LLM did not return valid JSON');
+  return JSON.parse(content.slice(start, end + 1));
+}
+
+// ─────────────────────────────────────────────────────────────
+// Shared: fetch all distinct skills from providerprofile
+// Auto-updates as new providers join with new skills
+// ─────────────────────────────────────────────────────────────
+async function fetchPlatformSkills(): Promise<string[]> {
+  try {
+    const rows = await query(`
+      SELECT DISTINCT jt.skill_value
+      FROM providerprofile,
+      JSON_TABLE(skills, '$[*]' COLUMNS (skill_value VARCHAR(100) PATH '$')) AS jt
+      WHERE skills IS NOT NULL
+      ORDER BY jt.skill_value ASC
+    `);
+    return rows.map((r: any) => r.skill_value).filter(Boolean);
+  } catch {
+    console.warn('⚠️ Could not fetch platform skills — taxonomy will be empty');
+    return [];
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// EXPORT 1: Full AI analysis for provider "AI Analyzer" button
+// Returns rich structured data displayed in RfpDetailsModal
+// ─────────────────────────────────────────────────────────────
+export async function analyzeRfpWithRAG(projectId: string, attachmentPaths: string[]) {
+  const fullText = await extractPdfText(attachmentPaths);
+
+  const result = await callLlm(`
 You are an expert GIS and RFP analyst.
-Analyze the following document and return **ONLY** valid JSON (no markdown, no extra text):
+Analyze this document and return ONLY valid JSON — no markdown, no extra text:
 
 {
-  "project_overview": "Brief summary",
-  "scope_of_work": ["item1", "item2"],
-  "technical_requirements": ["req1", "req2"],
-  "budget_info": "Budget details or range",
+  "project_overview": "brief summary",
+  "scope_of_work": ["item1"],
+  "technical_requirements": ["req1"],
+  "budget_info": "budget details",
   "timeline": { "start_date": "...", "end_date": "...", "duration": "..." },
-  "deliverables": ["del1", "del2"],
+  "deliverables": ["del1"],
   "evaluation_criteria": ["criteria1"],
   "risks_constraints": ["risk1"],
   "key_contact": "...",
   "confidence": 0.8
 }
 
-Document Content:
+Document:
 ${fullText.slice(0, 40000)}
-`;
+`);
 
-    const response = await llm.invoke(prompt);
+  console.log(`✅ analyzeRfpWithRAG complete for RFP ${projectId}`);
+  return result;
+}
 
-    let content = typeof response.content === 'string' 
-      ? response.content 
-      : JSON.stringify(response.content);
+// ─────────────────────────────────────────────────────────────
+// EXPORT 2: Skill extraction for matching at approval time
+// Maps RFP requirements → platform's actual skill vocabulary
+// so string matching works against real provider skills
+// ─────────────────────────────────────────────────────────────
+export async function extractRequiredSkills(projectId: string, attachmentPaths: string[]) {
+  const [fullText, platformSkills] = await Promise.all([
+    extractPdfText(attachmentPaths),
+    fetchPlatformSkills(),
+  ]);
 
-    // Clean response
-    content = content
-      .replace(/```json/g, '')
-      .replace(/```/g, '')
-      .trim();
+  console.log(`🏷️ Platform has ${platformSkills.length} skills. RFP: ${projectId}`);
 
-    const firstBrace = content.indexOf('{');
-    const lastBrace = content.lastIndexOf('}');
+  const result = await callLlm(`
+You are a GIS RFP analyst.
 
-    if (firstBrace !== -1 && lastBrace !== -1) {
-      content = content.slice(firstBrace, lastBrace + 1);
-    }
+${platformSkills.length > 0 
+  ? `Map to these exact platform skills when possible:\n${platformSkills.slice(0, 50).map(s => `- ${s}`).join('\n')}` 
+  : 'Return the most relevant GIS/geospatial skills.'}
 
-    const parsed = JSON.parse(content);
-    console.log("✅ Successfully parsed AI response");
-    return parsed;
+Return ONLY valid JSON (no extra text, no markdown):
 
-  } catch (error: any) {
-    console.error("❌ analyzeRfpWithRAG Error:", error.message);
-    throw error;
+{
+  "required_services": ["GIS Mapping", "Geospatial Consulting"],
+  "required_skills": ["ArcGIS Pro", "QGIS", "Spatial Analysis"],
+  "confidence": 0.85
+}
+
+Document excerpt:
+${fullText.slice(0, 35000)}
+`);
+
+  // Safety fallback
+  if (!result?.required_services && !result?.required_skills) {
+    console.warn("LLM returned bad format, using fallback");
+    return {
+      required_services: ["GIS Services"],
+      required_skills: [],
+      confidence: 0.5
+    };
   }
+
+  return result;
 }

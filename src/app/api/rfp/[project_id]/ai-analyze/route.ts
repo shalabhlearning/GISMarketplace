@@ -14,24 +14,26 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const sessionRows: any[] = await db.query(
+    // Auth check - Only providers
+    const [session] = await db.query(
       `SELECT u.user_type FROM sessions s 
        JOIN user u ON s.user_id = u.user_id 
        WHERE s.session_token = ? AND s.expires > NOW()`,
       [sessionToken]
     );
 
-    if (!sessionRows.length || sessionRows[0].user_type !== 'provider') {
+    if (!session || session.user_type !== 'provider') {
       return NextResponse.json({ error: 'Only providers can use AI Analyzer' }, { status: 403 });
     }
 
+    // Get RFP attachments
     const [rfp] = await db.query(
       `SELECT attachments FROM projectrequest WHERE project_id = ?`,
       [project_id]
     );
 
     if (!rfp?.attachments) {
-      return NextResponse.json({ error: 'This RFP has no attachments' }, { status: 400 });
+      return NextResponse.json({ error: 'No attachments found' }, { status: 400 });
     }
 
     let attachments: string[] = [];
@@ -39,14 +41,24 @@ export async function POST(
       attachments = typeof rfp.attachments === 'string' 
         ? JSON.parse(rfp.attachments) 
         : rfp.attachments;
-    } catch (e) {
-      console.error("Attachment Parse Error:", e);
-      return NextResponse.json({ error: 'Invalid attachment format' }, { status: 400 });
+    } catch {
+      return NextResponse.json({ error: 'Invalid attachment data' }, { status: 400 });
     }
 
-    console.log("📎 Attachments found:", attachments);
-
+    // Run AI Analysis
     const analysis = await analyzeRfpWithRAG(project_id, attachments);
+
+    // === SAVE TO DATABASE ===
+    await db.query(
+      `UPDATE projectrequest 
+       SET ai_summary = ?, 
+           ai_processed = TRUE, 
+           ai_processed_at = NOW() 
+       WHERE project_id = ?`,
+      [JSON.stringify(analysis), project_id]
+    );
+
+    console.log(`💾 AI Analysis saved successfully for RFP: ${project_id}`);
 
     return NextResponse.json({
       success: true,

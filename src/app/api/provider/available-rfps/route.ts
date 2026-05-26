@@ -1,25 +1,30 @@
 // src/app/api/provider/available-rfps/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { query } from '@/lib/db';
+import db from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
     const sessionToken = req.cookies.get('session_token')?.value;
+    const { searchParams } = new URL(req.url);
+
+    // ✅ Parse and clamp limit — inlined into SQL, never a bind param
+    const rawLimit = searchParams.get('limit');
+    const limit = rawLimit ? Math.min(Math.max(parseInt(rawLimit), 1), 100) : null;
 
     let providerId: string | null = null;
 
     if (sessionToken) {
-      const sessionRows: any[] = await query(
-        `SELECT s.user_id 
-         FROM sessions s 
-         WHERE s.session_token = ? AND s.expires > NOW()`,
+      const sessionRows = await db.query(
+        `SELECT user_id FROM sessions 
+         WHERE session_token = ? AND expires > NOW()`,
         [sessionToken]
       );
       providerId = sessionRows[0]?.user_id || null;
     }
 
-    const rfps: any[] = await query(
-      `
+    const params: any[] = [];
+
+    let queryStr = `
       SELECT 
         pr.project_id,
         pr.title,
@@ -33,25 +38,64 @@ export async function GET(req: NextRequest) {
         pr.contact_email,
         pr.attachments,
         pr.created_at,
-        bp.organization_name AS buyer_name
+        pr.ai_summary,
+        bp.organization_name AS buyer_name,
+        COALESCE(rpm.match_score, 0) AS match_score,
+        rpm.reason AS match_reason
       FROM projectrequest pr
       LEFT JOIN buyerprofile bp ON pr.buyer_id = bp.buyer_id
-      WHERE pr.status = 'open' 
+    `;
+
+    if (providerId) {
+      // ✅ INNER JOIN — logged-in providers only see RFPs they were matched to
+      queryStr += `
+      INNER JOIN rfp_provider_match rpm
+        ON pr.project_id = rpm.project_id
+        AND rpm.provider_id = ?`;
+      params.push(providerId);
+    } else {
+      // Unauthenticated fallback: show all public open RFPs
+      queryStr += `
+      LEFT JOIN rfp_provider_match rpm ON pr.project_id = rpm.project_id`;
+    }
+
+    queryStr += `
+      WHERE pr.status = 'open'
         AND pr.visibility = 'public'
-        ${providerId ? `AND NOT EXISTS (
-          SELECT 1 FROM proposal 
-          WHERE project_id = pr.project_id 
+    `;
+
+    if (providerId) {
+      // Exclude RFPs this provider already submitted a proposal for
+      queryStr += `
+        AND NOT EXISTS (
+          SELECT 1 FROM proposal
+          WHERE project_id = pr.project_id
             AND provider_id = ?
             AND status = 'submitted'
-        )` : ''}
-      ORDER BY pr.created_at DESC
-      `,
-      providerId ? [providerId] : []
-    );
+        )`;
+      params.push(providerId);
+    }
 
-    return NextResponse.json({ rfps });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: 'Failed to fetch available RFPs' }, { status: 500 });
+    queryStr += ` ORDER BY match_score DESC, pr.created_at DESC`;
+
+    // ✅ LIMIT inlined — MySQL prepared statements reject LIMIT as a bind param
+    if (limit) {
+      queryStr += ` LIMIT ${limit}`;
+    }
+
+    const rfps = await db.query(queryStr, params);
+
+    return NextResponse.json({
+      success: true,
+      rfps: rfps || [],
+    });
+
+  } catch (err: any) {
+    console.error('[AVAILABLE RFPS ERROR]', err);
+    return NextResponse.json({
+      success: false,
+      rfps: [],
+      error: 'Failed to fetch RFPs',
+    }, { status: 500 });
   }
 }

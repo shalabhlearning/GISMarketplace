@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { query } from '@/lib/db';
 import { randomUUID } from 'crypto';
+import { matchRfpsForProvider } from '@/lib/matchProviders';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,6 +13,7 @@ export async function POST(req: NextRequest) {
       phoneNumber,
       password,
       organizationName,
+      skills,           // ✅ string[] from provider registration form
       hourlyRate,
       experienceYears,
       portfolioUrl,
@@ -55,13 +57,19 @@ export async function POST(req: NextRequest) {
     }
 
     if (userType === 'provider') {
+      // ✅ Save skills from registration form
+      const skillsJson = Array.isArray(skills) && skills.length > 0
+        ? JSON.stringify(skills)
+        : null;
+
       await query(
         `INSERT INTO providerprofile (
-          provider_id, organization_name, hourly_rate, experience_years, portfolio_url, subscription_status, rating
-        ) VALUES (?, ?, ?, ?, ?, 'none', 0.0)`,
+          provider_id, organization_name, skills, hourly_rate, experience_years, portfolio_url, subscription_status, rating
+        ) VALUES (?, ?, ?, ?, ?, ?, 'none', 0.0)`,
         [
           userId,
           organizationName || null,
+          skillsJson,
           hourlyRate ? parseFloat(hourlyRate) : null,
           experienceYears ? parseInt(experienceYears) : null,
           portfolioUrl || null,
@@ -73,12 +81,28 @@ export async function POST(req: NextRequest) {
          VALUES (?, ?, 100, 'credit', 'Initial credits')`,
         [randomUUID(), userId]
       );
+
+      // ✅ Fire-and-forget: match this provider against all open RFPs immediately.
+      // Since skills are saved above, this will actually find matches on first join.
+      // Response goes back instantly — matching runs in the background.
+      matchRfpsForProvider(userId)
+        .then(result => {
+          if (result.total_matches > 0) {
+            console.log(`🎯 New provider "${organizationName}" matched to ${result.total_matches} RFPs on join`);
+          } else {
+            console.log(`ℹ️ New provider "${organizationName}" — no matching RFPs found yet`);
+          }
+        })
+        .catch(err => {
+          console.error(`⚠️ Initial match failed for provider ${userId}:`, err.message);
+        });
     }
 
     return NextResponse.json({
       success: true,
       message: 'Account created successfully!',
     });
+
   } catch (error: any) {
     console.error(error);
     return NextResponse.json({ error: 'Registration failed' }, { status: 500 });

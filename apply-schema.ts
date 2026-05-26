@@ -18,36 +18,50 @@ async function applySchema() {
       throw err;
     }
 
-    console.log('📄 Applying schema to target database...');
+    console.log('📄 Applying schema + data to target database...');
 
-    // Clean unwanted statements
+    // Remove lines that would conflict on a new DB
     sqlContent = sqlContent
-      .replace(/CREATE DATABASE.*?;/gi, '-- CREATE DATABASE skipped')
-      .replace(/USE\s+[`']?GISMarketplace[`']?\s*;/gi, '-- USE skipped');
+      .replace(/CREATE DATABASE.*?;/gi, '')
+      .replace(/USE\s+[`']?\w+[`']?\s*;/gi, '');
 
+    // Split on semicolons that are at end of a line (safer than plain split(';'))
     const statements = sqlContent
-      .split(';')
+      .split(/;\s*\n/)
       .map(s => s.trim())
-      .filter(s => s.length > 15 && !s.startsWith('--'));
+      .filter(s => s.length > 10 && !s.startsWith('--'));
 
-    console.log(`🔧 Found ${statements.length} statements...`);
+    console.log(`🔧 Found ${statements.length} statements to execute...\n`);
+
+    let ok = 0, skipped = 0, failed = 0;
 
     for (const [i, stmt] of statements.entries()) {
       try {
         await db.query(stmt);
-        console.log(`✅ [${i+1}/${statements.length}] OK`);
+        ok++;
+        // Only log every 10th statement to avoid console spam on large imports
+        if ((i + 1) % 10 === 0 || statements.length < 20) {
+          console.log(`✅ [${i + 1}/${statements.length}] OK`);
+        }
       } catch (err: any) {
-        if (err.message.includes('already exists') || err.code === 'ER_TABLE_EXISTS_ERROR') {
-          console.log(`⚠️  [${i+1}] Table already exists - skipped`);
+        if (
+          err.message?.includes('already exists') ||
+          err.code === 'ER_TABLE_EXISTS_ERROR'
+        ) {
+          skipped++;
+          console.log(`⚠️  [${i + 1}] Skipped (already exists)`);
         } else {
-          console.error(`❌ [${i+1}] Failed:`, err.message);
+          failed++;
+          console.error(`❌ [${i + 1}] Failed: ${err.message}`);
+          console.error(`   Statement: ${stmt.substring(0, 100)}...`);
         }
       }
     }
 
-    console.log('\n🎉 Schema applied successfully!');
+    console.log(`\n🎉 Done! ✅ ${ok} succeeded  ⚠️ ${skipped} skipped  ❌ ${failed} failed`);
+
   } catch (error: any) {
-    console.error('💥 Failed:', error.message);
+    console.error('💥 Fatal error:', error.message);
     process.exit(1);
   }
 }

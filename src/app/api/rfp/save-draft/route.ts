@@ -1,4 +1,6 @@
 // src/app/api/rfp/save-draft/route.ts
+// Supports multiple named drafts per buyer.
+// Pass draft_id in body to UPDATE an existing draft; omit to CREATE a new one.
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { randomUUID } from 'crypto';
@@ -27,6 +29,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     const {
+      draft_id,           // optional — if provided, update that draft
       title,
       description,
       budget,
@@ -40,48 +43,46 @@ export async function POST(req: NextRequest) {
       credits,
     } = body;
 
-    // Check existing draft
-    const existing: any[] = await db.query(
-      `SELECT draft_id FROM rfp_drafts WHERE buyer_id = ? LIMIT 1`,
-      [buyerId]
-    );
+    const fields = [
+      title             || '',
+      description       || '',
+      budget            || 0,
+      currency          || 'USD',
+      startDate         || null,
+      endDate           || null,
+      submissionDeadline|| null,
+      visibility        || 'public',
+      contactPerson     || '',
+      contactEmail      || '',
+      credits           || 0,
+    ];
 
-    if (existing.length) {
-      await db.query(
-        `UPDATE rfp_drafts SET
-          title = ?,
-          description = ?,
-          budget = ?,
-          currency = ?,
-          start_date = ?,
-          end_date = ?,
-          submission_deadline = ?,
-          visibility = ?,
-          contact_person = ?,
-          contact_email = ?,
-          credits = ?
-        WHERE draft_id = ?`,
-        [
-          title || '',
-          description || '',
-          budget || 0,
-          currency || 'USD',
-          startDate || null,
-          endDate || null,
-          submissionDeadline || null,
-          visibility || 'public',
-          contactPerson || '',
-          contactEmail || '',
-          credits || 0,
-          existing[0].draft_id
-        ]
+    if (draft_id) {
+      // Update existing draft — verify ownership
+      const existing: any[] = await db.query(
+        `SELECT draft_id FROM rfp_drafts WHERE draft_id = ? AND buyer_id = ?`,
+        [draft_id, buyerId]
       );
 
-      return NextResponse.json({ message: 'Draft updated' });
+      if (!existing.length) {
+        return NextResponse.json({ error: 'Draft not found' }, { status: 404 });
+      }
+
+      await db.query(
+        `UPDATE rfp_drafts SET
+          title = ?, description = ?, budget = ?, currency = ?,
+          start_date = ?, end_date = ?, submission_deadline = ?,
+          visibility = ?, contact_person = ?, contact_email = ?, credits = ?,
+          updated_at = NOW()
+        WHERE draft_id = ? AND buyer_id = ?`,
+        [...fields, draft_id, buyerId]
+      );
+
+      return NextResponse.json({ success: true, draft_id, message: 'Draft updated' });
     }
 
-    // Create new draft
-    const draftId = randomUUID();
+    // Create a brand-new draft
+    const newDraftId = randomUUID();
 
     await db.query(
       `INSERT INTO rfp_drafts (
@@ -89,27 +90,13 @@ export async function POST(req: NextRequest) {
         start_date, end_date, submission_deadline, visibility,
         contact_person, contact_email, credits
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        draftId,
-        buyerId,
-        title || '',
-        description || '',
-        budget || 0,
-        currency || 'USD',
-        startDate || null,
-        endDate || null,
-        submissionDeadline || null,
-        visibility || 'public',
-        contactPerson || '',
-        contactEmail || '',
-        credits || 0
-      ]
+      [newDraftId, buyerId, ...fields]
     );
 
-    return NextResponse.json({ message: 'Draft saved' });
+    return NextResponse.json({ success: true, draft_id: newDraftId, message: 'Draft saved' });
 
   } catch (err: any) {
-    console.error("💥 SAVE DRAFT ERROR:", err);
+    console.error('[SAVE DRAFT ERROR]', err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

@@ -24,28 +24,52 @@ export async function GET(req: NextRequest) {
 
     const rfps = await db.query(`
       SELECT 
-        project_id,
-        title,
-        description,
-        budget,
-        status,
-        created_at,
-        submission_deadline,
-        attachments
-      FROM projectrequest 
-      WHERE buyer_id = ?
-      ORDER BY created_at DESC
+        pr.project_id,
+        pr.title,
+        pr.description,
+        pr.budget,
+        pr.status,
+        pr.created_at,
+        pr.submission_deadline,
+        pr.start_date,
+        pr.end_date,
+        pr.contact_person,
+        pr.contact_email,
+        pr.attachments,
+        (
+          SELECT COUNT(*) 
+          FROM proposal p 
+          WHERE p.project_id = pr.project_id 
+            AND p.status = 'submitted'
+        ) AS quotes_count
+      FROM projectrequest pr
+      WHERE pr.buyer_id = ?
+      ORDER BY pr.created_at DESC
       LIMIT 10
     `, [buyerId]);
 
     const stats = await db.query(`
       SELECT 
-        COUNT(CASE WHEN status = 'open' THEN 1 END) as active_rfps,
-        COUNT(CASE WHEN status = 'in_review' THEN 1 END) as under_review,
-        COUNT(*) as total_rfps
+        -- Total RFPs created by this buyer (all statuses)
+        COUNT(*) AS total_rfps_created,
+
+        -- RFPs that are open or have been awarded (approved/live)
+        COUNT(CASE WHEN status IN ('open', 'awarded') THEN 1 END) AS approved_rfps,
+
+        -- RFPs currently under admin review
+        COUNT(CASE WHEN status = 'in_review' THEN 1 END) AS under_review,
+
+        -- Total quotes received across ALL this buyer's RFPs
+        (
+          SELECT COUNT(*)
+          FROM proposal p
+          JOIN projectrequest pr2 ON p.project_id = pr2.project_id
+          WHERE pr2.buyer_id = ?
+        ) AS total_quotes_received
+
       FROM projectrequest 
       WHERE buyer_id = ?
-    `, [buyerId]);
+    `, [buyerId, buyerId]);
 
     return NextResponse.json({
       stats: stats[0] || {},

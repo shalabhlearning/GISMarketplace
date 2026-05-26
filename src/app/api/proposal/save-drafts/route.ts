@@ -24,63 +24,71 @@ export async function POST(req: NextRequest) {
     const providerId = sessionRows[0].user_id;
     const body = await req.json();
 
-    const { 
-      project_id, 
-      bid_amount = 0, 
-      technical = '', 
-      delivery = '', 
-      milestones = [], 
-      case_studies = [], 
-      references = [] 
+    const {
+      project_id,
+      bid_amount = '',
+      technical = '',
+      delivery = '',
+      milestones = [],
+      case_studies = [],
+      references = []
     } = body;
 
     if (!project_id) {
       return NextResponse.json({ error: 'Project ID is required' }, { status: 400 });
     }
 
+    // ✅ Convert to number safely
+    const bidAmountNum = bid_amount ? parseFloat(String(bid_amount)) : 0;
+
     const existing = await db.query(
       `SELECT draft_id FROM proposal_drafts 
-       WHERE project_id = ? AND provider_id = ?`,
+   WHERE project_id = ? AND provider_id = ?`,
       [project_id, providerId]
     );
+
+    const milestonesJson = JSON.stringify(milestones || []);
+    const caseStudiesJson = JSON.stringify(case_studies || []);
+    const referencesJson = JSON.stringify(references || []);
 
     if (existing.length > 0) {
       await db.query(
         `UPDATE proposal_drafts 
-         SET bid_amount = ?, technical = ?, delivery = ?, 
-             milestones = ?, case_studies = ?, references_json = ?, 
-             updated_at = NOW()
-         WHERE draft_id = ?`,
+     SET bid_amount = ?, technical = ?, delivery = ?, 
+         milestones = ?, case_studies = ?, references_json = ?, 
+         updated_at = NOW()
+     WHERE draft_id = ?`,
         [
-          bid_amount,
+          bidAmountNum,
           technical,
           delivery,
-          JSON.stringify(milestones),
-          JSON.stringify(case_studies),
-          JSON.stringify(references),
+          milestonesJson,
+          caseStudiesJson,
+          referencesJson,
           existing[0].draft_id
         ]
       );
       return NextResponse.json({ message: 'Draft updated successfully' });
     }
 
+    // INSERT case
     const draftId = randomUUID();
 
     await db.query(
       `INSERT INTO proposal_drafts 
-       (draft_id, project_id, provider_id, bid_amount, technical, delivery, 
-        milestones, case_studies, references_json)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+   (draft_id, project_id, provider_id, bid_amount, technical, delivery, 
+    milestones, case_studies, references_json)
+   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         draftId,
         project_id,
         providerId,
-        bid_amount,
+        bidAmountNum,
         technical,
         delivery,
-        JSON.stringify(milestones),
-        JSON.stringify(case_studies),
-        JSON.stringify(references)
+        milestonesJson,
+        caseStudiesJson,
+        referencesJson
       ]
     );
 

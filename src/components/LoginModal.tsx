@@ -29,9 +29,7 @@ export default function LoginModal({
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen, onClose]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -50,29 +48,19 @@ export default function LoginModal({
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          identifier: identifier.trim(),
-          password,
-        }),
+        body: JSON.stringify({ identifier: identifier.trim(), password }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
         setMessage('Login successful! Redirecting...');
-
         setTimeout(() => {
           const userType = data?.user?.userType;
-
-          if (userType === 'admin') {
-            window.location.assign('/admin');
-          } else if (userType === 'provider') {
-            window.location.assign('/provider');
-          } else if (userType === 'buyer') {
-            window.location.assign('/buyer');
-          } else {
-            window.location.assign('/');
-          }
+          if (userType === 'admin') window.location.assign('/admin');
+          else if (userType === 'provider') window.location.assign('/provider');
+          else if (userType === 'buyer') window.location.assign('/buyer');
+          else window.location.assign('/');
         }, 800);
       } else {
         setMessage(data.error || 'Login failed');
@@ -88,27 +76,25 @@ export default function LoginModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div
         ref={modalRef}
-        className="w-full max-w-sm bg-white border border-gray-100 rounded-2xl shadow-2xl"
+        className="w-full max-w-sm bg-card border border-border rounded-3xl shadow-xl overflow-hidden"
       >
-        <div className="p-6 max-h-[85vh] overflow-y-auto">
-          <div className="flex justify-between items-center mb-5">
-            <h2 className="text-xl font-bold text-gray-900 text-center w-full">
-              Welcome back
-            </h2>
+        <div className="p-8">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold text-foreground">Welcome back</h2>
             <button
               onClick={onClose}
-              className="p-1 text-xl text-gray-400 hover:text-gray-600"
+              className="text-muted-foreground hover:text-foreground text-2xl leading-none"
             >
               ×
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">
+              <label className="text-sm font-medium text-muted-foreground block mb-1.5">
                 Email or Phone Number
               </label>
               <input
@@ -117,12 +103,12 @@ export default function LoginModal({
                 onChange={(e) => setIdentifier(e.target.value)}
                 required
                 placeholder="your@email.com or +1234567890"
-                className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-black"
+                className="w-full px-4 py-3 bg-background border border-input rounded-2xl focus:ring-2 focus:ring-primary outline-none text-foreground"
               />
             </div>
 
             <div>
-              <label className="block mb-1.5 text-xs font-medium text-gray-700 uppercase">
+              <label className="text-sm font-medium text-muted-foreground block mb-1.5">
                 Password
               </label>
               <input
@@ -131,38 +117,38 @@ export default function LoginModal({
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
-                className="w-full px-3 py-2.5 text-black text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-4 py-3 bg-background border border-input rounded-2xl focus:ring-2 focus:ring-primary outline-none text-foreground"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 text-sm font-semibold text-white uppercase rounded-xl bg-blue-600 hover:bg-blue-700 transition-all disabled:opacity-50"
+              className="w-full py-3.5 text-sm font-semibold bg-primary text-primary-foreground rounded-2xl hover:bg-primary/90 transition-all disabled:opacity-70"
             >
-              {loading ? 'Logging in…' : 'Login'}
+              {loading ? 'Logging in…' : 'Sign In'}
             </button>
           </form>
 
           {message && (
             <p
-              className={`mt-4 text-xs font-medium text-center p-2 rounded-lg ${
+              className={`mt-4 text-sm text-center p-3 rounded-2xl font-medium ${
                 message.includes('successful')
-                  ? 'bg-green-50 text-green-700'
-                  : 'bg-red-50 text-red-700'
+                  ? 'bg-green-500/10 text-green-600 dark:text-green-400'
+                  : 'bg-red-500/10 text-red-600 dark:text-red-400'
               }`}
             >
               {message}
             </p>
           )}
 
-          <p className="mt-4 text-xs text-center text-gray-600">
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             Don’t have an account?{' '}
             <button
               onClick={onSwitchToRegister}
-              className="font-medium text-blue-600 hover:underline"
+              className="text-primary font-medium hover:underline"
             >
-              Register
+              Register here
             </button>
           </p>
         </div>

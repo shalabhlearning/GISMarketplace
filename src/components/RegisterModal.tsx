@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { X, Check } from 'lucide-react';
 
 interface RegisterModalProps {
   isOpen: boolean;
@@ -21,6 +22,23 @@ interface FormData {
   portfolioUrl: string;
 }
 
+const PLATFORM_SKILLS = [
+  'GIS Mapping',
+  'Geospatial Consulting',
+  'LiDAR Processing',
+  'LiDAR Classification',
+  'Photogrammetry',
+  'Remote Sensing',
+  'Spatial Data Analysis',
+  'UAV Mapping',
+  'Terrain Analysis',
+  '3D City Modeling',
+  '3D Modeling',
+  'BIM Integration',
+  'Digital Elevation Models',
+  'Satellite Image Processing',
+];
+
 export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModalProps) {
   const [formData, setFormData] = useState<FormData>({
     role: 'buyer',
@@ -33,6 +51,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
     portfolioUrl: '',
   });
 
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [dummyEmail, setDummyEmail] = useState(false);
   const [dummyPhone, setDummyPhone] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
@@ -49,16 +68,23 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
         onClose();
       }
     };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+    if (isOpen) document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (formData.role !== 'provider') setSelectedSkills([]);
+  }, [formData.role]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const toggleSkill = (skill: string) => {
+    setSelectedSkills(prev =>
+      prev.includes(skill) ? prev.filter(s => s !== skill) : [...prev, skill]
+    );
   };
 
   const handleRegisterSubmit = async (e: React.FormEvent) => {
@@ -81,6 +107,11 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
     }
     if (!formData.password || formData.password.length < 8) {
       setMessage('Password must be at least 8 characters');
+      setLoading(false);
+      return;
+    }
+    if (formData.role === 'provider' && selectedSkills.length === 0) {
+      setMessage('Please select at least one skill or service');
       setLoading(false);
       return;
     }
@@ -121,7 +152,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
 
       setShowOtp(true);
       setMessage('OTPs sent successfully! Check your email and phone.');
-    } catch (error) {
+    } catch {
       setMessage('Network error. Please try again.');
     } finally {
       setLoading(false);
@@ -168,6 +199,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
         phoneNumber: trimmedPhone,
         password: formData.password,
         organizationName: formData.businessName,
+        skills: formData.role === 'provider' ? selectedSkills : undefined,
         hourlyRate: formData.role === 'provider' ? formData.hourlyRate : undefined,
         experienceYears: formData.role === 'provider' ? formData.experienceYears : undefined,
         portfolioUrl: formData.role === 'provider' ? formData.portfolioUrl : undefined,
@@ -191,7 +223,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
       } else {
         setMessage(registerData.error || 'Registration failed');
       }
-    } catch (error) {
+    } catch {
       setMessage('Network error. Please try again.');
     } finally {
       setLoading(false);
@@ -208,33 +240,35 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div
         ref={modalRef}
-        className="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden"
+        className="w-full max-w-md bg-card border border-border rounded-3xl shadow-xl overflow-hidden"
       >
-        <div className="p-6 max-h-[90vh] overflow-y-auto">
+        <div className="p-8 max-h-[92vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-semibold text-foreground">
               {showOtp ? 'Verify OTP' : 'Create Account'}
             </h2>
             <button
               onClick={onClose}
-              className="text-2xl text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-muted-foreground hover:text-foreground text-3xl leading-none"
             >
-              ×
+              <X size={24} />
             </button>
           </div>
 
           {!showOtp ? (
             <form onSubmit={handleRegisterSubmit} className="space-y-5">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">REGISTER AS</label>
+                <label className="text-sm font-medium text-muted-foreground mb-1.5 block">
+                  REGISTER AS
+                </label>
                 <select
                   name="role"
                   value={formData.role}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 text-sm border text-gray-500 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-4 py-3 bg-background border border-input rounded-2xl focus:ring-2 focus:ring-primary outline-none text-foreground"
                 >
                   <option value="buyer">Buyer</option>
                   <option value="provider">Service Provider</option>
@@ -243,8 +277,8 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                  Organization Name <span className="text-red-500">*</span>
+                <label className="text-sm font-medium text-muted-foreground mb-1.5 block">
+                  Organization Name <span className="text-destructive">*</span>
                 </label>
                 <input
                   type="text"
@@ -252,14 +286,14 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                   value={formData.businessName}
                   onChange={handleChange}
                   placeholder="Your company or organization"
-                  className="w-full px-4 py-3 text-sm border text-gray-500 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-4 py-3 bg-background border border-input rounded-2xl focus:ring-2 focus:ring-primary outline-none text-foreground"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                  Email <span className="text-red-500">*</span>
+                <label className="text-sm font-medium text-muted-foreground mb-1.5 block">
+                  Email <span className="text-destructive">*</span>
                 </label>
                 <input
                   type="email"
@@ -267,14 +301,14 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="contact@example.com"
-                  className="w-full px-4 py-3 text-sm border text-gray-500 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-4 py-3 bg-background border border-input rounded-2xl focus:ring-2 focus:ring-primary outline-none text-foreground"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                  Phone Number <span className="text-red-500">*</span>
+                <label className="text-sm font-medium text-muted-foreground mb-1.5 block">
+                  Phone Number <span className="text-destructive">*</span>
                 </label>
                 <input
                   type="tel"
@@ -282,14 +316,14 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                   value={formData.phoneNumber}
                   onChange={handleChange}
                   placeholder="+919876543210"
-                  className="w-full px-4 py-3 text-sm border text-gray-500 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-4 py-3 bg-background border border-input rounded-2xl focus:ring-2 focus:ring-primary outline-none text-foreground"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                  Password <span className="text-red-500">*</span>
+                <label className="text-sm font-medium text-muted-foreground mb-1.5 block">
+                  Password <span className="text-destructive">*</span>
                 </label>
                 <input
                   type="password"
@@ -297,7 +331,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Minimum 8 characters"
-                  className="w-full px-4 py-3 text-sm border text-gray-500 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-4 py-3 bg-background border border-input rounded-2xl focus:ring-2 focus:ring-primary outline-none text-foreground"
                   minLength={8}
                   required
                 />
@@ -307,7 +341,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1.5">Hourly Rate ($)</label>
+                      <label className="text-sm font-medium text-muted-foreground mb-1.5 block">Hourly Rate ($)</label>
                       <input
                         type="number"
                         name="hourlyRate"
@@ -316,11 +350,11 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                         placeholder="85.00"
                         step="0.01"
                         min="0"
-                        className="w-full px-4 py-3 text-sm border text-gray-500 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full px-4 py-3 bg-background border border-input rounded-2xl focus:ring-2 focus:ring-primary outline-none text-foreground"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1.5">Experience (years)</label>
+                      <label className="text-sm font-medium text-muted-foreground mb-1.5 block">Experience (years)</label>
                       <input
                         type="number"
                         name="experienceYears"
@@ -328,54 +362,86 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                         onChange={handleChange}
                         placeholder="5"
                         min="0"
-                        className="w-full px-4 py-3 text-sm border text-gray-500 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full px-4 py-3 bg-background border border-input rounded-2xl focus:ring-2 focus:ring-primary outline-none text-foreground"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1.5">Portfolio URL</label>
+                    <label className="text-sm font-medium text-muted-foreground mb-1.5 block">Portfolio URL</label>
                     <input
                       type="url"
                       name="portfolioUrl"
                       value={formData.portfolioUrl}
                       onChange={handleChange}
                       placeholder="https://yourportfolio.com"
-                      className="w-full px-4 py-3 text-sm border text-gray-500 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="w-full px-4 py-3 bg-background border border-input rounded-2xl focus:ring-2 focus:ring-primary outline-none text-foreground"
                     />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground mb-1.5 block">
+                      Services & Skills <span className="text-destructive">*</span>
+                    </label>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Select all that apply — this determines which RFPs you'll be matched to
+                    </p>
+
+                    <div className="flex flex-wrap gap-2">
+                      {PLATFORM_SKILLS.map(skill => {
+                        const selected = selectedSkills.includes(skill);
+                        return (
+                          <button
+                            key={skill}
+                            type="button"
+                            onClick={() => toggleSkill(skill)}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                              selected
+                                ? 'bg-primary text-primary-foreground border-primary'
+                                : 'bg-background border-border text-muted-foreground hover:border-primary hover:text-foreground'
+                            }`}
+                          >
+                            {selected && <Check className="w-3 h-3" />}
+                            {skill}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {selectedSkills.length > 0 && (
+                      <p className="text-xs text-primary mt-2 font-medium">
+                        {selectedSkills.length} skill{selectedSkills.length !== 1 ? 's' : ''} selected
+                      </p>
+                    )}
                   </div>
                 </>
               )}
 
               <div className="space-y-2 pt-2">
-                <div className="flex items-center text-gray-500 gap-2">
+                <div className="flex items-center gap-2 text-muted-foreground">
                   <input
                     type="checkbox"
                     id="dummyEmail"
                     checked={dummyEmail}
                     onChange={(e) => setDummyEmail(e.target.checked)}
                   />
-                  <label htmlFor="dummyEmail" className="text-sm text-gray-600">
-                    Dummy Email (Dev: No real email OTP)
-                  </label>
+                  <label htmlFor="dummyEmail" className="text-sm">Dummy Email (Dev: No real email OTP)</label>
                 </div>
-                <div className="flex items-center text-gray-500 gap-2">
+                <div className="flex items-center gap-2 text-muted-foreground">
                   <input
                     type="checkbox"
                     id="dummyPhone"
                     checked={dummyPhone}
                     onChange={(e) => setDummyPhone(e.target.checked)}
                   />
-                  <label htmlFor="dummyPhone" className="text-sm text-gray-600">
-                    Dummy Phone (Dev: No real SMS OTP)
-                  </label>
+                  <label htmlFor="dummyPhone" className="text-sm">Dummy Phone (Dev: No real SMS OTP)</label>
                 </div>
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 text-sm font-semibold bg-primary text-primary-foreground rounded-2xl hover:bg-primary/90 transition-all disabled:opacity-70"
               >
                 {loading ? 'Sending OTPs...' : 'Continue →'}
               </button>
@@ -384,37 +450,37 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
             <>
               <button
                 onClick={handleBackToRegistration}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium mb-4 flex items-center gap-1"
+                className="text-primary hover:text-primary/80 text-sm font-medium mb-4 flex items-center gap-1"
               >
                 ← Back to Registration
               </button>
 
               <form onSubmit={handleOtpSubmit} className="space-y-5">
-                <p className="text-sm text-gray-600 text-center">
+                <p className="text-sm text-muted-foreground text-center">
                   We sent separate OTPs to your email and phone number.
                 </p>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Email OTP</label>
+                  <label className="text-sm font-medium text-muted-foreground mb-1.5 block">Email OTP</label>
                   <input
                     type="text"
                     value={emailOtp}
                     onChange={(e) => setEmailOtp(e.target.value.trim())}
                     placeholder="Enter email OTP"
-                    className="w-full px-4 py-3 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-3 bg-background border border-input rounded-2xl focus:ring-2 focus:ring-primary outline-none text-foreground"
                     autoFocus
                   />
                   {dummyEmail && <p className="text-xs text-green-600 mt-1">Dummy mode: Try 77777</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Phone OTP</label>
+                  <label className="text-sm font-medium text-muted-foreground mb-1.5 block">Phone OTP</label>
                   <input
                     type="text"
                     value={phoneOtp}
                     onChange={(e) => setPhoneOtp(e.target.value.trim())}
                     placeholder="Enter phone OTP"
-                    className="w-full px-4 py-3 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-3 bg-background border border-input rounded-2xl focus:ring-2 focus:ring-primary outline-none text-foreground"
                   />
                   {dummyPhone && <p className="text-xs text-green-600 mt-1">Dummy mode: Try 77777</p>}
                 </div>
@@ -422,7 +488,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 rounded-xl transition-all disabled:opacity-50"
+                  className="w-full py-3.5 text-sm font-semibold bg-primary text-primary-foreground rounded-2xl hover:bg-primary/90 transition-all disabled:opacity-70"
                 >
                   {loading ? 'Verifying...' : 'Verify & Register'}
                 </button>
@@ -432,10 +498,10 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
 
           {message && (
             <p
-              className={`mt-4 text-sm text-center p-3 rounded-xl font-medium ${
-                message.includes('successful') || message.includes('sent')
-                  ? 'bg-green-50 text-green-700'
-                  : 'bg-red-50 text-red-700'
+              className={`mt-4 text-sm text-center p-3 rounded-2xl font-medium ${
+                message.toLowerCase().includes('success') || message.includes('sent')
+                  ? 'bg-green-500/10 text-green-600 dark:text-green-400'
+                  : 'bg-red-500/10 text-red-600 dark:text-red-400'
               }`}
             >
               {message}
@@ -443,11 +509,11 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
           )}
 
           {!showOtp && (
-            <p className="mt-6 text-center text-sm text-gray-600">
+            <p className="mt-6 text-center text-sm text-muted-foreground">
               Already have an account?{' '}
               <button
                 onClick={onSwitchToLogin}
-                className="text-blue-600 font-medium hover:underline"
+                className="text-primary font-medium hover:underline"
               >
                 Sign in
               </button>

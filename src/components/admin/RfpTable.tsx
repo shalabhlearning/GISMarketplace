@@ -1,10 +1,17 @@
+// src/components/admin/RfpTable.tsx
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
 
 type FilterType = 'all' | 'in_review' | 'open' | 'closed';
 
-export default function RfpTable({ onSelect }: { onSelect: (rfp: any) => void }) {
+export default function RfpTable({
+  onSelect,
+  refreshKey = 0,
+}: {
+  onSelect: (rfp: any) => void;
+  refreshKey?: number;
+}) {
   const [rfps, setRfps] = useState<any[]>([]);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [loading, setLoading] = useState(true);
@@ -22,10 +29,10 @@ export default function RfpTable({ onSelect }: { onSelect: (rfp: any) => void })
     }
   };
 
-  // Fetch when filter changes
+  // Re-fetch when filter changes OR when refreshKey increments (after an action)
   useEffect(() => {
     fetchRfps(activeFilter);
-  }, [activeFilter]);
+  }, [activeFilter, refreshKey]);
 
   const filteredRfps = useMemo(() => rfps, [rfps]);
 
@@ -57,8 +64,8 @@ export default function RfpTable({ onSelect }: { onSelect: (rfp: any) => void })
               key={key}
               onClick={() => setActiveFilter(key as FilterType)}
               className={`pb-1 transition-colors ${
-                activeFilter === key 
-                  ? 'text-blue-600 border-b-2 border-blue-600' 
+                activeFilter === key
+                  ? 'text-blue-600 border-b-2 border-blue-600'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -67,17 +74,13 @@ export default function RfpTable({ onSelect }: { onSelect: (rfp: any) => void })
           ))}
         </div>
 
-        <div className="text-sm text-gray-500">
-          {filteredRfps.length} submissions
-        </div>
+        <div className="text-sm text-gray-500">{filteredRfps.length} submissions</div>
       </div>
 
       {loading ? (
-        <div className="py-24 text-center">Loading...</div>
+        <div className="py-24 text-center text-gray-400">Loading...</div>
       ) : filteredRfps.length === 0 ? (
-        <div className="py-24 text-center text-gray-400 text-lg">
-          No RFPs found
-        </div>
+        <div className="py-24 text-center text-gray-400 text-lg">No RFPs found</div>
       ) : (
         <table className="w-full">
           <thead>
@@ -101,7 +104,7 @@ export default function RfpTable({ onSelect }: { onSelect: (rfp: any) => void })
                 <td className="p-5 text-gray-700">{rfp.buyer_name}</td>
                 <td className="p-5 text-gray-600">
                   {new Date(rfp.created_at).toLocaleDateString('en-US', {
-                    month: 'short', day: 'numeric', year: 'numeric'
+                    month: 'short', day: 'numeric', year: 'numeric',
                   })}
                 </td>
                 <td className="p-5">{getStatusBadge(rfp.status)}</td>
@@ -110,7 +113,7 @@ export default function RfpTable({ onSelect }: { onSelect: (rfp: any) => void })
                     onClick={() => onSelect(rfp)}
                     className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 ml-auto"
                   >
-                    Review →
+                    {rfp.status === 'in_review' ? 'Review →' : 'View →'}
                   </button>
                 </td>
               </tr>
