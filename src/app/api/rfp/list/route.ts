@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     const sessionResult: any[] = await db.query(
       `SELECT u.user_id, u.user_type 
        FROM sessions s
-       JOIN user u ON s.user_id = u.user_id
+       JOIN "user" u ON s.user_id = u.user_id
        WHERE s.session_token = ? AND s.expires > NOW()`,
       [sessionToken]
     );

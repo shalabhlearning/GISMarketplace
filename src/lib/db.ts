@@ -1,38 +1,18 @@
-// src/lib/db.ts
-import { env } from './env';
-import mysql from 'mysql2/promise';
+import { neon } from '@neondatabase/serverless';
 
-console.log("=== DB CONNECTION DEBUG ===");
-console.log("FINAL DB_HOST:", env.db.host);
-console.log("Clever Cloud: ✅ YES");
-console.log("===========================");
+const sql = neon(process.env.DATABASE_URL!);
 
-let pool: mysql.Pool | null = null;
-
-function getPool() {
-  if (!pool) {
-    pool = mysql.createPool({
-      host: env.db.host,
-      port: env.db.port,
-      user: env.db.user,
-      password: env.db.password,
-      database: env.db.database,
-      waitForConnections: true,
-      connectionLimit: 4,        // Keep under Clever Cloud limit
-      queueLimit: 0,
-      enableKeepAlive: true,
-    });
-    console.log("🟢 New database pool created");
-  }
-  return pool;
+// Converts MySQL-style ? placeholders to PostgreSQL $1, $2, ...
+function toPositional(query: string, params: any[] = []): string {
+  let i = 1;
+  return query.replace(/\?/g, () => `$${i++}`);
 }
 
-export async function query(sql: string, params?: any[]) {
-  const safeParams = (params || []).map(p => (p === undefined ? null : p));
-  const dbPool = getPool();
-  const [rows] = await dbPool.execute(sql, safeParams);
-  return rows;
+async function query<T = any>(rawSql: string, params: any[] = []): Promise<T[]> {
+  const pgSql = toPositional(rawSql, params);
+  const rows = await sql.query(pgSql, params);
+  return rows as T[];
 }
 
-export { getPool };
 export default { query };
+export { query };

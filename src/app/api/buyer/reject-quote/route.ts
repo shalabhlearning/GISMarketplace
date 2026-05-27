@@ -1,4 +1,4 @@
-// src/app/api/buyer/reject-quote/route.ts  (NEW FILE)
+// src/app/api/buyer/reject-quote/route.ts
 // Rejects a single quote
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';

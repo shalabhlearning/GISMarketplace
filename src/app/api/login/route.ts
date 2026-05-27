@@ -9,51 +9,43 @@ export async function POST(req: NextRequest) {
     const { identifier, password } = await req.json();
 
     if (!identifier || !password) {
-      return NextResponse.json({
-        error: 'Identifier (email or phone) and password are required',
-      }, { status: 400 });
+      return NextResponse.json({ error: 'Identifier and password are required' }, { status: 400 });
     }
 
-    const trimmedIdentifier = identifier.trim();
+    const trimmed = identifier.trim();
 
-    const users: any[] = await query(
-      'SELECT user_id, password_hash, user_type FROM user WHERE (email = ? OR phone_number = ?) AND status = "active"',
-      [trimmedIdentifier, trimmedIdentifier]
+    // PostgreSQL: status = 'active' uses single quotes (not double like MySQL)
+    const users = await query(
+      `SELECT user_id, password_hash, user_type
+       FROM "user"
+       WHERE (email = $1 OR phone_number = $1) AND status = 'active'`,
+      [trimmed]
     );
 
-    if (!users.length) {
-      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
-    }
+    if (!users.length) return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
 
     const user = users[0];
-
     const isValid = await bcrypt.compare(password, user.password_hash);
-    if (!isValid) {
-      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
-    }
+    if (!isValid) return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
 
-    // Delete old sessions
-    await query('DELETE FROM sessions WHERE user_id = ?', [user.user_id]);
+    await query(`DELETE FROM sessions WHERE user_id = $1`, [user.user_id]);
 
     const sessionToken = randomBytes(32).toString('hex');
     const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
     await query(
-      'INSERT INTO sessions (session_token, user_id, expires) VALUES (?, ?, ?)',
+      `INSERT INTO sessions (session_token, user_id, expires) VALUES ($1, $2, $3)`,
       [sessionToken, user.user_id, expires]
     );
+
+    await query(`UPDATE "user" SET last_login = NOW() WHERE user_id = $1`, [user.user_id]);
 
     const response = NextResponse.json({
       success: true,
       message: 'Login successful!',
-      user: {
-        userId: user.user_id,
-        identifier: trimmedIdentifier,
-        userType: user.user_type,
-      },
+      user: { userId: user.user_id, identifier: trimmed, userType: user.user_type },
     });
 
-    // Set HttpOnly cookie
     response.cookies.set('session_token', sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -61,8 +53,6 @@ export async function POST(req: NextRequest) {
       path: '/',
       sameSite: 'lax',
     });
-
-    await query('UPDATE user SET last_login = NOW() WHERE user_id = ?', [user.user_id]);
 
     return response;
   } catch (err) {

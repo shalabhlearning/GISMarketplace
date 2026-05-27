@@ -7,53 +7,48 @@ export async function GET(req: NextRequest) {
     const sessionToken = req.cookies.get('session_token')?.value;
     if (!sessionToken) return NextResponse.json({ trend: [] });
 
-    const sessionRows: any[] = await query(
-      `SELECT s.user_id 
-       FROM sessions s 
-       WHERE s.session_token = ? AND s.expires > NOW()`,
+    const sessionRows = await query(
+      `SELECT s.user_id
+       FROM sessions s
+       WHERE s.session_token = $1 AND s.expires > NOW()`,
       [sessionToken]
     );
 
     if (!sessionRows.length) return NextResponse.json({ trend: [] });
 
     const providerId = sessionRows[0].user_id;
-
-    // ?period=week  → last 8 weeks grouped by week
-    // ?period=month → last 6 months grouped by month (default)
     const period = req.nextUrl.searchParams.get('period') ?? 'month';
 
     let data: any[];
 
     if (period === 'week') {
-      // Group by ISO week for the last 8 weeks
+      // PostgreSQL: TO_CHAR + date_trunc instead of MySQL WEEK/DATE_FORMAT
       data = await query(
-        `SELECT 
-           CONCAT('W', LPAD(WEEK(created_at, 3), 2, '0')) AS m,
-           DATE_FORMAT(MIN(created_at), '%d %b')           AS label,
-           SUM(credits)                                     AS v
+        `SELECT
+           TO_CHAR(DATE_TRUNC('week', created_at), 'IYYY-IW') AS m,
+           TO_CHAR(MIN(created_at), 'DD Mon')                  AS label,
+           SUM(credits)                                         AS v
          FROM creditledger
-         WHERE provider_id = ?
+         WHERE provider_id = $1
            AND type        = 'debit'
-           AND created_at >= DATE_SUB(NOW(), INTERVAL 8 WEEK)
-         GROUP BY YEARWEEK(created_at, 3)
-         ORDER BY YEARWEEK(created_at, 3) ASC`,
+           AND created_at >= NOW() - INTERVAL '8 weeks'
+         GROUP BY DATE_TRUNC('week', created_at)
+         ORDER BY DATE_TRUNC('week', created_at) ASC`,
         [providerId]
       );
     } else {
       // Group by calendar month for the last 6 months
       data = await query(
-        `SELECT 
-           DATE_FORMAT(created_at, '%b')    AS m,
-           DATE_FORMAT(created_at, '%b %y') AS label,
-           SUM(credits)                     AS v
+        `SELECT
+           TO_CHAR(DATE_TRUNC('month', created_at), 'Mon')    AS m,
+           TO_CHAR(DATE_TRUNC('month', created_at), 'Mon YY') AS label,
+           SUM(credits)                                        AS v
          FROM creditledger
-         WHERE provider_id = ?
+         WHERE provider_id = $1
            AND type        = 'debit'
-           AND created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
-         GROUP BY DATE_FORMAT(created_at, '%Y-%m'),
-                  DATE_FORMAT(created_at, '%b'),
-                  DATE_FORMAT(created_at, '%b %y')
-         ORDER BY DATE_FORMAT(created_at, '%Y-%m') ASC`,
+           AND created_at >= NOW() - INTERVAL '6 months'
+         GROUP BY DATE_TRUNC('month', created_at)
+         ORDER BY DATE_TRUNC('month', created_at) ASC`,
         [providerId]
       );
     }

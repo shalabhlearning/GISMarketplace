@@ -1,3 +1,4 @@
+// src/app/api/proposal/create/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { randomUUID } from 'crypto';
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest) {
 
     const sessionRows = await db.query(
       `SELECT s.user_id, u.user_type FROM sessions s 
-       JOIN user u ON s.user_id = u.user_id 
+       JOIN "user" u ON s.user_id = u.user_id 
        WHERE s.session_token = ? AND s.expires > NOW()`,
       [sessionToken]
     );

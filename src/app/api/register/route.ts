@@ -8,35 +8,24 @@ import { matchRfpsForProvider } from '@/lib/matchProviders';
 export async function POST(req: NextRequest) {
   try {
     const {
-      userType,
-      email,
-      phoneNumber,
-      password,
-      organizationName,
-      skills,           // ✅ string[] from provider registration form
-      hourlyRate,
-      experienceYears,
-      portfolioUrl,
+      userType, email, phoneNumber, password,
+      organizationName, skills, hourlyRate, experienceYears, portfolioUrl,
     } = await req.json();
 
     if (!['buyer', 'provider', 'admin'].includes(userType)) {
       return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
     }
-
     if (!email || !phoneNumber || !password) {
-      return NextResponse.json({
-        error: 'Email, phone number, and password are required',
-      }, { status: 400 });
+      return NextResponse.json({ error: 'Email, phone number, and password are required' }, { status: 400 });
     }
 
     const cleanEmail = email.trim();
     const cleanPhone = phoneNumber.trim();
 
     const existing = await query(
-      'SELECT user_id FROM user WHERE email = ? OR phone_number = ?',
+      `SELECT user_id FROM "user" WHERE email = $1 OR phone_number = $2`,
       [cleanEmail, cleanPhone]
     );
-
     if (existing.length > 0) {
       return NextResponse.json({ error: 'User already exists' }, { status: 409 });
     }
@@ -45,63 +34,53 @@ export async function POST(req: NextRequest) {
     const userId = randomUUID();
 
     await query(
-      'INSERT INTO user (user_id, email, phone_number, password_hash, user_type, status) VALUES (?, ?, ?, ?, ?, "active")',
+      `INSERT INTO "user" (user_id, email, phone_number, password_hash, user_type, status)
+       VALUES ($1, $2, $3, $4, $5, 'active')`,
       [userId, cleanEmail, cleanPhone, hashedPassword, userType]
     );
 
     if (userType === 'buyer') {
       await query(
-        'INSERT INTO buyerprofile (buyer_id, organization_name, rating) VALUES (?, ?, 0.0)',
+        `INSERT INTO buyerprofile (buyer_id, organization_name, rating) VALUES ($1, $2, 0.0)`,
         [userId, organizationName || null]
       );
     }
 
     if (userType === 'provider') {
-      // ✅ Save skills from registration form
       const skillsJson = Array.isArray(skills) && skills.length > 0
         ? JSON.stringify(skills)
         : null;
 
       await query(
-        `INSERT INTO providerprofile (
-          provider_id, organization_name, skills, hourly_rate, experience_years, portfolio_url, subscription_status, rating
-        ) VALUES (?, ?, ?, ?, ?, ?, 'none', 0.0)`,
+        `INSERT INTO providerprofile
+           (provider_id, organization_name, skills, hourly_rate, experience_years, portfolio_url, subscription_status, rating)
+         VALUES ($1, $2, $3, $4, $5, $6, 'none', 0.0)`,
         [
           userId,
           organizationName || null,
           skillsJson,
-          hourlyRate ? parseFloat(hourlyRate) : null,
+          hourlyRate   ? parseFloat(hourlyRate)    : null,
           experienceYears ? parseInt(experienceYears) : null,
           portfolioUrl || null,
         ]
       );
 
       await query(
-        `INSERT INTO creditledger (id, provider_id, credits, type, reason) 
-         VALUES (?, ?, 100, 'credit', 'Initial credits')`,
+        `INSERT INTO creditledger (id, provider_id, credits, type, reason)
+         VALUES ($1, $2, 100, 'credit', 'Initial credits')`,
         [randomUUID(), userId]
       );
 
-      // ✅ Fire-and-forget: match this provider against all open RFPs immediately.
-      // Since skills are saved above, this will actually find matches on first join.
-      // Response goes back instantly — matching runs in the background.
       matchRfpsForProvider(userId)
         .then(result => {
           if (result.total_matches > 0) {
             console.log(`🎯 New provider "${organizationName}" matched to ${result.total_matches} RFPs on join`);
-          } else {
-            console.log(`ℹ️ New provider "${organizationName}" — no matching RFPs found yet`);
           }
         })
-        .catch(err => {
-          console.error(`⚠️ Initial match failed for provider ${userId}:`, err.message);
-        });
+        .catch(err => console.error(`⚠️ Initial match failed for provider ${userId}:`, err.message));
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Account created successfully!',
-    });
+    return NextResponse.json({ success: true, message: 'Account created successfully!' });
 
   } catch (error: any) {
     console.error(error);
