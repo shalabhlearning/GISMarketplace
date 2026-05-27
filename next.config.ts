@@ -3,7 +3,6 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
-  // Force Webpack (more stable for your current setup with fallbacks)
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -13,13 +12,12 @@ const nextConfig: NextConfig = {
         fs: false,
       };
     }
+
     return config;
   },
 
-  // Fix for pdf-parse
   serverExternalPackages: ['pdf-parse'],
 
-  // Image configuration
   images: {
     remotePatterns: [
       {

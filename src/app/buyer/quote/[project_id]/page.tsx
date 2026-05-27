@@ -1,4 +1,3 @@
-// src/app/buyer/quote/[project_id]/page.tsx
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
@@ -10,7 +9,7 @@ import {
   ChevronUp, Award, AlertTriangle, Eye,
 } from 'lucide-react';
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
 interface Quote {
   proposal_id: string;
   provider_name: string;
@@ -67,8 +66,11 @@ function Toast({ msg, type, onClose }: { msg: string; type: 'success' | 'error';
 function ConfirmModal({
   open, onConfirm, onCancel, providerName, action,
 }: {
-  open: boolean; onConfirm: () => void; onCancel: () => void;
-  providerName: string; action: 'award' | 'reject';
+  open: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+  providerName: string;
+  action: 'award' | 'reject';
 }) {
   if (!open) return null;
   return (
@@ -76,7 +78,7 @@ function ConfirmModal({
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-7 mx-4">
         <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${action === 'award' ? 'bg-emerald-50' : 'bg-red-50'}`}>
           {action === 'award'
-            ? <Award       className="w-6 h-6 text-emerald-600" />
+            ? <Award className="w-6 h-6 text-emerald-600" />
             : <AlertTriangle className="w-6 h-6 text-red-500" />}
         </div>
         <h3 className="text-xl font-bold text-gray-900 mb-2">
@@ -84,18 +86,24 @@ function ConfirmModal({
         </h3>
         <p className="text-gray-500 text-sm mb-6">
           {action === 'award'
-            ? <>You're awarding the contract to <strong className="text-gray-900">{providerName}</strong>. All other quotes will be automatically rejected. This cannot be undone.</>
-            : <>You're rejecting the quote from <strong className="text-gray-900">{providerName}</strong>.</>}
+            ? <><span>You're awarding the contract to </span><strong className="text-gray-900">{providerName}</strong><span>. All other quotes will be automatically rejected. This cannot be undone.</span></>
+            : <><span>You're rejecting the quote from </span><strong className="text-gray-900">{providerName}</strong>.</>}
         </p>
         <div className="flex gap-3">
-          <button onClick={onCancel}
-            className="flex-1 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all">
+          <button
+            onClick={onCancel}
+            className="flex-1 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all"
+          >
             Cancel
           </button>
-          <button onClick={onConfirm}
+          <button
+            onClick={onConfirm}
             className={`flex-1 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all shadow-sm ${
-              action === 'award' ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200' : 'bg-red-500 hover:bg-red-600 shadow-red-200'
-            }`}>
+              action === 'award'
+                ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200'
+                : 'bg-red-500 hover:bg-red-600 shadow-red-200'
+            }`}
+          >
             {action === 'award' ? 'Yes, Award Contract' : 'Yes, Reject'}
           </button>
         </div>
@@ -109,8 +117,12 @@ function QuoteCard({
   quote, isBestValue, isAwarded, rfpAwarded,
   onAward, onReject,
 }: {
-  quote: Quote; isBestValue: boolean; isAwarded: boolean; rfpAwarded: boolean;
-  onAward: (q: Quote) => void; onReject: (q: Quote) => void;
+  quote: Quote;
+  isBestValue: boolean;
+  isAwarded: boolean;
+  rfpAwarded: boolean;
+  onAward: (q: Quote) => void;
+  onReject: (q: Quote) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const p = parseProposal(quote.proposal_message);
@@ -128,10 +140,9 @@ function QuoteCard({
   return (
     <div className={`bg-white rounded-2xl border-2 shadow-sm transition-all overflow-hidden ${
       isAccepted  ? 'border-emerald-400 shadow-emerald-100' :
-      isRejected  ? 'border-gray-200 opacity-60'            :
-      isBestValue ? 'border-emerald-300'                    : 'border-gray-100 hover:border-emerald-200'
+      isRejected  ? 'border-gray-200 opacity-60' :
+      isBestValue ? 'border-emerald-300' : 'border-gray-100 hover:border-emerald-200'
     }`}>
-      {/* Best Value banner */}
       {isBestValue && !isRejected && (
         <div className="bg-emerald-600 text-white text-xs font-bold px-4 py-1.5 flex items-center gap-1.5">
           <Star className="w-3.5 h-3.5" /> Best Value
@@ -272,19 +283,18 @@ export default function RfpQuotesPage() {
   const { project_id } = useParams<{ project_id: string }>();
   const router = useRouter();
 
-  const [rfp, setRfp]         = useState<RfpInfo | null>(null);
-  const [quotes, setQuotes]   = useState<Quote[]>([]);
+  const [rfp, setRfp]       = useState<RfpInfo | null>(null);
+  const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast]     = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+  const [toastState, setToastState] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const [confirm, setConfirm] = useState<{ quote: Quote; action: 'award' | 'reject' } | null>(null);
-  const [acting, setActing]   = useState(false);
+  const [acting, setActing] = useState(false);
 
-  // Filter state
-  const [statusFilter, setStatusFilter] = useState<'all' | 'submitted' | 'accepted' | 'rejected'>('all');
-  const [maxBudget, setMaxBudget]       = useState<number>(Infinity);
-  const [searchVendor, setSearchVendor] = useState('');
+  const [statusFilter, setStatusFilter]   = useState<'all' | 'submitted' | 'accepted' | 'rejected'>('all');
+  const [maxBudget, setMaxBudget]         = useState<number>(Infinity);
+  const [searchVendor, setSearchVendor]   = useState('');
 
-  const showToast = (msg: string, type: 'success' | 'error') => setToast({ msg, type });
+  const showToast = (msg: string, type: 'success' | 'error') => setToastState({ msg, type });
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -293,9 +303,9 @@ export default function RfpQuotesPage() {
         fetch(`/api/rfp/single?project_id=${project_id}`, { credentials: 'include' }),
         fetch(`/api/buyer/rfp-quotes?project_id=${project_id}`, { credentials: 'include' }),
       ]);
-      if (rfpRes.ok)    setRfp(await rfpRes.json());
+      if (rfpRes.ok) setRfp(await rfpRes.json());
       if (quotesRes.ok) setQuotes((await quotesRes.json()).quotes || []);
-    } catch {}
+    } catch { }
     setLoading(false);
   }, [project_id]);
 
@@ -347,15 +357,17 @@ export default function RfpQuotesPage() {
     setActing(false);
   };
 
-  // Best value = lowest bid among submitted
-  const submitted = quotes.filter(q => q.status === 'submitted');
-  const minBid    = submitted.length ? Math.min(...submitted.map(q => Number(q.bid_amount))) : null;
-  const rfpAwarded = quotes.some(q => q.status === 'accepted') || rfp?.status === 'contracted';
+  const submitted   = quotes.filter(q => q.status === 'submitted');
+  const minBid      = submitted.length ? Math.min(...submitted.map(q => Number(q.bid_amount))) : null;
+  const rfpAwarded  = quotes.some(q => q.status === 'accepted') || rfp?.status === 'contracted';
 
   const filtered = quotes.filter(q => {
     if (statusFilter !== 'all' && q.status !== statusFilter) return false;
-    if (searchVendor && !q.provider_name?.toLowerCase().includes(searchVendor.toLowerCase()) &&
-        !q.provider_email?.toLowerCase().includes(searchVendor.toLowerCase())) return false;
+    if (
+      searchVendor &&
+      !q.provider_name?.toLowerCase().includes(searchVendor.toLowerCase()) &&
+      !q.provider_email?.toLowerCase().includes(searchVendor.toLowerCase())
+    ) return false;
     if (maxBudget !== Infinity && Number(q.bid_amount) > maxBudget) return false;
     return true;
   });
@@ -375,13 +387,26 @@ export default function RfpQuotesPage() {
 
   return (
     <DashboardShell>
-      {toast && <Toast msg={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
+      {toastState && (
+        <Toast
+          msg={toastState.msg}
+          type={toastState.type}
+          onClose={() => setToastState(null)}
+        />
+      )}
 
       <ConfirmModal
         open={!!confirm}
         action={confirm?.action ?? 'award'}
         providerName={confirm?.quote.provider_name || confirm?.quote.provider_email || ''}
-        onConfirm={() => confirm?.action === 'award' ? handleAward(confirm.quote) : handleReject(confirm.quote)}
+        onConfirm={() => {
+          if (!confirm) return;
+          if (confirm.action === 'award') {
+            handleAward(confirm.quote);
+          } else {
+            handleReject(confirm.quote);
+          }
+        }}
         onCancel={() => setConfirm(null)}
       />
 
@@ -396,18 +421,19 @@ export default function RfpQuotesPage() {
 
       <div className="flex gap-6 py-6 min-h-screen">
 
-        {/* ── Filters Sidebar ──────────────────────────────────────────────── */}
+        {/* ── Filters Sidebar ── */}
         <aside className="w-56 shrink-0 hidden lg:block">
           <div className="sticky top-6 bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-gray-900 text-sm">Filters</h3>
-              <button onClick={() => { setStatusFilter('all'); setSearchVendor(''); setMaxBudget(Infinity); }}
-                className="text-xs text-emerald-600 hover:text-emerald-700 font-semibold">
+              <button
+                onClick={() => { setStatusFilter('all'); setSearchVendor(''); setMaxBudget(Infinity); }}
+                className="text-xs text-emerald-600 hover:text-emerald-700 font-semibold"
+              >
                 Reset All
               </button>
             </div>
 
-            {/* Vendor Search */}
             <div>
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Vendor</p>
               <input
@@ -418,7 +444,6 @@ export default function RfpQuotesPage() {
               />
             </div>
 
-            {/* Status filter */}
             <div>
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Quote Status</p>
               <div className="space-y-2">
@@ -429,10 +454,14 @@ export default function RfpQuotesPage() {
                   { val: 'rejected',  label: 'Rejected', count: quotes.filter(q => q.status === 'rejected').length },
                 ] as const).map(({ val, label, count }) => (
                   <label key={val} className="flex items-center gap-2.5 cursor-pointer group">
-                    <div onClick={() => setStatusFilter(val)}
+                    <div
+                      onClick={() => setStatusFilter(val)}
                       className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all cursor-pointer ${
-                        statusFilter === val ? 'bg-emerald-600 border-emerald-600' : 'border-gray-300 group-hover:border-emerald-400'
-                      }`}>
+                        statusFilter === val
+                          ? 'bg-emerald-600 border-emerald-600'
+                          : 'border-gray-300 group-hover:border-emerald-400'
+                      }`}
+                    >
                       {statusFilter === val && <div className="w-1.5 h-1.5 bg-white rounded-sm" />}
                     </div>
                     <span className="text-sm text-gray-700 flex-1">{label}</span>
@@ -442,19 +471,24 @@ export default function RfpQuotesPage() {
               </div>
             </div>
 
-            {/* Price range */}
             {maxQuoteBid > 0 && (
               <div>
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  Max Price
+                  Max Price{' '}
                   <span className="ml-1 text-emerald-600 normal-case font-normal">
                     {maxBudget === Infinity ? 'Any' : `$${maxBudget.toLocaleString()}`}
                   </span>
                 </p>
                 <input
-                  type="range" min={0} max={maxQuoteBid}
+                  type="range"
+                  min={0}
+                  max={maxQuoteBid}
                   value={maxBudget === Infinity ? maxQuoteBid : maxBudget}
-                  onChange={e => setMaxBudget(Number(e.target.value) === maxQuoteBid ? Infinity : Number(e.target.value))}
+                  onChange={e =>
+                    setMaxBudget(
+                      Number(e.target.value) === maxQuoteBid ? Infinity : Number(e.target.value),
+                    )
+                  }
                   className="w-full accent-emerald-600"
                 />
                 <div className="flex justify-between text-xs text-gray-400 mt-1">
@@ -466,13 +500,13 @@ export default function RfpQuotesPage() {
           </div>
         </aside>
 
-        {/* ── Main Content ──────────────────────────────────────────────────── */}
+        {/* ── Main Content ── */}
         <div className="flex-1 min-w-0 space-y-6">
-
-          {/* Back + Header */}
           <div>
-            <button onClick={() => router.push('/buyer/quote')}
-              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-emerald-600 font-medium mb-4 transition-colors">
+            <button
+              onClick={() => router.push('/buyer/quote')}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-emerald-600 font-medium mb-4 transition-colors"
+            >
               <ArrowLeft className="w-4 h-4" /> Back to RFPs
             </button>
 
@@ -487,7 +521,9 @@ export default function RfpQuotesPage() {
                 <p className="text-gray-500 text-sm mt-1">
                   {quotes.length} Quote{quotes.length !== 1 ? 's' : ''} Received
                   {rfp?.submission_deadline && (() => {
-                    const days = Math.ceil((new Date(rfp.submission_deadline).getTime() - Date.now()) / 86400000);
+                    const days = Math.ceil(
+                      (new Date(rfp.submission_deadline).getTime() - Date.now()) / 86400000,
+                    );
                     return days > 0 ? ` • Closes in ${days} days` : ' • Deadline passed';
                   })()}
                 </p>
@@ -500,7 +536,6 @@ export default function RfpQuotesPage() {
             </div>
           </div>
 
-          {/* Quote Cards */}
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-52 bg-white rounded-2xl border border-gray-100 shadow-sm gap-3">
               <FileText className="w-10 h-10 text-gray-300" />

@@ -1,13 +1,12 @@
 'use client';
 
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { useState } from 'react';
-import RfpDetailsModal from '../provider/RfpDetailsModal'; // Reuse the same modal
 import BuyerRfpDetailsModal from './BuyerRfpDetailsModal';
 
 export default function BuyerRfpTable({
   rfps = [],
-  hasSubscription
+  hasSubscription,
 }: {
   rfps: any[];
   hasSubscription: boolean;
@@ -35,7 +34,6 @@ export default function BuyerRfpTable({
                 <th className="px-8 py-5 text-center text-xs font-bold text-gray-800 uppercase tracking-wider">ACTIONS</th>
               </tr>
             </thead>
-
             <tbody className="divide-y divide-gray-100">
               {rfps.length === 0 ? (
                 <tr>
@@ -52,34 +50,34 @@ export default function BuyerRfpTable({
                         {r.project_id?.slice(0, 8).toUpperCase() || '—'}
                       </div>
                     </td>
-
                     <td className="px-6 py-6 text-center">
-                      <span className={`inline-flex items-center px-5 py-1.5 text-xs font-semibold rounded-full uppercase tracking-wider
-                        ${r.status === 'in_review' ? 'bg-amber-600 text-white' :
-                          r.status === 'open' ? 'bg-emerald-600 text-white' :
-                            'bg-gray-600 text-white'}`}>
+                      <span
+                        className={`inline-flex items-center px-5 py-1.5 text-xs font-semibold rounded-full uppercase tracking-wider ${
+                          r.status === 'in_review'
+                            ? 'bg-amber-600 text-white'
+                            : r.status === 'open'
+                            ? 'bg-emerald-600 text-white'
+                            : 'bg-gray-600 text-white'
+                        }`}
+                      >
                         {r.status === 'in_review' ? 'UNDER REVIEW' : r.status?.toUpperCase() || 'OPEN'}
                       </span>
                     </td>
-
                     <td className="px-6 py-6 text-center font-medium text-gray-900">
                       {r.budget ? `$${Number(r.budget).toLocaleString()}` : 'Negotiable'}
                     </td>
-
                     <td className="px-6 py-6 text-center text-gray-600">
                       {r.submission_deadline
                         ? new Date(r.submission_deadline).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric',
-                            year: 'numeric'
+                            year: 'numeric',
                           })
                         : '—'}
                     </td>
-
                     <td className="px-6 py-6 text-center font-medium text-gray-900">
                       {r.quotes_count || 0}
                     </td>
-
                     <td className="px-8 py-6 text-center">
                       <button
                         onClick={() => handleViewRfp(r)}
@@ -97,7 +95,6 @@ export default function BuyerRfpTable({
         </div>
       </div>
 
-      {/* Reuse the same modal */}
       <BuyerRfpDetailsModal
         rfp={selectedRfp}
         isOpen={isModalOpen}

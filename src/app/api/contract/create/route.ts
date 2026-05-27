@@ -16,13 +16,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify session and buyer role
-    const sessionRows = await sql(
-      `SELECT s.user_id, u.user_type
-       FROM sessions s
-       JOIN "user" u ON s.user_id = u.user_id
-       WHERE s.session_token = $1 AND s.expires > NOW()`,
-      [sessionToken]
-    );
+    const sessionRows = await sql`
+  SELECT s.user_id, u.user_type
+  FROM sessions s
+  JOIN "user" u ON s.user_id = u.user_id
+  WHERE s.session_token = ${sessionToken}
+  AND s.expires > NOW()
+`;
 
     if (!sessionRows.length) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
@@ -39,8 +39,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch proposal + project details
-    const proposalRows = await sql(
-      `SELECT
+    const proposalRows = await sql`
+      SELECT
          p.project_id,
          p.status          AS proposal_status,
          p.provider_id     AS freelancer_id,
@@ -49,9 +49,8 @@ export async function POST(req: NextRequest) {
          pr.end_date
        FROM proposal p
        JOIN projectrequest pr ON p.project_id = pr.project_id
-       WHERE p.proposal_id = $1 AND pr.buyer_id = $2`,
-      [proposal_id, buyerId]
-    );
+       WHERE p.proposal_id = ${proposal_id} AND pr.buyer_id = ${buyerId}
+    `;
 
     if (!proposalRows.length) {
       return NextResponse.json({ error: 'Proposal not found or unauthorized' }, { status: 403 });
@@ -68,10 +67,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if contract already exists
-    const existing = await sql(
-      `SELECT contract_id FROM contract WHERE proposal_id = $1`,
-      [proposal_id]
-    );
+    const existing = await sql`
+      SELECT contract_id FROM contract WHERE proposal_id = ${proposal_id}
+    `;
 
     if (existing.length) {
       return NextResponse.json({ error: 'Contract already exists' }, { status: 400 });
@@ -81,27 +79,23 @@ export async function POST(req: NextRequest) {
 
     // Run all writes as a transaction using neon's transaction helper
     await sql.transaction([
-      sql(
-        `INSERT INTO contract (contract_id, proposal_id, start_date, end_date, status)
-         VALUES ($1, $2, $3, $4, 'in_progress')`,
-        [contract_id, proposal_id, start_date, end_date]
-      ),
-      sql(
-        `UPDATE proposal SET status = 'accepted' WHERE proposal_id = $1`,
-        [proposal_id]
-      ),
-      sql(
-        `UPDATE proposal
+      sql`
+        INSERT INTO contract (contract_id, proposal_id, start_date, end_date, status)
+         VALUES (${contract_id}, ${proposal_id}, ${start_date}, ${end_date}, 'in_progress')
+      `,
+      sql`
+        UPDATE proposal SET status = 'accepted' WHERE proposal_id = ${proposal_id}
+      `,
+      sql`
+        UPDATE proposal
          SET status = 'rejected'
-         WHERE project_id = $1 AND proposal_id != $2`,
-        [project_id, proposal_id]
-      ),
-      sql(
-        `UPDATE projectrequest
-         SET status = 'contracted', awarded_to = $1
-         WHERE project_id = $2`,
-        [freelancer_id, project_id]
-      ),
+         WHERE project_id = ${project_id} AND proposal_id != ${proposal_id}
+      `,
+      sql`
+        UPDATE projectrequest
+         SET status = 'contracted', awarded_to = ${freelancer_id}
+         WHERE project_id = ${project_id}
+      `,
     ]);
 
     return NextResponse.json({

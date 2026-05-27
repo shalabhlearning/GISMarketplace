@@ -231,6 +231,7 @@ export default function AdminDashboardPage() {
         <StatCard
           label="Pending Approvals"
           value={stats.totalPending}
+          badge={null}
           icon={<FileText className="w-5 h-5 text-muted-foreground" />}
         />
         <StatCard
@@ -445,7 +446,7 @@ function StatCard({
 }: {
   label: string;
   value: number | string;
-  badge: { text: string; color: string } | null;
+  badge?: { text: string; color: string } | null;
   icon: React.ReactNode;
   isText?: boolean;
 }) {

@@ -113,7 +113,7 @@ export default function RfpDetailPage() {
 
   return (
     <DashboardShell>
-      <Toaster position="top-center" richColors />
+      <Toaster position="top-center" />
 
       {/* ── Back button ── */}
       <button
