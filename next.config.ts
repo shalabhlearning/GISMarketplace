@@ -3,18 +3,12 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
-  // Important: Allow pdf-parse to work in Server Components / API Routes
-  experimental: {
-    serverComponentsExternalPackages: ['pdf-parse'],
-  },
+  // Fixed: Use serverExternalPackages (new correct key)
+  serverExternalPackages: ['pdf-parse'],
 
-  // Turbopack config (if you're using it)
-  turbopack: {
-    resolveAlias: {
-      net: false,
-      tls: false,
-      fs: false,
-    },
+  // Disable Turbopack (recommended for stability on Vercel right now)
+  experimental: {
+    turbopack: false,
   },
 
   // Image configuration
@@ -27,7 +21,7 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Webpack fallback (safety net)
+  // Webpack fallback for client-side (net, tls, fs)
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
