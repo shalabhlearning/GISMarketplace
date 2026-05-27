@@ -3,10 +3,7 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
-  // Fix for pdf-parse and other server packages
-  serverExternalPackages: ['pdf-parse'],
-
-  // Important: Force Webpack instead of Turbopack (more stable for your setup)
+  // Force Webpack (more stable for your current setup with fallbacks)
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -19,7 +16,10 @@ const nextConfig: NextConfig = {
     return config;
   },
 
-  // Image domains
+  // Fix for pdf-parse
+  serverExternalPackages: ['pdf-parse'],
+
+  // Image configuration
   images: {
     remotePatterns: [
       {
