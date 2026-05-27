@@ -1,23 +1,38 @@
-// src/lib/db.ts (Fixed: Replace undefined params with null to avoid mysql2 bind error)
+// src/lib/db.ts
+import { env } from './env';
 import mysql from 'mysql2/promise';
-import 'dotenv/config';
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'help',
-  database: 'GISMarketplace',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+console.log("=== DB CONNECTION DEBUG ===");
+console.log("FINAL DB_HOST:", env.db.host);
+console.log("Clever Cloud: ✅ YES");
+console.log("===========================");
 
-export async function query(sql: string, params?: any[]) {
-  // Safely replace any undefined with null (mysql2 requires this for bind params)
-  const safeParams = (params || []).map(p => (p === undefined ? null : p));
-  
-  const result = await pool.execute(sql, safeParams);
-  return result[0]; // Always return only the rows
+let pool: mysql.Pool | null = null;
+
+function getPool() {
+  if (!pool) {
+    pool = mysql.createPool({
+      host: env.db.host,
+      port: env.db.port,
+      user: env.db.user,
+      password: env.db.password,
+      database: env.db.database,
+      waitForConnections: true,
+      connectionLimit: 4,        // Keep under Clever Cloud limit
+      queueLimit: 0,
+      enableKeepAlive: true,
+    });
+    console.log("🟢 New database pool created");
+  }
+  return pool;
 }
 
+export async function query(sql: string, params?: any[]) {
+  const safeParams = (params || []).map(p => (p === undefined ? null : p));
+  const dbPool = getPool();
+  const [rows] = await dbPool.execute(sql, safeParams);
+  return rows;
+}
+
+export { getPool };
 export default { query };

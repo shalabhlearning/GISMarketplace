@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:export": "tsx export-latest-schema.ts",
+    "db:export": "set DB_HOST=localhost&& set DB_USER=root&& set DB_PASSWORD=help&& set DB_NAME=GISMarketplace&& tsx export-latest-schema.ts",
     "db:apply": "tsx apply-schema.ts"
   },
   "dependencies": {

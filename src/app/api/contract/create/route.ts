@@ -1,7 +1,8 @@
 // src/app/api/contract/create/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
 import { randomUUID } from 'crypto';
+import 'dotenv/config';   // ← Add this line at the top
+import mysql from 'mysql2/promise';
 
 export async function POST(req: NextRequest) {
   const pool = mysql.createPool({

@@ -1,13 +1,242 @@
--- =============================================
--- GISMarketplace - Full Export (Schema + Data)
--- Generated on: 2026-05-26T08:40:22.071Z
--- =============================================
+-- GISMarketplace Full Export
+-- Generated: 2026-05-26T11:46:46.475Z
 
 SET FOREIGN_KEY_CHECKS = 0;
+SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 
--- -----------------------------------------------
--- Table: buyerprofile
--- -----------------------------------------------
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user` (
+  `user_id` char(36) NOT NULL DEFAULT (uuid()),
+  `email` varchar(255) DEFAULT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `user_type` enum('buyer','provider','admin') NOT NULL,
+  `join_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `last_login` datetime DEFAULT NULL,
+  `status` enum('active','inactive','suspended') NOT NULL DEFAULT 'active',
+  `phone_number` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `phone_number` (`phone_number`),
+  UNIQUE KEY `email_2` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `user` (`user_id`, `email`, `password_hash`, `user_type`, `last_login`, `status`, `phone_number`) VALUES
+  ('bed9f264-58f7-11f1-b9ae-cecd02c24f20', 'saransh1@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-31 05:42:22', 'active', NULL),
+  ('bed9f6e5-58f7-11f1-b9ae-cecd02c24f20', NULL, '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', '+919717485454'),
+  ('bed9f8b5-58f7-11f1-b9ae-cecd02c24f20', 'testnew@gmail.com', '$2b$12$u3RAIPC/XAftGYZdbOAcoe/qTYYije4BWJ71v0Wd8aqtiznOqzw9m', 'provider', '2026-05-16 11:45:38', 'active', '9133446677'),
+  ('bed9f96c-58f7-11f1-b9ae-cecd02c24f20', 'test80@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2026-05-22 01:58:11', 'active', '9999888800'),
+  ('bed9fa0d-58f7-11f1-b9ae-cecd02c24f20', 'test3@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2026-01-11 08:53:35', 'active', NULL),
+  ('bed9faaf-58f7-11f1-b9ae-cecd02c24f20', 'test4@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-01-11 08:36:26', 'active', NULL),
+  ('bed9fb50-58f7-11f1-b9ae-cecd02c24f20', 'test54@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', '7848659815'),
+  ('bed9fbe2-58f7-11f1-b9ae-cecd02c24f20', 'shivanshumit2107@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', '9999999999'),
+  ('bed9fc87-58f7-11f1-b9ae-cecd02c24f20', 'nakshatechprivatelimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2026-05-15 10:53:31', 'active', NULL),
+  ('bed9fd2a-58f7-11f1-b9ae-cecd02c24f20', 'geoknoindia@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bed9fdc7-58f7-11f1-b9ae-cecd02c24f20', 'aamgeospatialtechprivatelimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bed9fe6a-58f7-11f1-b9ae-cecd02c24f20', 'alartechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2026-05-19 08:11:24', 'active', NULL),
+  ('bed9ff17-58f7-11f1-b9ae-cecd02c24f20', 'focusgeospatialprivatelimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda001b-58f7-11f1-b9ae-cecd02c24f20', 'geocentroidpvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda0132-58f7-11f1-b9ae-cecd02c24f20', 'goodlandgeospatialconsultantspvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda04de-58f7-11f1-b9ae-cecd02c24f20', 'mappaconsultingengineers@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda05bd-58f7-11f1-b9ae-cecd02c24f20', 'matrixgeosolutionltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda065c-58f7-11f1-b9ae-cecd02c24f20', 'lidartechpvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda06ee-58f7-11f1-b9ae-cecd02c24f20', 'genesysinternationalcorporationlimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda07aa-58f7-11f1-b9ae-cecd02c24f20', 'marvelgeospatialsolutionspvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda083d-58f7-11f1-b9ae-cecd02c24f20', 'bpcconsultantindiapvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda08d0-58f7-11f1-b9ae-cecd02c24f20', 'airpix@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda0960-58f7-11f1-b9ae-cecd02c24f20', 'sislindia@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda09f7-58f7-11f1-b9ae-cecd02c24f20', 'geovistatechnologiesprivatelimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda0a93-58f7-11f1-b9ae-cecd02c24f20', 'neogeoinfotechnologiespvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda0b2a-58f7-11f1-b9ae-cecd02c24f20', 'lidarengineeringandinfrastructurepvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda0bc3-58f7-11f1-b9ae-cecd02c24f20', 'datalabsindiasolutionspvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda0c78-58f7-11f1-b9ae-cecd02c24f20', 'landcoordinatestechnologylctssin@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda0d10-58f7-11f1-b9ae-cecd02c24f20', 'rightdatalabspvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda0db0-58f7-11f1-b9ae-cecd02c24f20', 'leadsquared@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda0e47-58f7-11f1-b9ae-cecd02c24f20', 'ispatialtechnosolutionspvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda0ede-58f7-11f1-b9ae-cecd02c24f20', 'datarisesolutions@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda0f85-58f7-11f1-b9ae-cecd02c24f20', 'lumendatasolutionsindiapvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda102e-58f7-11f1-b9ae-cecd02c24f20', 'atomaviationservicespvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda10c7-58f7-11f1-b9ae-cecd02c24f20', '3dpointshot@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda1155-58f7-11f1-b9ae-cecd02c24f20', 'infogeo@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda11e8-58f7-11f1-b9ae-cecd02c24f20', 'robomaniaindiaprivatelimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda127b-58f7-11f1-b9ae-cecd02c24f20', 'trigeotechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda130f-58f7-11f1-b9ae-cecd02c24f20', 'vividgeospatial@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda13a3-58f7-11f1-b9ae-cecd02c24f20', 'focusgeospatial@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda143b-58f7-11f1-b9ae-cecd02c24f20', 'ceinsystech@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda14cb-58f7-11f1-b9ae-cecd02c24f20', 'avakazageoscienceresearchtechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda155c-58f7-11f1-b9ae-cecd02c24f20', 'geoadithyatechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda15ed-58f7-11f1-b9ae-cecd02c24f20', 'geopageconsultants@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda1687-58f7-11f1-b9ae-cecd02c24f20', 'leptonsoftware@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda171d-58f7-11f1-b9ae-cecd02c24f20', 'ansimaptechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda17ac-58f7-11f1-b9ae-cecd02c24f20', 'productionmodelingindiaprivatelimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda183a-58f7-11f1-b9ae-cecd02c24f20', 'orbxtechnologiesprivatelimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda18cc-58f7-11f1-b9ae-cecd02c24f20', 'mapvista@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('beda195c-58f7-11f1-b9ae-cecd02c24f20', 'miraiaerospacesystems@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL);
+INSERT INTO `user` (`user_id`, `email`, `password_hash`, `user_type`, `last_login`, `status`, `phone_number`) VALUES
+  ('bf2c43ea-58f7-11f1-b9ae-cecd02c24f20', 'ausaaravunmannedsystems@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c492f-58f7-11f1-b9ae-cecd02c24f20', 'kglobesofttechindia@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c4a21-58f7-11f1-b9ae-cecd02c24f20', 'pixelvision@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c4ad0-58f7-11f1-b9ae-cecd02c24f20', 'hdsense@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c4b59-58f7-11f1-b9ae-cecd02c24f20', 'easternaerocarto@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c4be5-58f7-11f1-b9ae-cecd02c24f20', 'deducetechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c4c6e-58f7-11f1-b9ae-cecd02c24f20', 'aryageospatial@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c4cf7-58f7-11f1-b9ae-cecd02c24f20', 'edge3dtechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c4daf-58f7-11f1-b9ae-cecd02c24f20', 'asteriaaerospace@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2026-05-19 01:54:26', 'active', NULL),
+  ('bf2c4e44-58f7-11f1-b9ae-cecd02c24f20', 'peppertreeai@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c4ec9-58f7-11f1-b9ae-cecd02c24f20', 'jkrconsulting@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c4f54-58f7-11f1-b9ae-cecd02c24f20', 'heliware@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c4fd4-58f7-11f1-b9ae-cecd02c24f20', 'gisconsortiumindiapvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5055-58f7-11f1-b9ae-cecd02c24f20', 'rsisoftech@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c50d9-58f7-11f1-b9ae-cecd02c24f20', 'coordinatesystemsllp@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c515e-58f7-11f1-b9ae-cecd02c24f20', 'aerodyneindia@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c51eb-58f7-11f1-b9ae-cecd02c24f20', 'terrageotechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5279-58f7-11f1-b9ae-cecd02c24f20', 'mappaturageospatial@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5301-58f7-11f1-b9ae-cecd02c24f20', 'techmapperz@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c53fc-58f7-11f1-b9ae-cecd02c24f20', 'senseimagetechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c549e-58f7-11f1-b9ae-cecd02c24f20', 'yellowskye@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5573-58f7-11f1-b9ae-cecd02c24f20', 'treistek@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5613-58f7-11f1-b9ae-cecd02c24f20', 'earthonmappingconsulting@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c56ea-58f7-11f1-b9ae-cecd02c24f20', 'lucidimagingpvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5814-58f7-11f1-b9ae-cecd02c24f20', 'globeviewtechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c58b0-58f7-11f1-b9ae-cecd02c24f20', 'larixtechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5944-58f7-11f1-b9ae-cecd02c24f20', 'laderatechnology@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c59de-58f7-11f1-b9ae-cecd02c24f20', 'vmapstechindia@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5a79-58f7-11f1-b9ae-cecd02c24f20', 'geovertx@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5b1b-58f7-11f1-b9ae-cecd02c24f20', 'lgeom@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5bbd-58f7-11f1-b9ae-cecd02c24f20', 'latlontechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5c59-58f7-11f1-b9ae-cecd02c24f20', 'wildplantterrestrialsolutions@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5cf2-58f7-11f1-b9ae-cecd02c24f20', 'flybitechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5d88-58f7-11f1-b9ae-cecd02c24f20', 'leonsdigitaltechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5e20-58f7-11f1-b9ae-cecd02c24f20', 'droneacharyaaerialinnovations@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5eb0-58f7-11f1-b9ae-cecd02c24f20', 'astonbimcreations@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5f45-58f7-11f1-b9ae-cecd02c24f20', 'shayonamanagementservices@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c5fd3-58f7-11f1-b9ae-cecd02c24f20', 'dronitech@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c606b-58f7-11f1-b9ae-cecd02c24f20', 'laresgloballimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c60fd-58f7-11f1-b9ae-cecd02c24f20', 'raynasinfraandgeometics@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c6192-58f7-11f1-b9ae-cecd02c24f20', 'lrsservices@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c6226-58f7-11f1-b9ae-cecd02c24f20', 'ldsengineers@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c62ba-58f7-11f1-b9ae-cecd02c24f20', 'laminds@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c6353-58f7-11f1-b9ae-cecd02c24f20', 'terraaligngeospatialsolutions@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c63ec-58f7-11f1-b9ae-cecd02c24f20', 'skymapgeoinfomatic@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c6483-58f7-11f1-b9ae-cecd02c24f20', 'airotortechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c6a9b-58f7-11f1-b9ae-cecd02c24f20', 'lonartechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c6bd1-58f7-11f1-b9ae-cecd02c24f20', 'axesmap@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c6ca2-58f7-11f1-b9ae-cecd02c24f20', 'luminoguru@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', NULL),
+  ('bf2c6db5-58f7-11f1-b9ae-cecd02c24f20', 'test99@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-05-09 11:42:53', 'active', '9999000099');
+INSERT INTO `user` (`user_id`, `email`, `password_hash`, `user_type`, `last_login`, `status`, `phone_number`) VALUES
+  ('bfa4a53d-58f7-11f1-b9ae-cecd02c24f20', NULL, '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', NULL, 'active', '+918449309293'),
+  ('bfa4ab6a-58f7-11f1-b9ae-cecd02c24f20', 'gispoint@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4accf-58f7-11f1-b9ae-cecd02c24f20', 'lidarcouk@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4adf7-58f7-11f1-b9ae-cecd02c24f20', 'logxongmbhcokg@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4aeee-58f7-11f1-b9ae-cecd02c24f20', 'blominternationaloperationsbio@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4aff4-58f7-11f1-b9ae-cecd02c24f20', 'dephosgroup@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4b0fc-58f7-11f1-b9ae-cecd02c24f20', 'lidarscotland@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4b1f5-58f7-11f1-b9ae-cecd02c24f20', 'leicageosystemshexagonab@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4b304-58f7-11f1-b9ae-cecd02c24f20', 'fugro@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4b3f3-58f7-11f1-b9ae-cecd02c24f20', 'mggpaero@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4b4ec-58f7-11f1-b9ae-cecd02c24f20', 'korec@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4b5e3-58f7-11f1-b9ae-cecd02c24f20', 'laserscanningeuropegmbh@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4b6ba-58f7-11f1-b9ae-cecd02c24f20', 'exwayz@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4b799-58f7-11f1-b9ae-cecd02c24f20', 'outsight@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4b88b-58f7-11f1-b9ae-cecd02c24f20', 'routescene@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4b973-58f7-11f1-b9ae-cecd02c24f20', 'terrasolid@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4ba64-58f7-11f1-b9ae-cecd02c24f20', '3deling@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4bb58-58f7-11f1-b9ae-cecd02c24f20', 'cyclomedia@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4bc6e-58f7-11f1-b9ae-cecd02c24f20', 'dtmapping@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4bd54-58f7-11f1-b9ae-cecd02c24f20', 'generationsrobots@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4be3d-58f7-11f1-b9ae-cecd02c24f20', 'geoslamlimited@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4bf19-58f7-11f1-b9ae-cecd02c24f20', 'microdronesgmbh@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4c005-58f7-11f1-b9ae-cecd02c24f20', 'nmgroup@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4c0e6-58f7-11f1-b9ae-cecd02c24f20', 'yellowscansas@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4c1e2-58f7-11f1-b9ae-cecd02c24f20', 'fiverivers@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4c2e5-58f7-11f1-b9ae-cecd02c24f20', 'qebim@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4c3d8-58f7-11f1-b9ae-cecd02c24f20', 'energylineltd@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4c4a9-58f7-11f1-b9ae-cecd02c24f20', 'yellowscan@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4c57a-58f7-11f1-b9ae-cecd02c24f20', 'cadden@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4c64b-58f7-11f1-b9ae-cecd02c24f20', 'bimsolutions@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4c71b-58f7-11f1-b9ae-cecd02c24f20', 'xenomatix@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4c7da-58f7-11f1-b9ae-cecd02c24f20', 'eurosense@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4c8be-58f7-11f1-b9ae-cecd02c24f20', 'blickfeld@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4c9a3-58f7-11f1-b9ae-cecd02c24f20', 'bimfaktoria@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4ca86-58f7-11f1-b9ae-cecd02c24f20', 'laserdatagmbh@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4cb61-58f7-11f1-b9ae-cecd02c24f20', 'airbornelidarmappingas@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4ccfe-58f7-11f1-b9ae-cecd02c24f20', 'readaar@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4cde1-58f7-11f1-b9ae-cecd02c24f20', 'greehill@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4cec1-58f7-11f1-b9ae-cecd02c24f20', 'artificialmodelling@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4cf8f-58f7-11f1-b9ae-cecd02c24f20', 'harmonyat@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4d055-58f7-11f1-b9ae-cecd02c24f20', 'qebimservices@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4d12d-58f7-11f1-b9ae-cecd02c24f20', 'advenser@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4d1fe-58f7-11f1-b9ae-cecd02c24f20', 'teslacaduk@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4d2d5-58f7-11f1-b9ae-cecd02c24f20', 'bimplan@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4d3ac-58f7-11f1-b9ae-cecd02c24f20', 'bureaubouwtechnieknv@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4d47f-58f7-11f1-b9ae-cecd02c24f20', 'bimconsulting@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa4d552-58f7-11f1-b9ae-cecd02c24f20', 'bimly@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa558a1-58f7-11f1-b9ae-cecd02c24f20', 'atiproject@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa55a96-58f7-11f1-b9ae-cecd02c24f20', 'hochtiefviconisaleadingeuropeanserviceproviderandconsultantforvirtualconstructionandbuildinginformationmodelingbimitadvisesclientsintheuseofintelligent3dcomputermodelstominimizeriskscommunicateeffectivelyandsavecostsitworksonbuildingandinfrastructureproje', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('bfa55c03-58f7-11f1-b9ae-cecd02c24f20', 'dpsgroupglobalisaglobalconsultingengineeringandconstructionmanagementcompanywithanofficeineuropethecompanyusesvirtualdesignandconstructionvdcmethodologiesalongsidebimtechnologiestoservehightechindustries@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL);
+INSERT INTO `user` (`user_id`, `email`, `password_hash`, `user_type`, `last_login`, `status`, `phone_number`) VALUES
+  ('c00970d8-58f7-11f1-b9ae-cecd02c24f20', 'bimfacilityagisabimcompanymentionedamongthetopbuildinginformationmodelingsolutionsprovidersineuropethecompanyprovidesbimservicesandisbasedinswitzerland@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c00976c3-58f7-11f1-b9ae-cecd02c24f20', 'powerkhisaukbasedcompanythatoffersmepmechanicalelectricalandplumbingbimservicesithasofficesinukraineandtheusaandprovidesavarietyofbimoutsourcingservicesincludingcontentcreationand3dmodeling@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c00978e8-58f7-11f1-b9ae-cecd02c24f20', 'qebimservicesisabimserviceproviderbasedintheukofferingbimmodelingservicesineuropethecompanyspecializesinarchitecturalstructuralandmepmodeling@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c0097a0c-58f7-11f1-b9ae-cecd02c24f20', 'harmonyatisagermancompanylocatedinkundertitoffersbimmodelingservicesforclientsineurope@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c0097b1d-58f7-11f1-b9ae-cecd02c24f20', 'smallbimmodelingcompanies@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c0097bf6-58f7-11f1-b9ae-cecd02c24f20', 'bimspotisanaustrianstartupfoundedin2018thatprovidesasaasplatformforbimorientedcollaborationitstechnologyallowsforthedevelopmentofdigitalbuildingmodelsindependentofspecificsoftwarechoices@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c0097cd0-58f7-11f1-b9ae-cecd02c24f20', 'bimlabltdmepconsultancyisaspecializedmepbimconsultancylocatedinlondonukitfocusesonmechanicalelectricalandplumbingservicesforconstructionprojects@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c0097da7-58f7-11f1-b9ae-cecd02c24f20', 'bimdesignconsultingisbasedinspainandoffersbimprojectexecutionforbotharchitecturaldesignandmepinstallationsitalsoprovidesbimimplementationandtrainingforindividualsandcompanies@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c0097e69-58f7-11f1-b9ae-cecd02c24f20', 'bimconsultingsroisaczechcompanylocatedinpragueitoffersbimmanagementconsultingtoinstitutionsandcompaniescoveringprocessdigitizationprojectmonitoringdatamanagementandstandardization@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c0097f49-58f7-11f1-b9ae-cecd02c24f20', 'digitalengineeringworksdeworksisaukbasedcompanyspecializinginbimcontentcreationitprovidesservicestoclientswithintheukandeurope@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c009804f-58f7-11f1-b9ae-cecd02c24f20', 'sagitonisabimmodelingcompanylocatedinpolanditoffersbimservicestoclientsineuropeandfocusesondigitalconstruction@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c00982be-58f7-11f1-b9ae-cecd02c24f20', 'bimpactdesignsisabimoutsourcingcompanythatworkswithclientsineuropeitspecializesinarchitecturalstructuralandmepbimservicesandprovidessolutionsforconstructionprojects@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c00983df-58f7-11f1-b9ae-cecd02c24f20', 'innoviztechnologies@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c00984ca-58f7-11f1-b9ae-cecd02c24f20', 'quanergy@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c0098598-58f7-11f1-b9ae-cecd02c24f20', 'velodyne@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c0098657-58f7-11f1-b9ae-cecd02c24f20', 'ceptoninc@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c009871c-58f7-11f1-b9ae-cecd02c24f20', 'hesaitechnology@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c00987dd-58f7-11f1-b9ae-cecd02c24f20', 'ouster@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c00988d1-58f7-11f1-b9ae-cecd02c24f20', 'robosense@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c00989b0-58f7-11f1-b9ae-cecd02c24f20', 'geosat@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c0098aa6-58f7-11f1-b9ae-cecd02c24f20', 'shitpostsingh@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', '9999988888'),
+  ('c0098bfc-58f7-11f1-b9ae-cecd02c24f20', 'test1@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2026-05-09 05:18:57', 'active', NULL),
+  ('c0098d43-58f7-11f1-b9ae-cecd02c24f20', 'test90@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-05-22 08:16:11', 'active', '9999888820'),
+  ('c0098e77-58f7-11f1-b9ae-cecd02c24f20', 'testS@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-02-14 23:31:20', 'active', '9999944444'),
+  ('c0098fb5-58f7-11f1-b9ae-cecd02c24f20', 'saranshg180@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-01-24 09:00:53', 'active', NULL),
+  ('c00990fe-58f7-11f1-b9ae-cecd02c24f20', 'testmaile12@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', NULL),
+  ('c009923c-58f7-11f1-b9ae-cecd02c24f20', 'tinkermail2508@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-01-24 07:49:48', 'active', NULL),
+  ('c0099361-58f7-11f1-b9ae-cecd02c24f20', 'test8989@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'admin', '2026-05-22 01:57:12', 'active', '8989898989'),
+  ('c0099465-58f7-11f1-b9ae-cecd02c24f20', 'test2@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2026-01-18 00:20:19', 'active', NULL),
+  ('c009958f-58f7-11f1-b9ae-cecd02c24f20', 'shivanshudav48@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', NULL, 'active', '9999977777'),
+  ('c0099691-58f7-11f1-b9ae-cecd02c24f20', NULL, '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-01-23 21:42:27', 'active', '7017025630');
+
+DROP TABLE IF EXISTS `subscriptionplan`;
+CREATE TABLE `subscriptionplan` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) DEFAULT NULL,
+  `monthly_price` decimal(10,2) DEFAULT NULL,
+  `monthly_credits` int DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `subscriptionplan` (`id`, `name`, `monthly_price`, `monthly_credits`, `is_active`) VALUES
+  (1, 'Starter', '29.00', 50, 1),
+  (2, 'Professional', '99.00', 200, 1),
+  (3, 'Enterprise', '249.00', 500, 1);
+
+DROP TABLE IF EXISTS `servicecategory`;
+CREATE TABLE `servicecategory` (
+  `category_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `parent_category_id` int unsigned DEFAULT NULL,
+  `category_name` varchar(100) NOT NULL,
+  `description` text,
+  `embedding_vector` varbinary(256) DEFAULT NULL,
+  PRIMARY KEY (`category_id`),
+  UNIQUE KEY `category_name` (`category_name`),
+  KEY `parent_category_id` (`parent_category_id`),
+  CONSTRAINT `servicecategory_ibfk_1` FOREIGN KEY (`parent_category_id`) REFERENCES `servicecategory` (`category_id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `servicecategory` (`category_id`, `parent_category_id`, `category_name`, `description`, `embedding_vector`) VALUES
+  (10, NULL, 'General GIS Services', 'Default category for general GIS-related requests', NULL);
+
 DROP TABLE IF EXISTS `buyerprofile`;
 CREATE TABLE `buyerprofile` (
   `buyer_id` char(36) NOT NULL DEFAULT (uuid()),
@@ -23,160 +252,33 @@ CREATE TABLE `buyerprofile` (
   CONSTRAINT `buyerprofile_ibfk_1` FOREIGN KEY (`buyer_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `buyerprofile` (`buyer_id`, `organization_name`, `industry`, `preferred_services`, `budget_range`, `location`, `rating`, `subscription_status`) VALUES
-  ('061b6e0c-583b-4f56-8855-fb20d208b095', 'tyest1', NULL, NULL, NULL, '[object Object]', '0.00', 'inactive'),
-  ('08872940-b0fe-429c-89c0-accbea2e2ece', 'Rahul', NULL, NULL, NULL, '[object Object]', '0.00', 'inactive'),
-  ('609c3eac-5d2d-470d-b188-f85f8fd86096', 'test4', NULL, NULL, NULL, '[object Object]', '0.00', 'inactive'),
-  ('6bcbaf21-2e74-4d31-89ff-03d8136dadd2', 'test1234', NULL, NULL, NULL, '[object Object]', '0.00', 'inactive'),
-  ('7168149a-dde8-448d-bcfa-dee4212b0eda', 'Test9', NULL, NULL, NULL, '[object Object]', '0.00', 'inactive'),
-  ('9c76396b-fef9-43a2-b6fa-005baaa21e28', 'test99', NULL, NULL, NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6c8090f-de27-11f0-8727-001a7dda7113', 'GIS-Point', 'LiDAR / Remote Sensing', 'Surveying,LiDAR Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6cc505d-de27-11f0-8727-001a7dda7113', 'LiDAR.CO.UK', 'LiDAR / Remote Sensing', 'LiDAR Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6cc7b4c-de27-11f0-8727-001a7dda7113', 'LOGXON GmbH & Co. KG', 'LiDAR / Remote Sensing', 'Surveying,LiDAR Services,UAV / Drone Mapping', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d16ab5-de27-11f0-8727-001a7dda7113', 'Blom International Operations (BIO)', 'LiDAR / Remote Sensing', 'LiDAR Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d19109-de27-11f0-8727-001a7dda7113', 'DEPHOS Group', 'LiDAR / Remote Sensing', 'LiDAR Services,Point Cloud Processing,Geospatial Software', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d1b87f-de27-11f0-8727-001a7dda7113', 'LiDAR Scotland', 'LiDAR / Remote Sensing', 'LiDAR Services,Point Cloud Processing,UAV / Drone Mapping', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d1ea37-de27-11f0-8727-001a7dda7113', 'Leica Geosystems (Hexagon AB)', 'Surveying', 'Surveying,Point Cloud Processing,Geospatial Software', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d213b5-de27-11f0-8727-001a7dda7113', 'Fugro', 'Geospatial / GIS', 'Point Cloud Processing', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d236b6-de27-11f0-8727-001a7dda7113', 'MGGP Aero', 'LiDAR / Remote Sensing', 'LiDAR Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d25881-de27-11f0-8727-001a7dda7113', 'KOREC', 'LiDAR / Remote Sensing', 'Surveying,LiDAR Services,Geospatial Software', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d280a9-de27-11f0-8727-001a7dda7113', 'Laserscanning Europe GmbH', 'LiDAR / Remote Sensing', 'LiDAR Services,Point Cloud Processing,Geospatial Software', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d2a67d-de27-11f0-8727-001a7dda7113', 'Exwayz', 'LiDAR / Remote Sensing', 'LiDAR Services,Geospatial Software,UAV / Drone Mapping', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d2cd25-de27-11f0-8727-001a7dda7113', 'Outsight', 'LiDAR / Remote Sensing', 'LiDAR Services,Geospatial Software', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d2efec-de27-11f0-8727-001a7dda7113', 'Routescene', 'LiDAR / Remote Sensing', 'LiDAR Services,Geospatial Software,UAV / Drone Mapping', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d31ff9-de27-11f0-8727-001a7dda7113', 'Terrasolid', 'LiDAR / Remote Sensing', 'Surveying,LiDAR Services,Point Cloud Processing,Geospatial Software', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d34d8a-de27-11f0-8727-001a7dda7113', '3Deling', 'Geospatial / GIS', 'Point Cloud Processing', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d3916c-de27-11f0-8727-001a7dda7113', 'Cyclomedia', 'LiDAR / Remote Sensing', 'LiDAR Services,Point Cloud Processing,Geospatial Software', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d3b9a5-de27-11f0-8727-001a7dda7113', 'DT Mapping', 'LiDAR / Remote Sensing', 'LiDAR Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d3e0bc-de27-11f0-8727-001a7dda7113', 'Générations Robots', 'LiDAR / Remote Sensing', 'LiDAR Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d40388-de27-11f0-8727-001a7dda7113', 'GeoSLAM Limited', 'Geospatial / GIS', 'Geospatial Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d42ecf-de27-11f0-8727-001a7dda7113', 'Microdrones GmbH', 'LiDAR / Remote Sensing', 'Surveying,LiDAR Services,UAV / Drone Mapping', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d464e7-de27-11f0-8727-001a7dda7113', 'NM Group', 'LiDAR / Remote Sensing', 'LiDAR Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d48dc3-de27-11f0-8727-001a7dda7113', 'YellowScan SAS', 'LiDAR / Remote Sensing', 'LiDAR Services,Geospatial Software,UAV / Drone Mapping', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d4b606-de27-11f0-8727-001a7dda7113', 'FiveRivers', 'LiDAR / Remote Sensing', 'Surveying,LiDAR Services,UAV / Drone Mapping', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d4dc2b-de27-11f0-8727-001a7dda7113', 'QeBIM', 'BIM / Construction', 'Point Cloud Processing,BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d50171-de27-11f0-8727-001a7dda7113', 'Energyline Ltd', 'LiDAR / Remote Sensing', 'LiDAR Services,UAV / Drone Mapping', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d52514-de27-11f0-8727-001a7dda7113', 'YellowScan', 'LiDAR / Remote Sensing', 'LiDAR Services,Geospatial Software,UAV / Drone Mapping', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d545bf-de27-11f0-8727-001a7dda7113', 'CADDEN', 'LiDAR / Remote Sensing', 'Surveying,LiDAR Services,Point Cloud Processing', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d56452-de27-11f0-8727-001a7dda7113', 'BIM SOLUTIONS', 'BIM / Construction', 'LiDAR Services,BIM Services,UAV / Drone Mapping', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d58313-de27-11f0-8727-001a7dda7113', 'XenomatiX', 'LiDAR / Remote Sensing', 'LiDAR Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d5a402-de27-11f0-8727-001a7dda7113', 'Eurosense', 'LiDAR / Remote Sensing', 'LiDAR Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d5ca13-de27-11f0-8727-001a7dda7113', 'Blickfeld', 'LiDAR / Remote Sensing', 'LiDAR Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d5e91d-de27-11f0-8727-001a7dda7113', 'BIMfaktoria', 'BIM / Construction', 'Point Cloud Processing,BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d60737-de27-11f0-8727-001a7dda7113', 'Laserdata GmbH', 'LiDAR / Remote Sensing', 'LiDAR Services,Geospatial Software', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d6272c-de27-11f0-8727-001a7dda7113', 'Airborne LiDAR Mapping A/S', 'LiDAR / Remote Sensing', 'LiDAR Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d645ec-de27-11f0-8727-001a7dda7113', 'Readaar', 'Geospatial / GIS', 'Point Cloud Processing', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d662d7-de27-11f0-8727-001a7dda7113', 'greehill', 'LiDAR / Remote Sensing', 'LiDAR Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d67ffc-de27-11f0-8727-001a7dda7113', 'Artificial Modelling', 'BIM / Construction', 'Point Cloud Processing,BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d69fa3-de27-11f0-8727-001a7dda7113', 'Harmony AT', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d6c000-de27-11f0-8727-001a7dda7113', 'QeBIM Services', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d6efd3-de27-11f0-8727-001a7dda7113', 'Advenser', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d717f0-de27-11f0-8727-001a7dda7113', 'Tesla CAD UK', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d73a5a-de27-11f0-8727-001a7dda7113', 'Bimplan', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d75aa4-de27-11f0-8727-001a7dda7113', 'Bureau Bouwtechniek NV', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d7799e-de27-11f0-8727-001a7dda7113', 'BIM Consulting', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d797bf-de27-11f0-8727-001a7dda7113', 'BIMLY', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d7b59c-de27-11f0-8727-001a7dda7113', 'ATI Project', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d85eef-de27-11f0-8727-001a7dda7113', 'DPS Group Global is a global consulting, engineering, and construction management company with an office in Europe. The company uses Virtual Design and Construction (VDC) methodologies alongside BIM technologies to serve high-tech industries.', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d88800-de27-11f0-8727-001a7dda7113', 'BIM Facility AG is a BIM company mentioned among the "Top Building Information Modeling Solutions Providers" in Europe. The company provides BIM services and is based in Switzerland.', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d8e67f-de27-11f0-8727-001a7dda7113', 'Powerkh is a UK-based company that offers MEP (Mechanical, Electrical, and Plumbing) BIM services. It has offices in Ukraine and the USA and provides a variety of BIM outsourcing services, including content creation and 3D modeling.', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d90951-de27-11f0-8727-001a7dda7113', 'QeBIM Services is a BIM service provider based in the UK, offering BIM modeling services in Europe. The company specializes in architectural, structural, and MEP modeling.', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d929fe-de27-11f0-8727-001a7dda7113', 'Harmony AT is a German company located in Kundert. It offers BIM modeling services for clients in Europe.', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d94d0f-de27-11f0-8727-001a7dda7113', 'Small BIM Modeling Companies', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d98c2b-de27-11f0-8727-001a7dda7113', 'bimspot is an Austrian startup founded in 2018 that provides a SaaS platform for BIM-oriented collaboration. Its technology allows for the development of digital building models independent of specific software choices.', 'BIM / Construction', 'BIM Services,Geospatial Software', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d9b626-de27-11f0-8727-001a7dda7113', 'BIM-Lab Ltd - MEP consultancy is a specialized MEP BIM consultancy located in London, UK. It focuses on mechanical, electrical, and plumbing services for construction projects.', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d9d914-de27-11f0-8727-001a7dda7113', 'BIMdesign Consulting is based in Spain and offers BIM project execution for both architectural design and MEP installations. It also provides BIM implementation and training for individuals and companies.', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6d9f9b7-de27-11f0-8727-001a7dda7113', 'BIM Consulting, s.r.o. is a Czech company located in Prague. It offers BIM management consulting to institutions and companies, covering process digitization, project monitoring, data management, and standardization.', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6da1a9d-de27-11f0-8727-001a7dda7113', 'Digital Engineering Works (DEWorks) is a UK-based company specializing in BIM content creation. It provides services to clients within the UK and Europe.', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6db28ae-de27-11f0-8727-001a7dda7113', 'Sagiton is a BIM modeling company located in Poland. It offers BIM services to clients in Europe and focuses on digital construction.', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6db549c-de27-11f0-8727-001a7dda7113', 'Bimpact Designs is a BIM outsourcing company that works with clients in Europe. It specializes in architectural, structural, and MEP BIM services and provides solutions for construction projects.', 'BIM / Construction', 'BIM Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6db7d31-de27-11f0-8727-001a7dda7113', 'Innoviz Technologies', 'Geospatial / GIS', 'Geospatial Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6dba3db-de27-11f0-8727-001a7dda7113', 'Quanergy', 'Geospatial / GIS', 'Geospatial Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6dbc515-de27-11f0-8727-001a7dda7113', 'Velodyne', 'Geospatial / GIS', 'Geospatial Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6dbf206-de27-11f0-8727-001a7dda7113', 'Cepton, Inc.', 'Geospatial / GIS', 'Geospatial Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6dc310f-de27-11f0-8727-001a7dda7113', 'Hesai Technology', 'Geospatial / GIS', 'Geospatial Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6dc60cb-de27-11f0-8727-001a7dda7113', 'Ouster', 'Geospatial / GIS', 'Geospatial Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6dc852e-de27-11f0-8727-001a7dda7113', 'RoboSense', 'Geospatial / GIS', 'Geospatial Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('a6dca664-de27-11f0-8727-001a7dda7113', 'Geosat', 'Geospatial / GIS', 'Geospatial Services', NULL, '[object Object]', '0.00', 'inactive'),
-  ('aa2d0b5c-2ae4-4ecd-b631-8c7a5c13d6ce', 'test11', NULL, NULL, NULL, '[object Object]', '0.00', 'inactive'),
-  ('c288424d-c135-426e-afa5-a72040ae6476', 'test90', NULL, NULL, NULL, '[object Object]', '0.00', 'inactive'),
-  ('c6469221-6022-46ec-8c1c-d7d090ffe820', 'testS', NULL, NULL, NULL, '[object Object]', '0.00', 'inactive'),
-  ('d22237b2-6124-4fa2-a61b-625d95dbb955', 'test8', NULL, NULL, NULL, '[object Object]', '0.00', 'inactive'),
-  ('d5eeb1b2-e2b6-4a48-9203-ddff5f58131d', 'Rahul', NULL, NULL, NULL, '[object Object]', '0.00', 'inactive'),
-  ('d6c6eea3-28e2-49e8-8ec7-ef2c9a2be62d', 'test8', NULL, NULL, NULL, '[object Object]', '0.00', 'inactive'),
-  ('ece3ba8a-c1c5-4d2e-8bbf-ea78e1612d49', 'Test10', NULL, NULL, NULL, '[object Object]', '0.00', 'inactive'),
-  ('efc35bfb-6565-4bd4-ab4b-8a15669bb6ed', 'Test7', NULL, NULL, NULL, '[object Object]', '0.00', 'inactive');
+-- (no data in buyerprofile)
 
--- -----------------------------------------------
--- Table: contract
--- -----------------------------------------------
-DROP TABLE IF EXISTS `contract`;
-CREATE TABLE `contract` (
-  `contract_id` char(36) NOT NULL DEFAULT (uuid()),
-  `proposal_id` char(36) NOT NULL,
-  `start_date` date NOT NULL,
-  `end_date` date DEFAULT NULL,
-  `status` enum('in_progress','completed','cancelled','disputed') NOT NULL DEFAULT 'in_progress',
-  `completion_report` text,
-  PRIMARY KEY (`contract_id`),
-  UNIQUE KEY `proposal_id` (`proposal_id`),
-  CONSTRAINT `contract_ibfk_1` FOREIGN KEY (`proposal_id`) REFERENCES `proposal` (`proposal_id`) ON DELETE RESTRICT ON UPDATE CASCADE
+DROP TABLE IF EXISTS `providerprofile`;
+CREATE TABLE `providerprofile` (
+  `provider_id` char(36) NOT NULL DEFAULT (uuid()),
+  `organization_name` varchar(255) NOT NULL,
+  `skills` json DEFAULT NULL,
+  `experience_years` tinyint unsigned DEFAULT NULL,
+  `portfolio_url` varchar(2048) DEFAULT NULL,
+  `hourly_rate` decimal(10,2) NOT NULL,
+  `location` point NOT NULL DEFAULT (point(0,0)),
+  `rating` decimal(3,2) DEFAULT '0.00',
+  `skills_search` text GENERATED ALWAYS AS (json_unquote(json_extract(`skills`,_cp850'$[*]'))) STORED,
+  `subscription_status` enum('none','active','expired') DEFAULT 'none',
+  `subscription_plan_id` int DEFAULT NULL,
+  `subscription_start` date DEFAULT NULL,
+  `subscription_end` date DEFAULT NULL,
+  PRIMARY KEY (`provider_id`),
+  SPATIAL KEY `idx_provider_location` (`location`),
+  KEY `subscription_plan_id` (`subscription_plan_id`),
+  FULLTEXT KEY `idx_provider_skills` (`skills_search`),
+  CONSTRAINT `providerprofile_ibfk_1` FOREIGN KEY (`provider_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `providerprofile_ibfk_2` FOREIGN KEY (`subscription_plan_id`) REFERENCES `subscriptionplan` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `contract` (`contract_id`, `proposal_id`, `start_date`, `end_date`, `status`, `completion_report`) VALUES
-  ('4f6057cd-b4ff-4f61-9755-d2d6141d7232', 'fd9e0f87-4c23-4671-9180-f75f31981ada', '2026-01-24 18:30:00', '2026-12-11 18:30:00', 'in_progress', NULL),
-  ('571ff30c-962a-4c5e-bea8-52361d4c9ae7', 'df41caaa-9b6f-4c22-bf92-8433e3db8f46', '2026-02-03 18:30:00', '2026-02-24 18:30:00', 'in_progress', NULL),
-  ('9eefaf2a-6dd6-4901-bbac-0c87cde1bb71', '81c9434b-39cd-492f-a94b-db47c72eaaa7', '2026-01-24 18:30:00', '2026-12-11 18:30:00', 'in_progress', NULL),
-  ('c02874db-cf54-480c-b494-889c12fc8dcc', '02b4f449-8329-4d37-91f7-4b9e00605b36', '2026-02-03 18:30:00', '2026-02-23 18:30:00', 'in_progress', NULL),
-  ('caba52b3-e886-46bd-a5e8-59c99d66cdf1', '27e736e6-9ff2-4251-a813-64ad8709615e', '2026-02-14 18:30:00', '2026-02-23 18:30:00', 'in_progress', NULL);
+-- (no data in providerprofile)
 
--- -----------------------------------------------
--- Table: creditledger
--- -----------------------------------------------
-DROP TABLE IF EXISTS `creditledger`;
-CREATE TABLE `creditledger` (
-  `id` char(36) NOT NULL,
-  `provider_id` char(36) DEFAULT NULL,
-  `credits` int DEFAULT NULL,
-  `type` enum('credit','debit') DEFAULT NULL,
-  `reason` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-INSERT INTO `creditledger` (`id`, `provider_id`, `credits`, `type`, `reason`, `created_at`) VALUES
-  ('141e0a37-52d8-11f1-bf88-cc28aac91a8b', '7e3e2e3f-ddc9-11f0-8727-001a7dda7113', 200, 'credit', 'Manual credit addition', '2026-05-18 16:39:02'),
-  ('1ec2ad6b-1619-460d-ad74-7663003e1551', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 20, 'debit', 'Proposal submission', '2026-02-23 15:57:15'),
-  ('216a4d00-d2a8-47de-a540-ec0a5e2f445b', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 20, 'debit', 'Proposal submission', '2026-02-23 15:55:35'),
-  ('25d4f454-7031-402c-aa2b-7706fbab3cc1', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 20, 'debit', 'Proposal submission', '2026-02-23 15:56:44'),
-  ('673dcef9-5388-11f1-a1b9-28d043f11fd3', '7e33a7b4-ddc9-11f0-8727-001a7dda7113', 200, 'credit', 'Manual credit addition', '2026-05-19 13:41:13'),
-  ('6e4c635b-60ff-46f8-85df-2cd734aa05b3', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 200, 'credit', 'Initial credits', '2026-02-20 15:29:59'),
-  ('97b29cc1-538a-11f1-a1b9-28d043f11fd3', '7e33a7b4-ddc9-11f0-8727-001a7dda7113', 20, 'debit', 'Proposal submission for project 1dc0d4b0-7a65-46fb-bc68-29f57c457363', '2026-05-19 13:56:54'),
-  ('a29f0200-58db-4461-a2c7-5ba9df148374', '0b5442e4-e580-4e19-a0c6-4201a807c824', 100, 'credit', 'Initial credits', '2026-05-16 17:07:44'),
-  ('a42d6963-92b8-42a0-a1ff-543d3ccfaa37', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 20, 'debit', 'Proposal submission', '2026-02-23 15:55:51'),
-  ('aa67529a-cba5-4857-b8a4-ab0d37be15c9', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 20, 'debit', 'Proposal submission', '2026-02-20 16:06:22'),
-  ('deb371bd-bf4d-4ffb-82c9-5bda41393be9', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 20, 'debit', 'Proposal submission', '2026-03-23 14:11:46');
-
--- -----------------------------------------------
--- Table: payment
--- -----------------------------------------------
-DROP TABLE IF EXISTS `payment`;
-CREATE TABLE `payment` (
-  `payment_id` char(36) NOT NULL DEFAULT (uuid()),
-  `contract_id` char(36) NOT NULL,
-  `amount` decimal(10,2) NOT NULL,
-  `payment_status` enum('pending','paid','failed','refunded') NOT NULL DEFAULT 'pending',
-  `transaction_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`payment_id`),
-  KEY `contract_id` (`contract_id`),
-  CONSTRAINT `payment_ibfk_1` FOREIGN KEY (`contract_id`) REFERENCES `contract` (`contract_id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- (no data in payment)
-
--- -----------------------------------------------
--- Table: projectrequest
--- -----------------------------------------------
 DROP TABLE IF EXISTS `projectrequest`;
 CREATE TABLE `projectrequest` (
   `project_id` char(36) NOT NULL DEFAULT (uuid()),
@@ -210,31 +312,30 @@ CREATE TABLE `projectrequest` (
   CONSTRAINT `projectrequest_ibfk_1` FOREIGN KEY (`buyer_id`) REFERENCES `buyerprofile` (`buyer_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `projectrequest` (`project_id`, `buyer_id`, `title`, `description`, `budget`, `status`, `embedding_vector`, `created_at`, `start_date`, `end_date`, `submission_deadline`, `visibility`, `contact_person`, `contact_email`, `attachments`, `awarded_to`, `ai_processed`, `ai_summary`, `ai_skills`, `ai_processed_at`, `ai_version`) VALUES
-  ('0068113f-af3b-4f0e-a4d0-ee1b3a321374', 'c288424d-c135-426e-afa5-a72040ae6476', 'Smart City Digital Twin and Urban Mobility GIS Platform Development', 'The city administration seeks proposals from qualified geospatial technology vendors to design and implement a Smart City GIS platform with integrated urban digital twin capabilities. The project will include development of a centralized geospatial data infrastructure for urban planning, traffic management, zoning analysis, utility overlays, and citizen service mapping. The selected vendor will integrate multi-source spatial datasets including satellite imagery, LiDAR, cadastral maps, IoT sensor feeds, transportation networks, and building footprints into a unified web-based GIS platform. The scope includes 3D city modeling, traffic heatmap generation, land-use change detection, flood-risk mapping, and AI-assisted urban growth analysis. The platform must support real-time dashboards, mobile accessibility, spatial analytics, and interoperability with existing municipal ERP and smart infrastructure systems.', '180000.00', 'open', NULL, '2026-05-11 17:06:26', '2026-06-14 18:30:00', '2028-06-27 18:30:00', '2026-06-14 17:05:00', 'public', 'Test1pdf', 'test90@gmail.com', '/uploads/proposals/1778519186257-Smart_City_RFP.pdf', NULL, 1, '[object Object]', NULL, '2026-05-15 17:37:24', 'v1.0'),
-  ('0da7d0e9-e5f9-4ef9-b801-c2012dadabbb', 'c288424d-c135-426e-afa5-a72040ae6476', 'Agriculture Forestry', 'This is a test document', '150000.00', 'in_review', NULL, '2026-05-21 11:47:25', '2026-05-20 18:30:00', '2026-10-13 18:30:00', '2026-05-21 11:47:00', 'public', 'Sar', 'test90@gmail.com', '', NULL, 0, NULL, NULL, NULL, 'v1.0'),
-  ('1dc0d4b0-7a65-46fb-bc68-29f57c457363', 'c288424d-c135-426e-afa5-a72040ae6476', 'testing2', 'testing2', '50000.00', 'open', NULL, '2026-05-17 12:56:59', '2026-05-16 18:30:00', '2026-07-21 18:30:00', '2026-05-17 12:56:00', 'public', 'Sar', 'test90@gmail.com', '/uploads/proposals/1779022619908-smart_city_rfp__1_.pdf', NULL, 1, '[object Object]', '[object Object]', '2026-05-19 11:47:24', 'v1.0'),
-  ('1f850f4f-3c5e-4797-88ba-96f04552fcf6', 'c288424d-c135-426e-afa5-a72040ae6476', 'checu', 'awdadnh', '22342.00', 'open', NULL, '2026-03-31 13:32:49', '2026-03-29 18:30:00', '2026-04-07 18:30:00', '2026-03-31 13:32:00', 'public', 'fadwad', 'test90@gmail.com', '', NULL, 0, NULL, NULL, NULL, 'v1.0'),
-  ('288bc0a1-733a-44b8-a35f-f6bcbc6c8d21', 'c288424d-c135-426e-afa5-a72040ae6476', 'dwada', 'dwad', '23131.00', 'closed', NULL, '2026-03-27 16:37:45', '2026-03-08 18:30:00', '2026-03-27 18:30:00', '2026-03-10 16:15:00', 'public', 'rewdw', 'test90@gmail.com', '', NULL, 0, NULL, NULL, NULL, 'v1.0'),
-  ('2c5363fc-d6e8-42d0-882a-7f7ff981901f', 'c288424d-c135-426e-afa5-a72040ae6476', 'testingnew2', 'testingnew2', '50000.00', 'contracted', NULL, '2026-05-19 13:37:44', '2026-05-18 18:30:00', '2026-08-18 18:30:00', '2026-05-19 13:37:00', 'public', 'sar', 'test90@gmail.com', '/uploads/proposals/1779197864447-utility_infrastructure_rfp__1_.pdf', NULL, 1, NULL, '[object Object]', '2026-05-19 13:38:27', 'v1.0'),
-  ('4408801a-2569-4cfb-b3dc-62897ab01c77', 'c288424d-c135-426e-afa5-a72040ae6476', 'admintrest2', 'awdad', '15000.00', 'closed', NULL, '2026-04-07 16:59:07', '2026-04-06 18:30:00', '2026-04-28 18:30:00', '2026-04-09 16:58:00', 'public', 'test', 'test90@gmail.com', '', NULL, 0, NULL, NULL, NULL, 'v1.0'),
-  ('6299792c-8d21-4d17-bf8a-0d8ce7ea96e7', 'c288424d-c135-426e-afa5-a72040ae6476', 'Transmission Network Asset Mapping and Predictive Utility GIS System', 'A regional power distribution utility invites proposals for implementation of a geospatial asset management and predictive maintenance system for transmission and distribution infrastructure. The project aims to create a centralized GIS-based utility network model integrating substations, transformers, transmission lines, smart meters, and outage management systems. The selected vendor will conduct field data collection, GPS-based asset validation, drone-assisted corridor inspections, and integration of SCADA and IoT sensor feeds. The solution should support predictive analytics for asset failure detection, vegetation encroachment analysis, line-loss mapping, and outage impact visualization.', '250000.00', 'closed', NULL, '2026-05-11 17:16:54', '2026-06-30 18:30:00', '2027-04-14 18:30:00', '2026-05-20 17:16:00', 'public', 'Test2pdf', 'test90@gmail.com', '/uploads/proposals/1778519814976-Utility_Power_RFP.pdf', NULL, 0, NULL, NULL, NULL, 'v1.0'),
-  ('6b9b3870-ed09-4e0a-8300-befc4cfd26d6', 'c288424d-c135-426e-afa5-a72040ae6476', 'admintrest3', 'awdad', '15000.00', 'open', NULL, '2026-04-07 16:59:13', '2026-04-06 18:30:00', '2026-04-28 18:30:00', '2026-04-09 16:58:00', 'public', 'test', 'test90@gmail.com', '', NULL, 0, NULL, NULL, NULL, 'v1.0'),
-  ('6d837e96-e079-48cd-9f07-1a592c6932df', 'c288424d-c135-426e-afa5-a72040ae6476', 'testingnew', 'testingnew', '50000.00', 'open', NULL, '2026-05-16 17:12:31', '2026-05-15 18:30:00', '2026-10-15 18:30:00', '2026-05-18 17:12:00', 'public', 'Sar', 'test90@gmail.com', '/uploads/proposals/1778951551069-smart_city_rfp__1_.pdf', NULL, 0, NULL, NULL, NULL, 'v1.0'),
-  ('763cb55e-ae4f-4d5e-bd9c-a7334981d1b3', 'c288424d-c135-426e-afa5-a72040ae6476', 'test', 'tests', '200.00', 'open', NULL, '2026-02-12 16:11:28', '2026-01-24 18:30:00', '2026-12-11 18:30:00', '2026-02-12 18:11:00', 'public', 'test', 'test90@gmail.com', '', NULL, 0, NULL, NULL, NULL, 'v1.0'),
-  ('a37c81a6-6186-4cbc-b39c-2b38cb4501de', 'c288424d-c135-426e-afa5-a72040ae6476', 'fvesef', 'efsfsf', '2323.00', 'open', NULL, '2026-03-29 05:19:57', '2026-03-28 18:30:00', '2026-04-14 18:30:00', '2026-03-31 05:19:00', 'public', 'dwada', 'dawdawd@gmail.com', '', NULL, 0, NULL, NULL, NULL, 'v1.0'),
-  ('c05c6318-ef9e-4482-a236-bf82ae02676d', 'c288424d-c135-426e-afa5-a72040ae6476', 'test', 'tests', '200.00', 'open', NULL, '2026-02-12 16:11:36', '2026-01-24 18:30:00', '2026-12-11 18:30:00', '2026-02-12 18:11:00', 'public', 'test', 'test90@gmail.com', '', NULL, 0, NULL, NULL, NULL, 'v1.0'),
-  ('c5121be9-3bc5-49db-a42d-855ec156ba1b', 'c288424d-c135-426e-afa5-a72040ae6476', 't', 't', '2000.00', 'open', NULL, '2026-02-15 04:42:36', '2026-02-14 18:30:00', '2026-02-23 18:30:00', '2026-02-17 04:42:00', 'public', 's', 'saranshg180@gmail.com', '', NULL, 0, NULL, NULL, NULL, 'v1.0'),
-  ('dabdf5f7-518c-4a96-ae76-f651f3d2f611', '9c76396b-fef9-43a2-b6fa-005baaa21e28', 'test1', 'test1', '1999.98', 'open', NULL, '2026-02-04 16:02:46', '2026-02-03 18:30:00', '2026-02-24 18:30:00', '2026-02-05 17:00:00', 'public', 'sar', 'test99@gmail.com', '', 1144, 0, NULL, NULL, NULL, 'v1.0'),
-  ('dfcda47a-f72d-4a57-b7c8-7ad0879dcb4f', 'c288424d-c135-426e-afa5-a72040ae6476', 'admintrest1', 'awdad', '15000.00', 'open', NULL, '2026-04-07 16:59:01', '2026-04-06 18:30:00', '2026-04-28 18:30:00', '2026-04-09 16:58:00', 'public', 'test', 'test90@gmail.com', '', NULL, 0, NULL, NULL, NULL, 'v1.0'),
-  ('e37f4f45-00bb-4cbb-a38e-76d2870a7572', 'c288424d-c135-426e-afa5-a72040ae6476', 'Test123', 'awdad', '50000.00', 'open', NULL, '2026-05-12 17:22:37', '2026-05-12 18:30:00', '2026-05-26 18:30:00', '2026-05-13 17:22:00', 'public', 'Sar', 'test90@gmail.com', '/uploads/proposals/1778606557570-TOR_Better_Work_Smart_Toolbox__1_.pdf', NULL, 1, '[object Object]', NULL, '2026-05-16 11:59:57', 'v1.0'),
-  ('eebc06a8-523d-49b1-9016-ecaffe9a6564', 'c288424d-c135-426e-afa5-a72040ae6476', 'Smart City Digital Twin and Urban Mobility GIS Platform Development', 'The city administration seeks proposals from qualified geospatial technology vendors to design and implement a Smart City GIS platform with integrated urban digital twin capabilities. The project will include development of a centralized geospatial data infrastructure for urban planning, traffic management, zoning analysis, utility overlays, and citizen service mapping. The selected vendor will integrate multi-source spatial datasets including satellite imagery, LiDAR, cadastral maps, IoT sensor feeds, transportation networks, and building footprints into a unified web-based GIS platform. The scope includes 3D city modeling, traffic heatmap generation, land-use change detection, flood-risk mapping, and AI-assisted urban growth analysis. The platform must support real-time dashboards, mobile accessibility, spatial analytics, and interoperability with existing municipal ERP and smart infrastructure systems.', '180000.00', 'closed', NULL, '2026-05-11 17:06:10', '2026-06-14 18:30:00', '2028-06-27 18:30:00', '2026-06-14 17:05:00', 'public', 'Test1pdf', 'test90@gmail.com', '/uploads/proposals/1778519170939-Smart_City_RFP.pdf', NULL, 0, NULL, NULL, NULL, 'v1.0'),
-  ('f468ef0f-bf7a-482e-8a66-4f8216ec37e2', '9c76396b-fef9-43a2-b6fa-005baaa21e28', 'test1', 'test1', '4999.98', 'closed', NULL, '2026-02-04 16:10:41', '2026-02-03 18:30:00', '2026-02-23 18:30:00', '2026-02-05 18:10:00', 'public', 'sar', 'test99@gmail.com', '', 1144, 0, NULL, NULL, NULL, 'v1.0'),
-  ('f755f106-b3c8-492b-9f1e-4359a62d1cf0', 'c288424d-c135-426e-afa5-a72040ae6476', 'test2', 'test2', '10000.00', 'open', NULL, '2026-03-02 16:10:58', '2026-03-02 18:30:00', '2026-03-16 18:30:00', '2026-03-09 18:10:00', 'public', 'test2', 'test90@gmail.com', '', NULL, 0, NULL, NULL, NULL, 'v1.0');
+-- (no data in projectrequest)
 
--- -----------------------------------------------
--- Table: proposal
--- -----------------------------------------------
+DROP TABLE IF EXISTS `rfp_drafts`;
+CREATE TABLE `rfp_drafts` (
+  `draft_id` varchar(255) NOT NULL,
+  `buyer_id` varchar(255) DEFAULT NULL,
+  `title` text,
+  `description` text,
+  `budget` decimal(10,2) DEFAULT NULL,
+  `currency` varchar(10) DEFAULT NULL,
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `submission_deadline` datetime DEFAULT NULL,
+  `visibility` varchar(20) DEFAULT NULL,
+  `contact_person` text,
+  `contact_email` text,
+  `credits` int DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`draft_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `rfp_drafts` (`draft_id`, `buyer_id`, `title`, `description`, `budget`, `currency`, `start_date`, `end_date`, `submission_deadline`, `visibility`, `contact_person`, `contact_email`, `credits`) VALUES
+  ('daa29031-136f-4263-98c5-5a6dd4fe2bfb', 'c288424d-c135-426e-afa5-a72040ae6476', 'dwad', 'awdad', '0.00', 'USD', NULL, NULL, NULL, 'public', '', '', 0);
+
 DROP TABLE IF EXISTS `proposal`;
 CREATE TABLE `proposal` (
   `proposal_id` char(36) NOT NULL,
@@ -259,29 +360,8 @@ CREATE TABLE `proposal` (
   CONSTRAINT `proposal_ibfk_2` FOREIGN KEY (`provider_id`) REFERENCES `providerprofile` (`provider_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `proposal` (`proposal_id`, `project_id`, `provider_id`, `bid_amount`, `proposal_message`, `status`, `credits_used`, `created_at`, `technical`, `delivery`, `milestones`, `case_studies`, `references_json`, `attachments`) VALUES
-  ('02b4f449-8329-4d37-91f7-4b9e00605b36', 'f468ef0f-bf7a-482e-8a66-4f8216ec37e2', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', '1199.99', '{"technical":"","delivery":"","milestones":[],"caseStudies":[],"references":[]}\nAttachments: []', 'accepted', 20, '2026-02-23 16:39:11', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('08cbbe6b-505f-4a48-bec6-59b4f1db502e', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e33a7b4-ddc9-11f0-8727-001a7dda7113', '4999.99', '{"technical":"dwdwda","delivery":"dawda","milestones":[],"caseStudies":[],"references":[]}', 'accepted', 20, '2026-05-19 13:43:45', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('27e736e6-9ff2-4251-a813-64ad8709615e', 'c5121be9-3bc5-49db-a42d-855ec156ba1b', 'c11473bf-520b-46e1-a26c-68b4e2ce1376', '1900.00', '{"technical":"Test","delivery":"","milestones":[{"title":"1","amount":"250","dueDate":"2026-02-16"},{"title":"2","amount":"1500","dueDate":"2026-02-17"}],"caseStudies":[],"references":[]}\nAttachments: []', 'accepted', 0, '2026-02-23 16:39:11', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('64b4434f-21f4-43e7-a5d1-2b311ed54f68', '1f850f4f-3c5e-4797-88ba-96f04552fcf6', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', '323232.00', '{"technical":"dwadaw","delivery":"","milestones":[],"caseStudies":[],"references":[]}', 'submitted', 20, '2026-05-09 12:37:40', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('6905c23b-7c29-4313-b0dc-5d58b7f0f064', 'c5121be9-3bc5-49db-a42d-855ec156ba1b', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', '1200.00', '{"technical":"","delivery":"","milestones":[],"caseStudies":[],"references":[]}\nAttachments: []', 'rejected', 20, '2026-02-23 16:39:11', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('6cb4ce3d-2b5b-430f-a42e-68de8d573d6e', 'c5121be9-3bc5-49db-a42d-855ec156ba1b', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', '1499.99', '{"technical":"test","delivery":"test","milestones":[],"caseStudies":[],"references":[]}\nAttachments: []', 'rejected', 20, '2026-02-23 16:39:11', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('7d5ea06a-4fa0-44fd-b642-9dd5296880b0', '6b9b3870-ed09-4e0a-8300-befc4cfd26d6', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', '23232.00', '{"technical":"dwada","delivery":"","milestones":[],"caseStudies":[],"references":[]}', 'submitted', 20, '2026-05-09 12:30:38', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('7e2d5d3f-999b-4482-9fdb-b1ff5c2d6491', 'c5121be9-3bc5-49db-a42d-855ec156ba1b', 'c11473bf-520b-46e1-a26c-68b4e2ce1376', '2000.00', '{"technical":"t","delivery":"t","milestones":[],"caseStudies":[],"references":[]}', 'rejected', 0, '2026-02-23 16:39:11', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('81c9434b-39cd-492f-a94b-db47c72eaaa7', '763cb55e-ae4f-4d5e-bd9c-a7334981d1b3', 'c11473bf-520b-46e1-a26c-68b4e2ce1376', '200.00', '{"technical":"test1","delivery":"test","milestones":[{"title":"1","amount":"100","dueDate":"2026-02-15"}],"caseStudies":[],"references":[]}\nAttachments: []', 'accepted', 0, '2026-02-23 16:39:11', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('89cf6696-c27f-492d-8629-9a660176af40', 'a37c81a6-6186-4cbc-b39c-2b38cb4501de', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', '231231.00', '{"technical":"wdada","delivery":"","milestones":[],"caseStudies":[],"references":[]}', 'submitted', 20, '2026-05-09 12:39:38', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('9f2420d5-5013-4d9e-9901-221f64ccd41c', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3e2e3f-ddc9-11f0-8727-001a7dda7113', '150000.00', '{"technical":"tetst","delivery":"nofwd","milestones":[],"caseStudies":[],"references":[]}', 'submitted', 20, '2026-05-19 12:06:51', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('a1759aac-72f6-4cc5-8a7b-fbf55eed28ae', 'c5121be9-3bc5-49db-a42d-855ec156ba1b', 'c11473bf-520b-46e1-a26c-68b4e2ce1376', '2000.00', '{"technical":"t","delivery":"t","milestones":[],"caseStudies":[],"references":[]}', 'rejected', 0, '2026-02-23 16:39:11', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('b45d1e41-86ed-44e0-b787-82d728cdb714', 'c5121be9-3bc5-49db-a42d-855ec156ba1b', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', '999.97', '{"technical":"","delivery":"","milestones":[],"caseStudies":[],"references":[]}\nAttachments: []', 'rejected', 20, '2026-02-23 16:39:11', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('ce5f42cd-8283-4110-8543-fdb0aa032cd5', 'f755f106-b3c8-492b-9f1e-4359a62d1cf0', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', '1200.00', '{"technical":"dawdad","delivery":"dwa","milestones":[],"caseStudies":[],"references":[]}', 'accepted', 20, '2026-03-23 14:11:46', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('d87d8a29-cf0d-4cb6-b652-e34db2dfa9dc', 'c5121be9-3bc5-49db-a42d-855ec156ba1b', 'c11473bf-520b-46e1-a26c-68b4e2ce1376', '2000.00', '{"technical":"","delivery":"","milestones":[],"caseStudies":[],"references":[]}', 'rejected', 0, '2026-02-23 16:39:11', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('df41caaa-9b6f-4c22-bf92-8433e3db8f46', 'dabdf5f7-518c-4a96-ae76-f651f3d2f611', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', '1199.98', '{"technical":"","delivery":"","milestones":[],"caseStudies":[],"references":[]}\nAttachments: []', 'accepted', 20, '2026-02-23 16:39:11', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('ec7cdd13-bc5f-4562-813a-6ce41198ba59', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e33a7b4-ddc9-11f0-8727-001a7dda7113', '23344.00', '{"technical":"daeda","delivery":"dawdwa","milestones":[],"caseStudies":[],"references":[]}', 'submitted', 20, '2026-05-19 13:56:54', NULL, NULL, NULL, NULL, NULL, NULL),
-  ('fd9e0f87-4c23-4671-9180-f75f31981ada', 'c05c6318-ef9e-4482-a236-bf82ae02676d', 'c11473bf-520b-46e1-a26c-68b4e2ce1376', '500.00', '{"technical":"test1","delivery":"tesst1","milestones":[{"title":"1","amount":"200","dueDate":"2026-02-15"}],"caseStudies":[],"references":[]}\nAttachments: []', 'accepted', 0, '2026-02-23 16:39:11', NULL, NULL, NULL, NULL, NULL, NULL);
+-- (no data in proposal)
 
--- -----------------------------------------------
--- Table: proposal_drafts
--- -----------------------------------------------
 DROP TABLE IF EXISTS `proposal_drafts`;
 CREATE TABLE `proposal_drafts` (
   `draft_id` char(36) NOT NULL,
@@ -301,138 +381,37 @@ CREATE TABLE `proposal_drafts` (
   CONSTRAINT `proposal_drafts_ibfk_2` FOREIGN KEY (`provider_id`) REFERENCES `providerprofile` (`provider_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `proposal_drafts` (`draft_id`, `project_id`, `provider_id`, `bid_amount`, `technical`, `delivery`, `milestones`, `case_studies`, `references_json`, `updated_at`) VALUES
-  ('0c4017b9-d1a0-440e-8d6a-5e4ae47eda19', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e33a7b4-ddc9-11f0-8727-001a7dda7113', '4999.99', 'dwdwda', 'dawda', '', '', '', '2026-05-19 13:44:07'),
-  ('210cea00-c9d6-4940-9b13-3eeb898b971f', 'a37c81a6-6186-4cbc-b39c-2b38cb4501de', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', '231231.00', 'wdada', '', '', '', '', '2026-05-09 12:39:32'),
-  ('6638207e-653d-46f5-907c-2be44e3a501e', 'c5121be9-3bc5-49db-a42d-855ec156ba1b', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', '1243.00', 'dwadad', '', '', '', '', '2026-03-26 15:06:53');
+-- (no data in proposal_drafts)
 
--- -----------------------------------------------
--- Table: providerprofile
--- -----------------------------------------------
-DROP TABLE IF EXISTS `providerprofile`;
-CREATE TABLE `providerprofile` (
-  `provider_id` char(36) NOT NULL DEFAULT (uuid()),
-  `organization_name` varchar(255) NOT NULL,
-  `skills` json DEFAULT NULL,
-  `experience_years` tinyint unsigned DEFAULT NULL,
-  `portfolio_url` varchar(2048) DEFAULT NULL,
-  `hourly_rate` decimal(10,2) NOT NULL,
-  `location` point NOT NULL DEFAULT (point(0,0)),
-  `rating` decimal(3,2) DEFAULT '0.00',
-  `skills_search` text GENERATED ALWAYS AS (json_unquote(json_extract(`skills`,_cp850'$[*]'))) STORED,
-  `subscription_status` enum('none','active','expired') DEFAULT 'none',
-  `subscription_plan_id` int DEFAULT NULL,
-  `subscription_start` date DEFAULT NULL,
-  `subscription_end` date DEFAULT NULL,
-  PRIMARY KEY (`provider_id`),
-  SPATIAL KEY `idx_provider_location` (`location`),
-  KEY `subscription_plan_id` (`subscription_plan_id`),
-  FULLTEXT KEY `idx_provider_skills` (`skills_search`),
-  CONSTRAINT `providerprofile_ibfk_1` FOREIGN KEY (`provider_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `providerprofile_ibfk_2` FOREIGN KEY (`subscription_plan_id`) REFERENCES `subscriptionplan` (`id`)
+DROP TABLE IF EXISTS `contract`;
+CREATE TABLE `contract` (
+  `contract_id` char(36) NOT NULL DEFAULT (uuid()),
+  `proposal_id` char(36) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date DEFAULT NULL,
+  `status` enum('in_progress','completed','cancelled','disputed') NOT NULL DEFAULT 'in_progress',
+  `completion_report` text,
+  PRIMARY KEY (`contract_id`),
+  UNIQUE KEY `proposal_id` (`proposal_id`),
+  CONSTRAINT `contract_ibfk_1` FOREIGN KEY (`proposal_id`) REFERENCES `proposal` (`proposal_id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `providerprofile` (`provider_id`, `organization_name`, `skills`, `experience_years`, `portfolio_url`, `hourly_rate`, `location`, `rating`, `skills_search`, `subscription_status`, `subscription_plan_id`, `subscription_start`, `subscription_end`) VALUES
-  ('0b5442e4-e580-4e19-a0c6-4201a807c824', 'TestingRegister', 'GIS Mapping,LiDAR Processing,UAV Mapping,3D City Modeling,Satellite Image Processing', 5, NULL, '50.00', '[object Object]', '0.00', '["GIS Mapping", "LiDAR Processing", "UAV Mapping", "3D City Modeling", "Satellite Image Processing"]', 'none', NULL, NULL, NULL),
-  ('1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 'test80', NULL, 10, NULL, '10.00', '[object Object]', '0.00', NULL, 'none', NULL, NULL, NULL),
-  ('46b348da-6ce1-4cf6-af61-c477a1cbf123', 'Test3', NULL, 20, 'https://testsite1.com', '50.00', '[object Object]', '0.00', NULL, 'none', NULL, NULL, NULL),
-  ('7e2b5874-ddc9-11f0-8727-001a7dda7113', 'Naksha Tech Private Limited', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 15, 'https://www.naksha-tech-private-limited.com', '120.00', '[object Object]', '4.05', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e33587c-ddc9-11f0-8727-001a7dda7113', 'Geokno India', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 5, 'https://www.geokno-india.com', '90.00', '[object Object]', '3.75', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e33820b-ddc9-11f0-8727-001a7dda7113', 'Aam Geo Spatial Tech PRIVATE LIMITED', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,UAV Mapping', 6, 'https://www.aam-geo-spatial-tech-private-limited.com', '90.00', '[object Object]', '3.78', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e33a7b4-ddc9-11f0-8727-001a7dda7113', 'ALAR Technologies', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,Terrain Analysis', 9, 'https://www.alar-technologies.com', '90.00', '[object Object]', '3.87', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "Terrain Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e33ccc8-ddc9-11f0-8727-001a7dda7113', 'FOCUS GEOSPATIAL PRIVATE LIMITED', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 5, 'https://www.focus-geospatial-private-limited.com', '90.00', '[object Object]', '3.75', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e341d4f-ddc9-11f0-8727-001a7dda7113', 'GeoCentroid Pvt Ltd', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,UAV Mapping', 7, 'https://www.geocentroid-pvt-ltd.com', '90.00', '[object Object]', '3.81', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e34412d-ddc9-11f0-8727-001a7dda7113', 'Goodland Geospatial & Consultants Pvt Ltd', 'BIM Integration,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 10, 'https://www.goodland-geospatial-consultants-pvt-ltd.com', '120.00', '[object Object]', '3.90', '["BIM Integration", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e34647a-ddc9-11f0-8727-001a7dda7113', 'Mappa Consulting Engineers', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,Terrain Analysis', 15, 'https://www.mappa-consulting-engineers.com', '120.00', '[object Object]', '4.05', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "Terrain Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e348867-ddc9-11f0-8727-001a7dda7113', 'Matrix Geo Solution Ltd.', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 9, 'https://www.matrix-geo-solution-ltd.com', '90.00', '[object Object]', '3.87', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e34ae0e-ddc9-11f0-8727-001a7dda7113', 'Lidar Tech Pvt Ltd', 'GIS Mapping,Geospatial Consulting,LiDAR Classification,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,UAV Mapping', 11, 'https://www.lidar-tech-pvt-ltd.com', '120.00', '[object Object]', '3.93', '["GIS Mapping", "Geospatial Consulting", "LiDAR Classification", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e34d940-ddc9-11f0-8727-001a7dda7113', 'Genesys International Corporation limited', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 26, 'https://www.genesys-international-corporation-limited.com', '150.00', '[object Object]', '4.38', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e351e3a-ddc9-11f0-8727-001a7dda7113', 'Marvel Geospatial Solutions Pvt Ltd', 'BIM Integration,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 5, 'https://www.marvel-geospatial-solutions-pvt-ltd.com', '90.00', '[object Object]', '3.75', '["BIM Integration", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e354bc0-ddc9-11f0-8727-001a7dda7113', 'BPC Consultant India Pvt. Ltd.', '3D City Modeling,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 13, 'https://www.bpc-consultant-india-pvt-ltd.com', '120.00', '[object Object]', '3.99', '["3D City Modeling", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e357865-ddc9-11f0-8727-001a7dda7113', 'Airpix', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 13, 'https://www.airpix.com', '120.00', '[object Object]', '3.99', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e359a1b-ddc9-11f0-8727-001a7dda7113', 'SISL, India', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 15, 'https://www.sisl-india.com', '120.00', '[object Object]', '4.05', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e35bbb2-ddc9-11f0-8727-001a7dda7113', 'GeoVista Technologies Private Limited', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 14, 'https://www.geovista-technologies-private-limited.com', '120.00', '[object Object]', '4.02', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e35dcc4-ddc9-11f0-8727-001a7dda7113', 'NeoGeoInfo Technologies Pvt Ltd', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 5, 'https://www.neogeoinfo-technologies-pvt-ltd.com', '90.00', '[object Object]', '3.75', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e35fe43-ddc9-11f0-8727-001a7dda7113', 'Lidar Engineering and Infrastructure Pvt Ltd', 'GIS Mapping,Geospatial Consulting,LiDAR Classification,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,UAV Mapping', 15, 'https://www.lidar-engineering-and-infrastructure-pvt-ltd.com', '120.00', '[object Object]', '4.05', '["GIS Mapping", "Geospatial Consulting", "LiDAR Classification", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e361ecf-ddc9-11f0-8727-001a7dda7113', 'Data Labs India Solutions Pvt Ltd', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 13, 'https://www.data-labs-india-solutions-pvt-ltd.com', '120.00', '[object Object]', '3.99', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e363f68-ddc9-11f0-8727-001a7dda7113', 'Land Coordinates Technology (Lctss.in)', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 8, 'https://www.land-coordinates-technology-lctss-in.com', '90.00', '[object Object]', '3.78', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e36604b-ddc9-11f0-8727-001a7dda7113', 'RightData Labs Pvt Ltd', 'Digital Elevation Models,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 9, 'https://www.rightdata-labs-pvt-ltd.com', '90.00', '[object Object]', '3.87', '["Digital Elevation Models", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3684a5-ddc9-11f0-8727-001a7dda7113', 'LeadSquared', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,UAV Mapping', 6, 'https://www.leadsquared.com', '90.00', '[object Object]', '3.78', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e36a411-ddc9-11f0-8727-001a7dda7113', 'iSpatial Techno Solutions Pvt Ltd', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 8, 'https://www.ispatial-techno-solutions-pvt-ltd.com', '90.00', '[object Object]', '3.84', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e36c538-ddc9-11f0-8727-001a7dda7113', 'Datarise Solutions', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 7, 'https://www.datarise-solutions.com', '90.00', '[object Object]', '3.81', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e36e561-ddc9-11f0-8727-001a7dda7113', 'LumenData Solutions India Pvt Ltd', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,UAV Mapping', 5, 'https://www.lumendata-solutions-india-pvt-ltd.com', '90.00', '[object Object]', '3.75', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e3706bc-ddc9-11f0-8727-001a7dda7113', 'Atom Aviation Services Pvt Ltd.', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 7, 'https://www.atom-aviation-services-pvt-ltd.com', '90.00', '[object Object]', '3.81', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e372884-ddc9-11f0-8727-001a7dda7113', '3D Pointshot', '3D Modeling,BIM Integration,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 12, 'https://www.3d-pointshot.com', '120.00', '[object Object]', '3.96', '["3D Modeling", "BIM Integration", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e385d29-ddc9-11f0-8727-001a7dda7113', 'Infogeo', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 10, 'https://www.infogeo.com', '120.00', '[object Object]', '3.96', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e396228-ddc9-11f0-8727-001a7dda7113', 'Robomania India Private Limited', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 7, 'https://www.robomania-india-private-limited.com', '90.00', '[object Object]', '3.81', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e398a41-ddc9-11f0-8727-001a7dda7113', 'Trigeo Technologies', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 10, 'https://www.trigeo-technologies.com', '120.00', '[object Object]', '3.90', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e39acd5-ddc9-11f0-8727-001a7dda7113', 'Vivid Geospatial', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Satellite Image Processing,Spatial Data Analysis', 12, 'https://www.vivid-geospatial.com', '120.00', '[object Object]', '3.96', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Satellite Image Processing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e39eaab-ddc9-11f0-8727-001a7dda7113', 'Ceinsys Tech', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Satellite Image Processing,Spatial Data Analysis', 5, 'https://www.ceinsys-tech.com', '90.00', '[object Object]', '3.75', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Satellite Image Processing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3a0948-ddc9-11f0-8727-001a7dda7113', 'Avakaza Geo-Science Research Technologies', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 11, 'https://www.avakaza-geo-science-research-technologies.com', '120.00', '[object Object]', '3.93', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3a2715-ddc9-11f0-8727-001a7dda7113', 'Geo Adithya Technologies', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 6, 'https://www.geo-adithya-technologies.com', '90.00', '[object Object]', '3.78', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3b9f9f-ddc9-11f0-8727-001a7dda7113', 'Geopage Consultants', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 14, 'https://www.geopage-consultants.com', '120.00', '[object Object]', '4.02', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3bc3e6-ddc9-11f0-8727-001a7dda7113', 'Lepton Software', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 8, 'https://www.lepton-software.com', '90.00', '[object Object]', '3.84', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3be8b4-ddc9-11f0-8727-001a7dda7113', 'Ansimap Technologies', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 12, 'https://www.ansimap-technologies.com', '120.00', '[object Object]', '3.96', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3c0d7e-ddc9-11f0-8727-001a7dda7113', 'Production Modeling India Private Limited', '3D City Modeling,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 8, 'https://www.production-modeling-india-private-limited.com', '90.00', '[object Object]', '3.84', '["3D City Modeling", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3c33ae-ddc9-11f0-8727-001a7dda7113', 'ORBX Technologies Private Limited', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,UAV Mapping', 14, 'https://www.orbx-technologies-private-limited.com', '120.00', '[object Object]', '4.02', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e3c5661-ddc9-11f0-8727-001a7dda7113', 'MapVista', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 11, 'https://www.mapvista.com', '120.00', '[object Object]', '3.93', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3d0b1f-ddc9-11f0-8727-001a7dda7113', 'Mirai Aerospace Systems', 'GIS Mapping,Geospatial Consulting,LiDAR Classification,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,UAV Mapping', 13, 'https://www.mirai-aerospace-systems.com', '120.00', '[object Object]', '3.99', '["GIS Mapping", "Geospatial Consulting", "LiDAR Classification", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e3d3017-ddc9-11f0-8727-001a7dda7113', 'AUS-Aarav Unmanned Systems', '3D City Modeling,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 8, 'https://www.aus-aarav-unmanned-systems.com', '90.00', '[object Object]', '3.84', '["3D City Modeling", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3d5095-ddc9-11f0-8727-001a7dda7113', 'KGLOBE SOFTTECH INDIA', '3D City Modeling,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 13, 'https://www.kglobe-softtech-india.com', '120.00', '[object Object]', '3.99', '["3D City Modeling", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3d70d1-ddc9-11f0-8727-001a7dda7113', 'Pixel Vision', 'BIM Integration,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 13, 'https://www.pixel-vision.com', '120.00', '[object Object]', '3.99', '["BIM Integration", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3d907e-ddc9-11f0-8727-001a7dda7113', 'HDSENSE', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 10, 'https://www.hdsense.com', '120.00', '[object Object]', '3.90', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3daf61-ddc9-11f0-8727-001a7dda7113', 'Eastern Aero Carto', 'GIS Mapping,Geospatial Consulting,LiDAR Classification,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,UAV Mapping', 5, 'https://www.eastern-aero-carto.com', '90.00', '[object Object]', '3.75', '["GIS Mapping", "Geospatial Consulting", "LiDAR Classification", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e3dcef8-ddc9-11f0-8727-001a7dda7113', 'Deduce Technologies', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,Terrain Analysis', 9, 'https://www.deduce-technologies.com', '90.00', '[object Object]', '3.87', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "Terrain Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3dee5f-ddc9-11f0-8727-001a7dda7113', 'Arya Geospatial', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 13, 'https://www.arya-geospatial.com', '120.00', '[object Object]', '3.96', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3e0dc1-ddc9-11f0-8727-001a7dda7113', 'EDGE 3D Technologies', '3D Modeling,BIM Integration,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 6, 'https://www.edge-3d-technologies.com', '90.00', '[object Object]', '3.78', '["3D Modeling", "BIM Integration", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3e2e3f-ddc9-11f0-8727-001a7dda7113', 'Asteria Aerospace', 'BIM Integration,GIS Mapping,Geospatial Consulting,LiDAR Classification,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,UAV Mapping', 11, 'https://www.asteria-aerospace.com', '120.00', '[object Object]', '3.93', '["BIM Integration", "GIS Mapping", "Geospatial Consulting", "LiDAR Classification", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e3e4e3c-ddc9-11f0-8727-001a7dda7113', 'PepperTree.AI', '3D City Modeling,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 7, 'https://www.peppertree-ai.com', '90.00', '[object Object]', '3.81', '["3D City Modeling", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3e93db-ddc9-11f0-8727-001a7dda7113', 'JKR Consulting', '3D City Modeling,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 9, 'https://www.jkr-consulting.com', '90.00', '[object Object]', '3.87', '["3D City Modeling", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3eb46e-ddc9-11f0-8727-001a7dda7113', 'Heliware', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 5, 'https://www.heliware.com', '90.00', '[object Object]', '3.75', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3ed474-ddc9-11f0-8727-001a7dda7113', 'GIS Consortium India Pvt Ltd', '3D City Modeling,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 12, 'https://www.gis-consortium-india-pvt-ltd.com', '120.00', '[object Object]', '3.96', '["3D City Modeling", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3ef46f-ddc9-11f0-8727-001a7dda7113', 'RSI Softech', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 10, 'https://www.rsi-softech.com', '120.00', '[object Object]', '3.90', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3f17aa-ddc9-11f0-8727-001a7dda7113', 'Coordinate Systems LLP', 'Digital Elevation Models,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 12, 'https://www.coordinate-systems-llp.com', '120.00', '[object Object]', '3.96', '["Digital Elevation Models", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3f3b1a-ddc9-11f0-8727-001a7dda7113', 'Aerodyne India', 'GIS Mapping,Geospatial Consulting,LiDAR Classification,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,Terrain Analysis,UAV Mapping', 12, 'https://www.aerodyne-india.com', '120.00', '[object Object]', '3.96', '["GIS Mapping", "Geospatial Consulting", "LiDAR Classification", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "Terrain Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e3f5b8c-ddc9-11f0-8727-001a7dda7113', 'Terrageo Technologies', '3D City Modeling,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 15, 'https://www.terrageo-technologies.com', '120.00', '[object Object]', '4.05', '["3D City Modeling", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3f80e6-ddc9-11f0-8727-001a7dda7113', 'Mappatura Geospatial', 'Digital Elevation Models,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 9, 'https://www.mappatura-geospatial.com', '90.00', '[object Object]', '3.87', '["Digital Elevation Models", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3fa469-ddc9-11f0-8727-001a7dda7113', 'Techmapperz', 'Digital Elevation Models,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 14, 'https://www.techmapperz.com', '120.00', '[object Object]', '4.02', '["Digital Elevation Models", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3fcdb6-ddc9-11f0-8727-001a7dda7113', 'Senseimage Technologies', 'Digital Elevation Models,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 9, 'https://www.senseimage-technologies.com', '90.00', '[object Object]', '3.87', '["Digital Elevation Models", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e3ff1ce-ddc9-11f0-8727-001a7dda7113', 'Yellow SKYE', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,UAV Mapping', 8, 'https://www.yellow-skye.com', '90.00', '[object Object]', '3.84', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e401260-ddc9-11f0-8727-001a7dda7113', 'TreisTek', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,Terrain Analysis', 12, 'https://www.treistek.com', '120.00', '[object Object]', '3.96', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "Terrain Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e403323-ddc9-11f0-8727-001a7dda7113', 'Earth On Mapping Consulting', 'Digital Elevation Models,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 6, 'https://www.earth-on-mapping-consulting.com', '90.00', '[object Object]', '3.78', '["Digital Elevation Models", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e40539a-ddc9-11f0-8727-001a7dda7113', 'Lucid Imaging Pvt Ltd', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,UAV Mapping', 14, 'https://www.lucid-imaging-pvt-ltd.com', '90.00', '[object Object]', '3.81', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e407460-ddc9-11f0-8727-001a7dda7113', 'Globe View Technologies', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 11, 'https://www.globe-view-technologies.com', '120.00', '[object Object]', '3.93', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e4093ad-ddc9-11f0-8727-001a7dda7113', 'Larix Technologies', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,UAV Mapping', 6, 'https://www.larix-technologies.com', '90.00', '[object Object]', '3.78', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e40b30f-ddc9-11f0-8727-001a7dda7113', 'Ladera Technology', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 13, 'https://www.ladera-technology.com', '120.00', '[object Object]', '3.99', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e40d214-ddc9-11f0-8727-001a7dda7113', 'VMAPStech India', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 5, 'https://www.vmapstech-india.com', '90.00', '[object Object]', '3.75', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e40f100-ddc9-11f0-8727-001a7dda7113', 'GeovertX', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 6, 'https://www.geovertx.com', '90.00', '[object Object]', '3.84', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e41101f-ddc9-11f0-8727-001a7dda7113', 'LGEOM', 'BIM Integration,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 10, 'https://www.lgeom.com', '120.00', '[object Object]', '3.90', '["BIM Integration", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e412fa1-ddc9-11f0-8727-001a7dda7113', 'Latlon Technologies', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 8, 'https://www.latlon-technologies.com', '90.00', '[object Object]', '3.84', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e414e8d-ddc9-11f0-8727-001a7dda7113', 'Wildplant Terrestrial Solutions', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 6, 'https://www.wildplant-terrestrial-solutions.com', '90.00', '[object Object]', '3.78', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e416da2-ddc9-11f0-8727-001a7dda7113', 'Flybi Technologies', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Satellite Image Processing,Spatial Data Analysis', 15, 'https://www.flybi-technologies.com', '120.00', '[object Object]', '4.05', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Satellite Image Processing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e418cc6-ddc9-11f0-8727-001a7dda7113', 'Leons Digital Technologies', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 10, 'https://www.leons-digital-technologies.com', '120.00', '[object Object]', '3.90', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e41ac04-ddc9-11f0-8727-001a7dda7113', 'DroneAcharya Aerial Innovations', 'GIS Mapping,Geospatial Consulting,LiDAR Classification,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,UAV Mapping', 14, 'https://www.droneacharya-aerial-innovations.com', '120.00', '[object Object]', '4.02', '["GIS Mapping", "Geospatial Consulting", "LiDAR Classification", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e41cb4d-ddc9-11f0-8727-001a7dda7113', 'Aston BIM Creations', '3D Modeling,BIM Integration,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 5, 'https://www.aston-bim-creations.com', '90.00', '[object Object]', '3.81', '["3D Modeling", "BIM Integration", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e41ea58-ddc9-11f0-8727-001a7dda7113', 'Shayona Management Services', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,Terrain Analysis', 7, 'https://www.shayona-management-services.com', '90.00', '[object Object]', '3.81', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "Terrain Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e42098b-ddc9-11f0-8727-001a7dda7113', 'Dronitech', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Satellite Image Processing,Spatial Data Analysis', 12, 'https://www.dronitech.com', '120.00', '[object Object]', '3.96', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Satellite Image Processing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e422bf6-ddc9-11f0-8727-001a7dda7113', 'Lares Global Limited', 'Digital Elevation Models,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 24, 'https://www.lares-global-limited.com', '150.00', '[object Object]', '4.32', '["Digital Elevation Models", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e424bd1-ddc9-11f0-8727-001a7dda7113', 'Raynas Infra and Geometics', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 10, 'https://www.raynas-infra-and-geometics.com', '120.00', '[object Object]', '3.90', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e427083-ddc9-11f0-8727-001a7dda7113', 'LRS Services', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Satellite Image Processing,Spatial Data Analysis', 5, 'https://www.lrs-services.com', '90.00', '[object Object]', '3.75', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Satellite Image Processing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e428fd1-ddc9-11f0-8727-001a7dda7113', 'LDS Engineers', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 5, 'https://www.lds-engineers.com', '90.00', '[object Object]', '3.75', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e42aec3-ddc9-11f0-8727-001a7dda7113', 'LaMinds', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,Terrain Analysis', 8, 'https://www.laminds.com', '120.00', '[object Object]', '4.05', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "Terrain Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e42cdb6-ddc9-11f0-8727-001a7dda7113', 'Terra Align Geospatial Solutions', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 7, 'https://www.terra-align-geospatial-solutions.com', '90.00', '[object Object]', '3.81', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e43150f-ddc9-11f0-8727-001a7dda7113', 'SKYMAP GEO-INFOMATIC', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 9, 'https://www.skymap-geo-infomatic.com', '90.00', '[object Object]', '3.87', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e433525-ddc9-11f0-8727-001a7dda7113', 'AiRotor Technologies', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 6, 'https://www.airotor-technologies.com', '90.00', '[object Object]', '3.78', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e435464-ddc9-11f0-8727-001a7dda7113', 'Lonar Technologies', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 11, 'https://www.lonar-technologies.com', '120.00', '[object Object]', '3.93', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('7e43747f-ddc9-11f0-8727-001a7dda7113', 'Axesmap', 'GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis,UAV Mapping', 15, 'https://www.axesmap.com', '120.00', '[object Object]', '4.05', '["GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis", "UAV Mapping"]', 'none', NULL, NULL, NULL),
-  ('7e439361-ddc9-11f0-8727-001a7dda7113', 'LuminoGuru', 'BIM Integration,GIS Mapping,Geospatial Consulting,LiDAR Processing,Photogrammetry,Remote Sensing,Spatial Data Analysis', 4, 'https://www.luminoguru.com', '120.00', '[object Object]', '3.93', '["BIM Integration", "GIS Mapping", "Geospatial Consulting", "LiDAR Processing", "Photogrammetry", "Remote Sensing", "Spatial Data Analysis"]', 'none', NULL, NULL, NULL),
-  ('a23f7c25-7690-4acf-ae4a-096a5db9ec4d', 'DAKSHA AND COMPANY', NULL, 5, 'https://testsite2.com', '50.00', '[object Object]', '0.00', NULL, 'none', NULL, NULL, NULL),
-  ('c11473bf-520b-46e1-a26c-68b4e2ce1376', 'Test1', NULL, 10, 'https:/test.com', '50.00', '[object Object]', '0.00', NULL, 'none', NULL, NULL, NULL),
-  ('eb580aee-cc64-4485-bdbe-f5769fd9283b', 'Test2', NULL, 20, NULL, '16.00', '[object Object]', '0.00', NULL, 'none', NULL, NULL, NULL);
+-- (no data in contract)
 
--- -----------------------------------------------
--- Table: review
--- -----------------------------------------------
+DROP TABLE IF EXISTS `payment`;
+CREATE TABLE `payment` (
+  `payment_id` char(36) NOT NULL DEFAULT (uuid()),
+  `contract_id` char(36) NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `payment_status` enum('pending','paid','failed','refunded') NOT NULL DEFAULT 'pending',
+  `transaction_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`payment_id`),
+  KEY `contract_id` (`contract_id`),
+  CONSTRAINT `payment_ibfk_1` FOREIGN KEY (`contract_id`) REFERENCES `contract` (`contract_id`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- (no data in payment)
+
 DROP TABLE IF EXISTS `review`;
 CREATE TABLE `review` (
   `review_id` char(36) NOT NULL DEFAULT (uuid()),
@@ -454,34 +433,6 @@ CREATE TABLE `review` (
 
 -- (no data in review)
 
--- -----------------------------------------------
--- Table: rfp_drafts
--- -----------------------------------------------
-DROP TABLE IF EXISTS `rfp_drafts`;
-CREATE TABLE `rfp_drafts` (
-  `draft_id` varchar(255) NOT NULL,
-  `buyer_id` varchar(255) DEFAULT NULL,
-  `title` text,
-  `description` text,
-  `budget` decimal(10,2) DEFAULT NULL,
-  `currency` varchar(10) DEFAULT NULL,
-  `start_date` date DEFAULT NULL,
-  `end_date` date DEFAULT NULL,
-  `submission_deadline` datetime DEFAULT NULL,
-  `visibility` varchar(20) DEFAULT NULL,
-  `contact_person` text,
-  `contact_email` text,
-  `credits` int DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`draft_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-INSERT INTO `rfp_drafts` (`draft_id`, `buyer_id`, `title`, `description`, `budget`, `currency`, `start_date`, `end_date`, `submission_deadline`, `visibility`, `contact_person`, `contact_email`, `credits`, `created_at`) VALUES
-  ('daa29031-136f-4263-98c5-5a6dd4fe2bfb', 'c288424d-c135-426e-afa5-a72040ae6476', 'dwad', 'awdad', '0.00', 'USD', NULL, NULL, NULL, 'public', '', '', 0, '2026-03-26 15:30:35');
-
--- -----------------------------------------------
--- Table: rfp_provider_match
--- -----------------------------------------------
 DROP TABLE IF EXISTS `rfp_provider_match`;
 CREATE TABLE `rfp_provider_match` (
   `id` char(36) NOT NULL DEFAULT (uuid()),
@@ -498,212 +449,32 @@ CREATE TABLE `rfp_provider_match` (
   CONSTRAINT `rfp_provider_match_ibfk_2` FOREIGN KEY (`provider_id`) REFERENCES `providerprofile` (`provider_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `rfp_provider_match` (`id`, `project_id`, `provider_id`, `match_score`, `reason`, `created_at`) VALUES
-  ('0482f499-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '0b5442e4-e580-4e19-a0c6-4201a807c824', '0.4000', '[object Object]', '2026-05-19 13:38:28'),
-  ('0488f337-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e2b5874-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('048a1f18-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e33587c-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('048b11e6-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e33820b-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('048be16a-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e33a7b4-ddc9-11f0-8727-001a7dda7113', '1.0000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04ad6e28-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e33ccc8-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04aecec5-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e341d4f-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04b0b3c4-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e34412d-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04b21086-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e34647a-ddc9-11f0-8727-001a7dda7113', '1.0000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04b381da-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e348867-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04c1bd3f-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e34ae0e-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04c34133-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e34d940-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04c52586-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e351e3a-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04c791b3-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e354bc0-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04c901d6-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e357865-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04d921d3-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e359a1b-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04db0828-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e35bbb2-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04dc5671-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e35dcc4-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04dd7f7e-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e35fe43-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04defbdc-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e361ecf-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04e0e65b-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e363f68-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04e283e5-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e36604b-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04e3a5b2-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3684a5-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04e49213-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e36a411-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04f208ee-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e36c538-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04f328b6-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e36e561-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04f3f2d1-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3706bc-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04f4b37d-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e372884-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04f57bf8-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e385d29-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04f63b23-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e396228-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04f75c46-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e398a41-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04f8a0d2-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e39acd5-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04fa22af-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e39eaab-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04fbfbd5-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3a0948-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04fd3440-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3a2715-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04fe7317-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3b9f9f-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('04ffb415-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3bc3e6-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('0500dcd3-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3be8b4-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('0502349d-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3c0d7e-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('0502e3d5-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3c33ae-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('05039477-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3c5661-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:28'),
-  ('05045819-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3d0b1f-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('05051435-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3d3017-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0506161f-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3d5095-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0506c392-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3d70d1-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('05076fa7-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3d907e-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0508272e-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3daf61-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('050909eb-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3dcef8-ddc9-11f0-8727-001a7dda7113', '1.0000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0509ff65-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3dee5f-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('050ab942-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3e0dc1-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('050c7337-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3e2e3f-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('050d6bb9-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3e4e3c-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('050ea25a-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3e93db-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('050fe889-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3eb46e-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0510dcb4-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3ed474-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0511ffdb-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3ef46f-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0512ed65-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3f17aa-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0514148a-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3f3b1a-ddc9-11f0-8727-001a7dda7113', '1.0000', '[object Object]', '2026-05-19 13:38:29'),
-  ('05156ce9-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3f5b8c-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('05169c2e-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3f80e6-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('051802bd-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3fa469-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('05192d56-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3fcdb6-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('051a94d1-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e3ff1ce-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('051bc5b6-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e401260-ddc9-11f0-8727-001a7dda7113', '1.0000', '[object Object]', '2026-05-19 13:38:29'),
-  ('051daa88-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e403323-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('051eb6aa-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e40539a-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('051fe131-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e407460-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0520dc46-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e4093ad-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0521c86f-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e40b30f-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('05227262-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e40d214-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('05232447-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e40f100-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0523ea7a-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e41101f-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0524ad50-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e412fa1-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('05255d30-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e414e8d-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('05261731-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e416da2-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0526c6cb-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e418cc6-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0527709e-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e41ac04-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('05282709-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e41cb4d-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0528f27c-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e41ea58-ddc9-11f0-8727-001a7dda7113', '1.0000', '[object Object]', '2026-05-19 13:38:29'),
-  ('052998ee-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e42098b-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('052a3f8c-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e422bf6-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('052ae9c6-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e424bd1-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('052b9b52-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e427083-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('052c51f9-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e428fd1-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('052d0a04-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e42aec3-ddc9-11f0-8727-001a7dda7113', '1.0000', '[object Object]', '2026-05-19 13:38:29'),
-  ('052dbcd4-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e42cdb6-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('052f6267-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e43150f-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('053008c1-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e433525-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0530b8c0-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e435464-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('0531643b-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e43747f-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('05320d78-5388-11f1-a1b9-28d043f11fd3', '2c5363fc-d6e8-42d0-882a-7f7ff981901f', '7e439361-ddc9-11f0-8727-001a7dda7113', '0.8000', '[object Object]', '2026-05-19 13:38:29'),
-  ('f2588f24-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e2b5874-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:22'),
-  ('f25cc205-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e33587c-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f25e9aff-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e33820b-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f25fc67e-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e33a7b4-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f26108f0-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e33ccc8-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2705e06-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e341d4f-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2712671-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e34412d-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f271f682-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e34647a-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f272c164-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e348867-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23');
-INSERT INTO `rfp_provider_match` (`id`, `project_id`, `provider_id`, `match_score`, `reason`, `created_at`) VALUES
-  ('f2736cb7-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e34ae0e-ddc9-11f0-8727-001a7dda7113', '0.5000', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2742b5a-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e34d940-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f274f652-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e351e3a-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f275d4fc-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e354bc0-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2775c7a-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e357865-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2780fea-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e359a1b-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f278c984-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e35bbb2-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f279854a-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e35dcc4-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f27a45a5-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e35fe43-ddc9-11f0-8727-001a7dda7113', '0.5000', '[object Object]', '2026-05-17 12:57:23'),
-  ('f27af3b3-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e361ecf-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f27bb58b-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e363f68-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f27c6cae-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e36604b-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f27d2a54-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3684a5-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f27dde7a-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e36a411-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f27e941c-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e36c538-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f27f508c-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e36e561-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f27ffd93-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3706bc-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f280c54a-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e372884-ddc9-11f0-8727-001a7dda7113', '0.5000', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2819458-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e385d29-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f28243e3-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e396228-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f28301dd-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e398a41-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f283b0d9-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e39acd5-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2845b05-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e39eaab-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f28504be-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3a0948-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f285b41b-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3a2715-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f286605f-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3b9f9f-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2870677-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3bc3e6-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f287b6b5-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3be8b4-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2886e1f-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3c0d7e-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2891746-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3c33ae-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f289b4c8-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3c5661-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f28a6308-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3d0b1f-ddc9-11f0-8727-001a7dda7113', '0.5000', '[object Object]', '2026-05-17 12:57:23'),
-  ('f28b1337-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3d3017-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f28bb53d-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3d5095-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f28c5fe3-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3d70d1-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f28d1160-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3d907e-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f28dc499-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3daf61-ddc9-11f0-8727-001a7dda7113', '0.5000', '[object Object]', '2026-05-17 12:57:23'),
-  ('f28e76f2-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3dcef8-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f28f2746-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3dee5f-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f28fc35e-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3e0dc1-ddc9-11f0-8727-001a7dda7113', '0.5000', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2907b25-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3e2e3f-ddc9-11f0-8727-001a7dda7113', '0.5600', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2914149-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3e4e3c-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f29229c5-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3e93db-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f292e479-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3eb46e-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f294425f-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3ed474-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f295079d-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3ef46f-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f295c7ef-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3f17aa-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2966d3d-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3f3b1a-ddc9-11f0-8727-001a7dda7113', '0.5600', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2972000-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3f5b8c-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f297e6be-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3f80e6-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2989e0a-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3fa469-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2994d1f-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3fcdb6-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f299fb8c-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e3ff1ce-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f29ab885-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e401260-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f29b64ee-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e403323-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f29c11b3-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e40539a-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f29cbd00-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e407460-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2a4916d-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e4093ad-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2a540f9-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e40b30f-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2a636c6-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e40d214-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2a6de06-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e40f100-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2a78821-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e41101f-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2a83d94-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e412fa1-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2a8eef6-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e414e8d-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2a99fa5-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e416da2-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2aa6ae3-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e418cc6-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2ab6075-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e41ac04-ddc9-11f0-8727-001a7dda7113', '0.5000', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2ac23d7-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e41cb4d-ddc9-11f0-8727-001a7dda7113', '0.5000', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2acd10f-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e41ea58-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2ad7e1e-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e42098b-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2ae1b37-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e422bf6-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2aec287-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e424bd1-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2af8008-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e427083-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2b03a1e-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e428fd1-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2b0eea4-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e42aec3-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2b1b0d9-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e42cdb6-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2b2759d-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e43150f-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2b32c9a-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e433525-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2b3f2f8-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e435464-ddc9-11f0-8727-001a7dda7113', '0.3800', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2b4b9da-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e43747f-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23'),
-  ('f2b58829-51ef-11f1-bf88-cc28aac91a8b', '1dc0d4b0-7a65-46fb-bc68-29f57c457363', '7e439361-ddc9-11f0-8727-001a7dda7113', '0.4400', '[object Object]', '2026-05-17 12:57:23');
+-- (no data in rfp_provider_match)
 
--- -----------------------------------------------
--- Table: servicecategory
--- -----------------------------------------------
-DROP TABLE IF EXISTS `servicecategory`;
-CREATE TABLE `servicecategory` (
-  `category_id` int unsigned NOT NULL AUTO_INCREMENT,
-  `parent_category_id` int unsigned DEFAULT NULL,
-  `category_name` varchar(100) NOT NULL,
-  `description` text,
-  `embedding_vector` varbinary(256) DEFAULT NULL,
-  PRIMARY KEY (`category_id`),
-  UNIQUE KEY `category_name` (`category_name`),
-  KEY `parent_category_id` (`parent_category_id`),
-  CONSTRAINT `servicecategory_ibfk_1` FOREIGN KEY (`parent_category_id`) REFERENCES `servicecategory` (`category_id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+DROP TABLE IF EXISTS `creditledger`;
+CREATE TABLE `creditledger` (
+  `id` char(36) NOT NULL,
+  `provider_id` char(36) DEFAULT NULL,
+  `credits` int DEFAULT NULL,
+  `type` enum('credit','debit') DEFAULT NULL,
+  `reason` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `servicecategory` (`category_id`, `parent_category_id`, `category_name`, `description`, `embedding_vector`) VALUES
-  (10, NULL, 'General GIS Services', 'Default category for general GIS-related requests', NULL);
+INSERT INTO `creditledger` (`id`, `provider_id`, `credits`, `type`, `reason`) VALUES
+  ('141e0a37-52d8-11f1-bf88-cc28aac91a8b', '7e3e2e3f-ddc9-11f0-8727-001a7dda7113', 200, 'credit', 'Manual credit addition'),
+  ('1ec2ad6b-1619-460d-ad74-7663003e1551', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 20, 'debit', 'Proposal submission'),
+  ('216a4d00-d2a8-47de-a540-ec0a5e2f445b', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 20, 'debit', 'Proposal submission'),
+  ('25d4f454-7031-402c-aa2b-7706fbab3cc1', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 20, 'debit', 'Proposal submission'),
+  ('673dcef9-5388-11f1-a1b9-28d043f11fd3', '7e33a7b4-ddc9-11f0-8727-001a7dda7113', 200, 'credit', 'Manual credit addition'),
+  ('6e4c635b-60ff-46f8-85df-2cd734aa05b3', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 200, 'credit', 'Initial credits'),
+  ('97b29cc1-538a-11f1-a1b9-28d043f11fd3', '7e33a7b4-ddc9-11f0-8727-001a7dda7113', 20, 'debit', 'Proposal submission for project 1dc0d4b0-7a65-46fb-bc68-29f57c457363'),
+  ('a29f0200-58db-4461-a2c7-5ba9df148374', '0b5442e4-e580-4e19-a0c6-4201a807c824', 100, 'credit', 'Initial credits'),
+  ('a42d6963-92b8-42a0-a1ff-543d3ccfaa37', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 20, 'debit', 'Proposal submission'),
+  ('aa67529a-cba5-4857-b8a4-ab0d37be15c9', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 20, 'debit', 'Proposal submission'),
+  ('deb371bd-bf4d-4ffb-82c9-5bda41393be9', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 20, 'debit', 'Proposal submission');
 
--- -----------------------------------------------
--- Table: servicelisting
--- -----------------------------------------------
 DROP TABLE IF EXISTS `servicelisting`;
 CREATE TABLE `servicelisting` (
   `service_id` char(36) NOT NULL DEFAULT (uuid()),
@@ -730,9 +501,6 @@ CREATE TABLE `servicelisting` (
 
 -- (no data in servicelisting)
 
--- -----------------------------------------------
--- Table: sessions
--- -----------------------------------------------
 DROP TABLE IF EXISTS `sessions`;
 CREATE TABLE `sessions` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -745,237 +513,6 @@ CREATE TABLE `sessions` (
   CONSTRAINT `sessions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=263 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `sessions` (`id`, `session_token`, `user_id`, `expires`) VALUES
-  (105, 'f9ad164263b0411a730b8292502c8c82634d0ab3e7e180974c9f1c8f25ab41a6', 'c6469221-6022-46ec-8c1c-d7d090ffe820', '2026-03-17 05:01:21'),
-  (181, '1b6268f72b28aa72f48c5fcd3975c57d031185ebd8f7e1668f908f0dfd3e882d', 'c11473bf-520b-46e1-a26c-68b4e2ce1376', '2026-06-08 10:48:58'),
-  (184, '0f8cbe29fe711dfdf7e68aa0aadec451115513438ca22077cb62fcffcb2259e7', '9c76396b-fef9-43a2-b6fa-005baaa21e28', '2026-06-08 17:12:54'),
-  (205, '67de76882c0daa0b94ace827a2ecf729a8ee58a40b2579113e7d7b187d2c74f0', '7e2b5874-ddc9-11f0-8727-001a7dda7113', '2026-06-14 16:23:32'),
-  (218, 'c9e5bbe9f4be3c9304f497a35c5b460a41115af01b7ae97da86301e9f134b74e', '0b5442e4-e580-4e19-a0c6-4201a807c824', '2026-06-15 17:15:38'),
-  (247, 'b63b5a8df3f84d0865de25854a44394f18ff314068bf30576d0e894a7a2de277', '7e3e2e3f-ddc9-11f0-8727-001a7dda7113', '2026-06-18 07:24:27'),
-  (250, '1b9014ffbf708df2f038e01348e5c00fdf43fc9e9a0a0e113a45229d0b7ae6bb', '7e33a7b4-ddc9-11f0-8727-001a7dda7113', '2026-06-18 13:41:24'),
-  (260, '2fe6cbff2a8e2b0e67f48a78e648ba3ce439ae3f98efa432d80e25b22a2ebe27', 'e3115fb2-699e-4ed7-acf7-fd638b8b7d4d', '2026-06-21 07:27:12'),
-  (261, '41619d9094124414722136a5df546ed916714d802df8b869dbb87bf3e2703cb4', '1144a92e-ba5c-442e-9ff0-1e4f2dff4860', '2026-06-21 07:28:12'),
-  (262, 'b3c90b8897c0cd693b4cbe8bda25f0891bb59686a927d9c6532a6a5caa485c0f', 'c288424d-c135-426e-afa5-a72040ae6476', '2026-06-21 13:46:11');
-
--- -----------------------------------------------
--- Table: subscriptionplan
--- -----------------------------------------------
-DROP TABLE IF EXISTS `subscriptionplan`;
-CREATE TABLE `subscriptionplan` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) DEFAULT NULL,
-  `monthly_price` decimal(10,2) DEFAULT NULL,
-  `monthly_credits` int DEFAULT NULL,
-  `is_active` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-INSERT INTO `subscriptionplan` (`id`, `name`, `monthly_price`, `monthly_credits`, `is_active`) VALUES
-  (1, 'Starter', '29.00', 50, 1),
-  (2, 'Professional', '99.00', 200, 1),
-  (3, 'Enterprise', '249.00', 500, 1);
-
--- -----------------------------------------------
--- Table: user
--- -----------------------------------------------
-DROP TABLE IF EXISTS `user`;
-CREATE TABLE `user` (
-  `user_id` char(36) NOT NULL DEFAULT (uuid()),
-  `email` varchar(255) DEFAULT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `user_type` enum('buyer','provider','admin') NOT NULL,
-  `join_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `last_login` datetime DEFAULT NULL,
-  `status` enum('active','inactive','suspended') NOT NULL DEFAULT 'active',
-  `phone_number` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`user_id`),
-  UNIQUE KEY `email` (`email`),
-  UNIQUE KEY `phone_number` (`phone_number`),
-  UNIQUE KEY `email_2` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-INSERT INTO `user` (`user_id`, `email`, `password_hash`, `user_type`, `join_date`, `last_login`, `status`, `phone_number`) VALUES
-  ('061b6e0c-583b-4f56-8855-fb20d208b095', 'saransh1@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-31 10:50:52', '2025-12-31 11:12:22', 'active', NULL),
-  ('08872940-b0fe-429c-89c0-accbea2e2ece', NULL, '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-01-24 13:54:50', NULL, 'active', '+919717485454'),
-  ('0b5442e4-e580-4e19-a0c6-4201a807c824', 'testnew@gmail.com', '$2b$12$u3RAIPC/XAftGYZdbOAcoe/qTYYije4BWJ71v0Wd8aqtiznOqzw9m', 'provider', '2026-05-16 17:07:44', '2026-05-16 17:15:38', 'active', '9133446677'),
-  ('1144a92e-ba5c-442e-9ff0-1e4f2dff4860', 'test80@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2026-02-20 15:29:59', '2026-05-22 07:28:11', 'active', '9999888800'),
-  ('46b348da-6ce1-4cf6-af61-c477a1cbf123', 'test3@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2026-01-10 08:34:03', '2026-01-11 14:23:35', 'active', NULL),
-  ('609c3eac-5d2d-470d-b188-f85f8fd86096', 'test4@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-01-11 13:58:24', '2026-01-11 14:06:26', 'active', NULL),
-  ('6bcbaf21-2e74-4d31-89ff-03d8136dadd2', 'test54@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-03-01 08:14:31', NULL, 'active', '7848659815'),
-  ('7168149a-dde8-448d-bcfa-dee4212b0eda', 'shivanshumit2107@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-01-31 06:36:56', NULL, 'active', '9999999999'),
-  ('7e2b5874-ddc9-11f0-8727-001a7dda7113', 'nakshatechprivatelimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', '2026-05-15 16:23:31', 'active', NULL),
-  ('7e33587c-ddc9-11f0-8727-001a7dda7113', 'geoknoindia@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e33820b-ddc9-11f0-8727-001a7dda7113', 'aamgeospatialtechprivatelimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e33a7b4-ddc9-11f0-8727-001a7dda7113', 'alartechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', '2026-05-19 13:41:24', 'active', NULL),
-  ('7e33ccc8-ddc9-11f0-8727-001a7dda7113', 'focusgeospatialprivatelimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e341d4f-ddc9-11f0-8727-001a7dda7113', 'geocentroidpvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e34412d-ddc9-11f0-8727-001a7dda7113', 'goodlandgeospatialconsultantspvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e34647a-ddc9-11f0-8727-001a7dda7113', 'mappaconsultingengineers@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e348867-ddc9-11f0-8727-001a7dda7113', 'matrixgeosolutionltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e34ae0e-ddc9-11f0-8727-001a7dda7113', 'lidartechpvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e34d940-ddc9-11f0-8727-001a7dda7113', 'genesysinternationalcorporationlimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e351e3a-ddc9-11f0-8727-001a7dda7113', 'marvelgeospatialsolutionspvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e354bc0-ddc9-11f0-8727-001a7dda7113', 'bpcconsultantindiapvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e357865-ddc9-11f0-8727-001a7dda7113', 'airpix@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e359a1b-ddc9-11f0-8727-001a7dda7113', 'sislindia@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e35bbb2-ddc9-11f0-8727-001a7dda7113', 'geovistatechnologiesprivatelimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e35dcc4-ddc9-11f0-8727-001a7dda7113', 'neogeoinfotechnologiespvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e35fe43-ddc9-11f0-8727-001a7dda7113', 'lidarengineeringandinfrastructurepvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e361ecf-ddc9-11f0-8727-001a7dda7113', 'datalabsindiasolutionspvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e363f68-ddc9-11f0-8727-001a7dda7113', 'landcoordinatestechnologylctssin@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e36604b-ddc9-11f0-8727-001a7dda7113', 'rightdatalabspvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3684a5-ddc9-11f0-8727-001a7dda7113', 'leadsquared@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e36a411-ddc9-11f0-8727-001a7dda7113', 'ispatialtechnosolutionspvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e36c538-ddc9-11f0-8727-001a7dda7113', 'datarisesolutions@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e36e561-ddc9-11f0-8727-001a7dda7113', 'lumendatasolutionsindiapvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3706bc-ddc9-11f0-8727-001a7dda7113', 'atomaviationservicespvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e372884-ddc9-11f0-8727-001a7dda7113', '3dpointshot@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e385d29-ddc9-11f0-8727-001a7dda7113', 'infogeo@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e396228-ddc9-11f0-8727-001a7dda7113', 'robomaniaindiaprivatelimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e398a41-ddc9-11f0-8727-001a7dda7113', 'trigeotechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e39acd5-ddc9-11f0-8727-001a7dda7113', 'vividgeospatial@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e39cc46-ddc9-11f0-8727-001a7dda7113', 'focusgeospatial@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e39eaab-ddc9-11f0-8727-001a7dda7113', 'ceinsystech@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3a0948-ddc9-11f0-8727-001a7dda7113', 'avakazageoscienceresearchtechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3a2715-ddc9-11f0-8727-001a7dda7113', 'geoadithyatechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3b9f9f-ddc9-11f0-8727-001a7dda7113', 'geopageconsultants@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3bc3e6-ddc9-11f0-8727-001a7dda7113', 'leptonsoftware@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3be8b4-ddc9-11f0-8727-001a7dda7113', 'ansimaptechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3c0d7e-ddc9-11f0-8727-001a7dda7113', 'productionmodelingindiaprivatelimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3c33ae-ddc9-11f0-8727-001a7dda7113', 'orbxtechnologiesprivatelimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3c5661-ddc9-11f0-8727-001a7dda7113', 'mapvista@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3d0b1f-ddc9-11f0-8727-001a7dda7113', 'miraiaerospacesystems@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3d3017-ddc9-11f0-8727-001a7dda7113', 'ausaaravunmannedsystems@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3d5095-ddc9-11f0-8727-001a7dda7113', 'kglobesofttechindia@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3d70d1-ddc9-11f0-8727-001a7dda7113', 'pixelvision@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3d907e-ddc9-11f0-8727-001a7dda7113', 'hdsense@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3daf61-ddc9-11f0-8727-001a7dda7113', 'easternaerocarto@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3dcef8-ddc9-11f0-8727-001a7dda7113', 'deducetechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3dee5f-ddc9-11f0-8727-001a7dda7113', 'aryageospatial@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3e0dc1-ddc9-11f0-8727-001a7dda7113', 'edge3dtechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3e2e3f-ddc9-11f0-8727-001a7dda7113', 'asteriaaerospace@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', '2026-05-19 07:24:26', 'active', NULL),
-  ('7e3e4e3c-ddc9-11f0-8727-001a7dda7113', 'peppertreeai@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3e93db-ddc9-11f0-8727-001a7dda7113', 'jkrconsulting@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3eb46e-ddc9-11f0-8727-001a7dda7113', 'heliware@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3ed474-ddc9-11f0-8727-001a7dda7113', 'gisconsortiumindiapvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3ef46f-ddc9-11f0-8727-001a7dda7113', 'rsisoftech@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3f17aa-ddc9-11f0-8727-001a7dda7113', 'coordinatesystemsllp@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3f3b1a-ddc9-11f0-8727-001a7dda7113', 'aerodyneindia@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3f5b8c-ddc9-11f0-8727-001a7dda7113', 'terrageotechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3f80e6-ddc9-11f0-8727-001a7dda7113', 'mappaturageospatial@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3fa469-ddc9-11f0-8727-001a7dda7113', 'techmapperz@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3fcdb6-ddc9-11f0-8727-001a7dda7113', 'senseimagetechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e3ff1ce-ddc9-11f0-8727-001a7dda7113', 'yellowskye@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e401260-ddc9-11f0-8727-001a7dda7113', 'treistek@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e403323-ddc9-11f0-8727-001a7dda7113', 'earthonmappingconsulting@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e40539a-ddc9-11f0-8727-001a7dda7113', 'lucidimagingpvtltd@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e407460-ddc9-11f0-8727-001a7dda7113', 'globeviewtechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e4093ad-ddc9-11f0-8727-001a7dda7113', 'larixtechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e40b30f-ddc9-11f0-8727-001a7dda7113', 'laderatechnology@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e40d214-ddc9-11f0-8727-001a7dda7113', 'vmapstechindia@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e40f100-ddc9-11f0-8727-001a7dda7113', 'geovertx@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e41101f-ddc9-11f0-8727-001a7dda7113', 'lgeom@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e412fa1-ddc9-11f0-8727-001a7dda7113', 'latlontechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e414e8d-ddc9-11f0-8727-001a7dda7113', 'wildplantterrestrialsolutions@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e416da2-ddc9-11f0-8727-001a7dda7113', 'flybitechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e418cc6-ddc9-11f0-8727-001a7dda7113', 'leonsdigitaltechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e41ac04-ddc9-11f0-8727-001a7dda7113', 'droneacharyaaerialinnovations@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e41cb4d-ddc9-11f0-8727-001a7dda7113', 'astonbimcreations@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e41ea58-ddc9-11f0-8727-001a7dda7113', 'shayonamanagementservices@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e42098b-ddc9-11f0-8727-001a7dda7113', 'dronitech@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e422bf6-ddc9-11f0-8727-001a7dda7113', 'laresgloballimited@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e424bd1-ddc9-11f0-8727-001a7dda7113', 'raynasinfraandgeometics@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e427083-ddc9-11f0-8727-001a7dda7113', 'lrsservices@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e428fd1-ddc9-11f0-8727-001a7dda7113', 'ldsengineers@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e42aec3-ddc9-11f0-8727-001a7dda7113', 'laminds@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e42cdb6-ddc9-11f0-8727-001a7dda7113', 'terraaligngeospatialsolutions@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e43150f-ddc9-11f0-8727-001a7dda7113', 'skymapgeoinfomatic@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e433525-ddc9-11f0-8727-001a7dda7113', 'airotortechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e435464-ddc9-11f0-8727-001a7dda7113', 'lonartechnologies@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e43747f-ddc9-11f0-8727-001a7dda7113', 'axesmap@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('7e439361-ddc9-11f0-8727-001a7dda7113', 'luminoguru@provider.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2025-12-20 17:29:52', NULL, 'active', NULL),
-  ('9c76396b-fef9-43a2-b6fa-005baaa21e28', 'test99@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-02-04 14:59:30', '2026-05-09 17:12:53', 'active', '9999000099');
-INSERT INTO `user` (`user_id`, `email`, `password_hash`, `user_type`, `join_date`, `last_login`, `status`, `phone_number`) VALUES
-  ('a23f7c25-7690-4acf-ae4a-096a5db9ec4d', NULL, '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2026-01-24 14:30:44', NULL, 'active', '+918449309293'),
-  ('a6c8090f-de27-11f0-8727-001a7dda7113', 'gispoint@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6cc505d-de27-11f0-8727-001a7dda7113', 'lidarcouk@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6cc7b4c-de27-11f0-8727-001a7dda7113', 'logxongmbhcokg@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d16ab5-de27-11f0-8727-001a7dda7113', 'blominternationaloperationsbio@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d19109-de27-11f0-8727-001a7dda7113', 'dephosgroup@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d1b87f-de27-11f0-8727-001a7dda7113', 'lidarscotland@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d1ea37-de27-11f0-8727-001a7dda7113', 'leicageosystemshexagonab@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d213b5-de27-11f0-8727-001a7dda7113', 'fugro@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d236b6-de27-11f0-8727-001a7dda7113', 'mggpaero@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d25881-de27-11f0-8727-001a7dda7113', 'korec@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d280a9-de27-11f0-8727-001a7dda7113', 'laserscanningeuropegmbh@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d2a67d-de27-11f0-8727-001a7dda7113', 'exwayz@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d2cd25-de27-11f0-8727-001a7dda7113', 'outsight@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d2efec-de27-11f0-8727-001a7dda7113', 'routescene@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d31ff9-de27-11f0-8727-001a7dda7113', 'terrasolid@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d34d8a-de27-11f0-8727-001a7dda7113', '3deling@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d3916c-de27-11f0-8727-001a7dda7113', 'cyclomedia@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d3b9a5-de27-11f0-8727-001a7dda7113', 'dtmapping@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d3e0bc-de27-11f0-8727-001a7dda7113', 'generationsrobots@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d40388-de27-11f0-8727-001a7dda7113', 'geoslamlimited@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d42ecf-de27-11f0-8727-001a7dda7113', 'microdronesgmbh@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d464e7-de27-11f0-8727-001a7dda7113', 'nmgroup@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d48dc3-de27-11f0-8727-001a7dda7113', 'yellowscansas@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d4b606-de27-11f0-8727-001a7dda7113', 'fiverivers@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d4dc2b-de27-11f0-8727-001a7dda7113', 'qebim@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d50171-de27-11f0-8727-001a7dda7113', 'energylineltd@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d52514-de27-11f0-8727-001a7dda7113', 'yellowscan@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d545bf-de27-11f0-8727-001a7dda7113', 'cadden@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d56452-de27-11f0-8727-001a7dda7113', 'bimsolutions@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d58313-de27-11f0-8727-001a7dda7113', 'xenomatix@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d5a402-de27-11f0-8727-001a7dda7113', 'eurosense@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d5ca13-de27-11f0-8727-001a7dda7113', 'blickfeld@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d5e91d-de27-11f0-8727-001a7dda7113', 'bimfaktoria@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d60737-de27-11f0-8727-001a7dda7113', 'laserdatagmbh@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d6272c-de27-11f0-8727-001a7dda7113', 'airbornelidarmappingas@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d645ec-de27-11f0-8727-001a7dda7113', 'readaar@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d662d7-de27-11f0-8727-001a7dda7113', 'greehill@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d67ffc-de27-11f0-8727-001a7dda7113', 'artificialmodelling@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d69fa3-de27-11f0-8727-001a7dda7113', 'harmonyat@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d6c000-de27-11f0-8727-001a7dda7113', 'qebimservices@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d6efd3-de27-11f0-8727-001a7dda7113', 'advenser@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d717f0-de27-11f0-8727-001a7dda7113', 'teslacaduk@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d73a5a-de27-11f0-8727-001a7dda7113', 'bimplan@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d75aa4-de27-11f0-8727-001a7dda7113', 'bureaubouwtechnieknv@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d7799e-de27-11f0-8727-001a7dda7113', 'bimconsulting@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d797bf-de27-11f0-8727-001a7dda7113', 'bimly@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d7b59c-de27-11f0-8727-001a7dda7113', 'atiproject@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d8168b-de27-11f0-8727-001a7dda7113', 'hochtiefviconisaleadingeuropeanserviceproviderandconsultantforvirtualconstructionandbuildinginformationmodelingbimitadvisesclientsintheuseofintelligent3dcomputermodelstominimizeriskscommunicateeffectivelyandsavecostsitworksonbuildingandinfrastructureproje', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d85eef-de27-11f0-8727-001a7dda7113', 'dpsgroupglobalisaglobalconsultingengineeringandconstructionmanagementcompanywithanofficeineuropethecompanyusesvirtualdesignandconstructionvdcmethodologiesalongsidebimtechnologiestoservehightechindustries@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d88800-de27-11f0-8727-001a7dda7113', 'bimfacilityagisabimcompanymentionedamongthetopbuildinginformationmodelingsolutionsprovidersineuropethecompanyprovidesbimservicesandisbasedinswitzerland@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d8e67f-de27-11f0-8727-001a7dda7113', 'powerkhisaukbasedcompanythatoffersmepmechanicalelectricalandplumbingbimservicesithasofficesinukraineandtheusaandprovidesavarietyofbimoutsourcingservicesincludingcontentcreationand3dmodeling@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d90951-de27-11f0-8727-001a7dda7113', 'qebimservicesisabimserviceproviderbasedintheukofferingbimmodelingservicesineuropethecompanyspecializesinarchitecturalstructuralandmepmodeling@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d929fe-de27-11f0-8727-001a7dda7113', 'harmonyatisagermancompanylocatedinkundertitoffersbimmodelingservicesforclientsineurope@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d94d0f-de27-11f0-8727-001a7dda7113', 'smallbimmodelingcompanies@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d98c2b-de27-11f0-8727-001a7dda7113', 'bimspotisanaustrianstartupfoundedin2018thatprovidesasaasplatformforbimorientedcollaborationitstechnologyallowsforthedevelopmentofdigitalbuildingmodelsindependentofspecificsoftwarechoices@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d9b626-de27-11f0-8727-001a7dda7113', 'bimlabltdmepconsultancyisaspecializedmepbimconsultancylocatedinlondonukitfocusesonmechanicalelectricalandplumbingservicesforconstructionprojects@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d9d914-de27-11f0-8727-001a7dda7113', 'bimdesignconsultingisbasedinspainandoffersbimprojectexecutionforbotharchitecturaldesignandmepinstallationsitalsoprovidesbimimplementationandtrainingforindividualsandcompanies@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6d9f9b7-de27-11f0-8727-001a7dda7113', 'bimconsultingsroisaczechcompanylocatedinpragueitoffersbimmanagementconsultingtoinstitutionsandcompaniescoveringprocessdigitizationprojectmonitoringdatamanagementandstandardization@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6da1a9d-de27-11f0-8727-001a7dda7113', 'digitalengineeringworksdeworksisaukbasedcompanyspecializinginbimcontentcreationitprovidesservicestoclientswithintheukandeurope@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6db28ae-de27-11f0-8727-001a7dda7113', 'sagitonisabimmodelingcompanylocatedinpolanditoffersbimservicestoclientsineuropeandfocusesondigitalconstruction@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6db549c-de27-11f0-8727-001a7dda7113', 'bimpactdesignsisabimoutsourcingcompanythatworkswithclientsineuropeitspecializesinarchitecturalstructuralandmepbimservicesandprovidessolutionsforconstructionprojects@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6db7d31-de27-11f0-8727-001a7dda7113', 'innoviztechnologies@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6dba3db-de27-11f0-8727-001a7dda7113', 'quanergy@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6dbc515-de27-11f0-8727-001a7dda7113', 'velodyne@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6dbf206-de27-11f0-8727-001a7dda7113', 'ceptoninc@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6dc310f-de27-11f0-8727-001a7dda7113', 'hesaitechnology@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6dc60cb-de27-11f0-8727-001a7dda7113', 'ouster@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6dc852e-de27-11f0-8727-001a7dda7113', 'robosense@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('a6dca664-de27-11f0-8727-001a7dda7113', 'geosat@buyer.local', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2025-12-21 04:43:53', NULL, 'active', NULL),
-  ('aa2d0b5c-2ae4-4ecd-b631-8c7a5c13d6ce', 'shitpostsingh@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-01-31 06:52:11', NULL, 'active', '9999988888'),
-  ('c11473bf-520b-46e1-a26c-68b4e2ce1376', 'test1@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2026-01-02 04:24:58', '2026-05-09 10:48:57', 'active', NULL),
-  ('c288424d-c135-426e-afa5-a72040ae6476', 'test90@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-02-12 16:09:54', '2026-05-22 13:46:11', 'active', '9999888820'),
-  ('c6469221-6022-46ec-8c1c-d7d090ffe820', 'testS@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-02-15 04:59:45', '2026-02-15 05:01:20', 'active', '9999944444'),
-  ('d22237b2-6124-4fa2-a61b-625d95dbb955', 'saranshg180@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-01-24 13:10:05', '2026-01-24 14:30:53', 'active', NULL),
-  ('d5eeb1b2-e2b6-4a48-9203-ddff5f58131d', 'testmaile12@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-01-26 06:15:20', NULL, 'active', NULL),
-  ('d6c6eea3-28e2-49e8-8ec7-ef2c9a2be62d', 'tinkermail2508@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-01-24 13:19:36', '2026-01-24 13:19:48', 'active', NULL),
-  ('e3115fb2-699e-4ed7-acf7-fd638b8b7d4d', 'test8989@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'admin', '2026-03-27 15:52:09', '2026-05-22 07:27:12', 'active', '8989898989'),
-  ('eb580aee-cc64-4485-bdbe-f5769fd9283b', 'test2@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'provider', '2026-01-06 14:48:39', '2026-01-18 05:50:19', 'active', NULL),
-  ('ece3ba8a-c1c5-4d2e-8bbf-ea78e1612d49', 'shivanshudav48@gmail.com', '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-01-31 06:48:57', NULL, 'active', '9999977777'),
-  ('efc35bfb-6565-4bd4-ab4b-8a15669bb6ed', NULL, '$2b$12$iK3wjeVTZTUqxcR95e2vRO0Eg2yK07wvpLQkO6kpgjzTQACnz9j7W', 'buyer', '2026-01-24 03:12:19', '2026-01-24 03:12:27', 'active', '7017025630');
+-- (no data in sessions)
 
 SET FOREIGN_KEY_CHECKS = 1;
