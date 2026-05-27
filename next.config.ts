@@ -3,15 +3,8 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
-  // Fixed: Use serverExternalPackages (new correct key)
   serverExternalPackages: ['pdf-parse'],
 
-  // Disable Turbopack (recommended for stability on Vercel right now)
-  experimental: {
-    turbopack: false,
-  },
-
-  // Image configuration
   images: {
     remotePatterns: [
       {
@@ -21,7 +14,6 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Webpack fallback for client-side (net, tls, fs)
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {

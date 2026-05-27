@@ -20,7 +20,7 @@ async function loadEnv(filePath: string) {
       const val = trimmed.substring(eqIndex + 1).trim();
       if (!process.env[key]) process.env[key] = val;
     }
-  } catch {}
+  } catch { }
 }
 
 // ── Split a row's raw values (respects strings and nested parens) ─────────────
@@ -242,12 +242,12 @@ async function main() {
   console.log('🚀 Starting migration to Neon...\n');
 
   // Migrate in FK order
-  await migrateTable(sql, dump, 'user', 'user');
-  await migrateTable(sql, dump, 'buyerprofile', 'buyerprofile');
-  await migrateTable(sql, dump, 'providerprofile', 'providerprofile');
+  await migrateTable(sql as any, dump, 'user', 'user');
+  await migrateTable(sql as any, dump, 'buyerprofile', 'buyerprofile');
+  await migrateTable(sql as any, dump, 'providerprofile', 'providerprofile');
 
   // Seed credits
-  await seedProviderCredits(sql);
+  await seedProviderCredits(sql as any);
 
   console.log('\n🎉 Migration complete.');
 }
