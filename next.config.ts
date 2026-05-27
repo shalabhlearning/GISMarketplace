@@ -3,17 +3,10 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
+  // Fix for pdf-parse and other server packages
   serverExternalPackages: ['pdf-parse'],
 
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'assets.gravatar.com',
-      },
-    ],
-  },
-
+  // Important: Force Webpack instead of Turbopack (more stable for your setup)
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -24,6 +17,16 @@ const nextConfig: NextConfig = {
       };
     }
     return config;
+  },
+
+  // Image domains
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'assets.gravatar.com',
+      },
+    ],
   },
 };
 
