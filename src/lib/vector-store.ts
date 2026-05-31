@@ -1,7 +1,5 @@
 // src/lib/vector-store.ts
 import PDFParser from 'pdf2json';
-import fs from 'fs/promises';
-import path from 'path';
 import { ChatGroq } from '@langchain/groq';
 import { query } from '@/lib/db';
 
@@ -9,6 +7,7 @@ const llm = new ChatGroq({ model: 'llama-3.3-70b-versatile', temperature: 0.1 })
 
 // ─────────────────────────────────────────────────────────────
 // Shared: extract text from PDF attachments
+// Supports both Vercel Blob URLs (https://) and legacy local paths
 // ─────────────────────────────────────────────────────────────
 async function extractPdfText(attachmentPaths: string[]): Promise<string> {
   const pdfPaths = attachmentPaths.filter(p =>
@@ -21,9 +20,24 @@ async function extractPdfText(attachmentPaths: string[]): Promise<string> {
 
   let fullText = '';
 
-  for (const relPath of pdfPaths) {
-    const fullPath = path.join(process.cwd(), 'public', relPath);
-    const buffer = await fs.readFile(fullPath);
+  for (const filePath of pdfPaths) {
+    let buffer: Buffer;
+
+    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+      // ✅ Vercel Blob URL — fetch remotely
+      const response = await fetch(filePath);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch PDF from Blob: ${response.status} ${response.statusText} — ${filePath}`);
+      }
+      buffer = Buffer.from(await response.arrayBuffer());
+    } else {
+      // Legacy local path fallback (for local dev with old uploads)
+      const { default: fs } = await import('fs/promises');
+      const { default: path } = await import('path');
+      const fullPath = path.join(process.cwd(), 'public', filePath);
+      buffer = await fs.readFile(fullPath);
+    }
+
     const pdfParser = new PDFParser();
 
     const pageText = await new Promise<string>((resolve, reject) => {
@@ -61,27 +75,28 @@ async function callLlm(prompt: string): Promise<any> {
 
   content = content.replace(/```json|```/g, '').trim();
   const start = content.indexOf('{');
-  const end = content.lastIndexOf('}');
+  const end   = content.lastIndexOf('}');
   if (start === -1 || end === -1) throw new Error('LLM did not return valid JSON');
   return JSON.parse(content.slice(start, end + 1));
 }
 
 // ─────────────────────────────────────────────────────────────
 // Shared: fetch all distinct skills from providerprofile
-// Auto-updates as new providers join with new skills
+// Fixed: uses PostgreSQL jsonb_array_elements_text instead of
+// MySQL JSON_TABLE which is not supported on Neon/PostgreSQL
 // ─────────────────────────────────────────────────────────────
 async function fetchPlatformSkills(): Promise<string[]> {
   try {
     const rows = await query(`
-      SELECT DISTINCT jt.skill_value
+      SELECT DISTINCT skill_value
       FROM providerprofile,
-      JSON_TABLE(skills, '$[*]' COLUMNS (skill_value VARCHAR(100) PATH '$')) AS jt
+      jsonb_array_elements_text(skills::jsonb) AS skill_value
       WHERE skills IS NOT NULL
-      ORDER BY jt.skill_value ASC
+      ORDER BY skill_value ASC
     `);
     return rows.map((r: any) => r.skill_value).filter(Boolean);
-  } catch {
-    console.warn('⚠️ Could not fetch platform skills — taxonomy will be empty');
+  } catch (err) {
+    console.warn('⚠️ Could not fetch platform skills — taxonomy will be empty', err);
     return [];
   }
 }
@@ -134,9 +149,9 @@ export async function extractRequiredSkills(projectId: string, attachmentPaths: 
   const result = await callLlm(`
 You are a GIS RFP analyst.
 
-${platformSkills.length > 0 
-  ? `Map to these exact platform skills when possible:\n${platformSkills.slice(0, 50).map(s => `- ${s}`).join('\n')}` 
-  : 'Return the most relevant GIS/geospatial skills.'}
+${platformSkills.length > 0
+    ? `Map to these exact platform skills when possible:\n${platformSkills.slice(0, 50).map(s => `- ${s}`).join('\n')}`
+    : 'Return the most relevant GIS/geospatial skills.'}
 
 Return ONLY valid JSON (no extra text, no markdown):
 
@@ -152,11 +167,11 @@ ${fullText.slice(0, 35000)}
 
   // Safety fallback
   if (!result?.required_services && !result?.required_skills) {
-    console.warn("LLM returned bad format, using fallback");
+    console.warn('LLM returned bad format, using fallback');
     return {
-      required_services: ["GIS Services"],
+      required_services: ['GIS Services'],
       required_skills: [],
-      confidence: 0.5
+      confidence: 0.5,
     };
   }
 

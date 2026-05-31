@@ -17,7 +17,7 @@ export async function POST(
     // Auth check - Only providers
     const [session] = await db.query(
       `SELECT u.user_type FROM sessions s 
-       JOIN user u ON s.user_id = u.user_id 
+       JOIN "user" u ON s.user_id = u.user_id 
        WHERE s.session_token = ? AND s.expires > NOW()`,
       [sessionToken]
     );

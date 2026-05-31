@@ -316,7 +316,7 @@ export default function ProviderPage() {
           {/* ── Job Pipeline ── */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[17px] font-bold text-gray-900">Job Pipeline</h2>
+              <h2 className="text-[17px] font-bold text-gray-900">Jobs Available</h2>
               <Link
                 href="/provider/available"
                 className="text-sm text-gray-500 hover:text-gray-700 font-medium flex items-center gap-0.5"

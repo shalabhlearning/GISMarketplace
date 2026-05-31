@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
         u.email       AS provider_email,
         COALESCE(pp.organization_name, u.email) AS provider_name
        FROM proposal p
-       JOIN user u ON p.provider_id = u.user_id
+       JOIN "user" u ON p.provider_id = u.user_id
        LEFT JOIN providerprofile pp ON pp.provider_id = p.provider_id
        WHERE p.project_id = ?
        ORDER BY p.bid_amount ASC`,

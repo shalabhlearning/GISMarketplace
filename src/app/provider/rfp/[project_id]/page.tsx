@@ -262,7 +262,7 @@ export default function RfpDetailPage() {
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-semibold transition-colors disabled:opacity-60"
               >
                 <Brain className="w-4 h-4 text-purple-600" />
-                {analyzing ? 'Analyzing PDF with AI…' : '✦ Run AI Document Check'}
+                {analyzing ? 'Analyzing PDF with AI…' : '✦ Get Documment Summary with AI'}
               </button>
             </div>
           )}
@@ -474,7 +474,7 @@ export default function RfpDetailPage() {
               className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-600 text-xs font-semibold transition-colors disabled:opacity-60 shadow-sm"
             >
               <Zap className="w-3.5 h-3.5 text-purple-500" />
-              {analyzing ? 'Analyzing…' : 'Run AI Document Check'}
+              {analyzing ? 'Analyzing…' : 'Get Documment Summary with AI'}
             </button>
           )}
         </div>
