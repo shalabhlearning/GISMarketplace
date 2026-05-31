@@ -245,8 +245,8 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
         ref={modalRef}
         className="w-full max-w-md bg-card border border-border rounded-3xl shadow-xl overflow-hidden"
       >
-        <div className="p-8 max-h-[92vh] overflow-y-auto">
-          <div className="flex justify-between items-center mb-6">
+        <div className="px-8 py-7 max-h-[92vh] overflow-y-auto">
+          <div className="flex justify-between items-center mb-3">
             <h2 className="text-2xl font-semibold text-foreground">
               {showOtp ? 'Verify OTP' : 'Create Account'}
             </h2>
@@ -259,7 +259,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
           </div>
 
           {!showOtp ? (
-            <form onSubmit={handleRegisterSubmit} className="space-y-5">
+            <form onSubmit={handleRegisterSubmit} className="space-y-3">
               <div>
                 <label className="text-sm font-medium text-muted-foreground mb-1.5 block">
                   REGISTER AS
@@ -441,7 +441,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 text-sm font-semibold bg-primary text-primary-foreground rounded-2xl hover:bg-primary/90 transition-all disabled:opacity-70"
+                className="w-full py-3 text-sm font-semibold bg-primary text-primary-foreground rounded-2xl hover:bg-primary/90 transition-all disabled:opacity-70"
               >
                 {loading ? 'Sending OTPs...' : 'Continue →'}
               </button>
@@ -509,7 +509,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
           )}
 
           {!showOtp && (
-            <p className="mt-6 text-center text-sm text-muted-foreground">
+            <p className="mt-3 text-center text-sm text-muted-foreground">
               Already have an account?{' '}
               <button
                 onClick={onSwitchToLogin}

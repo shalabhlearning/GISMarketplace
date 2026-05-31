@@ -56,12 +56,23 @@ const EMPTY_FORM: FormData = {
   attachments: [],
 };
 
+// ─── Currency map ─────────────────────────────────────────────────────────────
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: '$',
+  INR: '₹',
+  EUR: '€',
+  GBP: '£',
+  CAD: 'CA$',
+  AED: 'د.إ',
+  SAR: '﷼',
+};
+
 // ─── Step config ──────────────────────────────────────────────────────────────
 const STEPS = [
-  { id: 1, label: 'Project Details',     icon: FileText  },
-  { id: 2, label: 'Timeline & Budget',   icon: Calendar  },
-  { id: 3, label: 'Visibility & Contact',icon: Globe     },
-  { id: 4, label: 'Attachments',         icon: Upload    },
+  { id: 1, label: 'Project Details',      icon: FileText },
+  { id: 2, label: 'Timeline & Budget',    icon: Calendar },
+  { id: 3, label: 'Visibility & Contact', icon: Globe    },
+  { id: 4, label: 'Attachments',          icon: Upload   },
 ];
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
@@ -77,7 +88,7 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
     }`}>
       {type === 'success'
         ? <CheckCircle2 className="w-5 h-5 shrink-0" />
-        : <AlertCircle   className="w-5 h-5 shrink-0" />}
+        : <AlertCircle  className="w-5 h-5 shrink-0" />}
       {message}
       <button onClick={onClose} className="ml-2 opacity-70 hover:opacity-100">
         <X className="w-4 h-4" />
@@ -179,7 +190,7 @@ function DraftsDrawer({
                     <div className="flex items-center gap-3 mt-2">
                       {d.budget && (
                         <span className="text-xs text-emerald-700 font-medium bg-emerald-100 px-2 py-0.5 rounded-full">
-                          {d.currency === 'INR' ? '₹' : '$'}{Number(d.budget).toLocaleString()}
+                          {CURRENCY_SYMBOLS[d.currency] ?? '$'}{Number(d.budget).toLocaleString()}
                         </span>
                       )}
                       <span className="text-xs text-gray-400">
@@ -219,12 +230,12 @@ function DraftsDrawer({
 export default function CreateRFPPage() {
   const router = useRouter();
 
-  const [formData, setFormData]         = useState<FormData>({ ...EMPTY_FORM });
-  const [currentStep, setCurrentStep]   = useState(1);
-  const [loading, setLoading]           = useState(false);
-  const [savingDraft, setSavingDraft]   = useState(false);
-  const [drawerOpen, setDrawerOpen]     = useState(false);
-  const [toast, setToast]               = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [formData, setFormData]       = useState<FormData>({ ...EMPTY_FORM });
+  const [currentStep, setCurrentStep] = useState(1);
+  const [loading, setLoading]         = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
+  const [drawerOpen, setDrawerOpen]   = useState(false);
+  const [toast, setToast]             = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -253,18 +264,18 @@ export default function CreateRFPPage() {
 
   const loadDraft = (draft: any) => {
     setFormData({
-      title:               draft.title               || '',
-      description:         draft.description         || '',
-      budget:              draft.budget?.toString()  || '',
-      currency:            draft.currency            || 'USD',
-      startDate:           draft.start_date          || '',
-      endDate:             draft.end_date            || '',
-      submissionDeadline:  draft.submission_deadline || '',
-      visibility:          draft.visibility          || 'public',
-      contactPerson:       draft.contact_person      || '',
-      contactEmail:        draft.contact_email       || '',
-      credits:             draft.credits?.toString() || '0',
-      attachments:         [],
+      title:              draft.title               || '',
+      description:        draft.description         || '',
+      budget:             draft.budget?.toString()  || '',
+      currency:           draft.currency            || 'USD',
+      startDate:          draft.start_date          || '',
+      endDate:            draft.end_date            || '',
+      submissionDeadline: draft.submission_deadline || '',
+      visibility:         draft.visibility          || 'public',
+      contactPerson:      draft.contact_person      || '',
+      contactEmail:       draft.contact_email       || '',
+      credits:            draft.credits?.toString() || '0',
+      attachments:        [],
     });
     setCurrentStep(1);
     showToast('Draft loaded! Continue editing below.', 'success');
@@ -296,22 +307,23 @@ export default function CreateRFPPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // FIX: handleSubmit is now called from a type="button" onClick, not form onSubmit.
+  // This prevents any "Continue" button from accidentally triggering submission.
+  const handleSubmit = async () => {
     setLoading(true);
 
     const fd = new FormData();
-    fd.append('title',             formData.title);
-    fd.append('description',       formData.description);
-    fd.append('budget',            formData.budget);
-    fd.append('currency',          formData.currency);
-    fd.append('visibility',        formData.visibility);
-    fd.append('contactPerson',     formData.contactPerson);
-    fd.append('contactEmail',      formData.contactEmail);
-    fd.append('credits',           formData.credits);
-    fd.append('startDate',         formData.startDate);
-    fd.append('endDate',           formData.endDate);
-    fd.append('submissionDeadline',formData.submissionDeadline);
+    fd.append('title',              formData.title);
+    fd.append('description',        formData.description);
+    fd.append('budget',             formData.budget);
+    fd.append('currency',           formData.currency);
+    fd.append('visibility',         formData.visibility);
+    fd.append('contactPerson',      formData.contactPerson);
+    fd.append('contactEmail',       formData.contactEmail);
+    fd.append('credits',            formData.credits);
+    fd.append('startDate',          formData.startDate);
+    fd.append('endDate',            formData.endDate);
+    fd.append('submissionDeadline', formData.submissionDeadline);
     formData.attachments.forEach(f => fd.append('attachments', f));
 
     try {
@@ -332,7 +344,7 @@ export default function CreateRFPPage() {
   };
 
   // ── Derived preview values ──────────────────────────────────────────────────
-  const currencySymbol = formData.currency === 'INR' ? '₹' : '$';
+  const currencySymbol = CURRENCY_SYMBOLS[formData.currency] ?? '$';
   const formatBudget   = formData.budget
     ? `${currencySymbol}${parseFloat(formData.budget).toLocaleString()}`
     : '—';
@@ -367,6 +379,7 @@ export default function CreateRFPPage() {
             <p className="text-gray-500 mt-1 text-sm">Fill in the details to publish your request for proposals.</p>
           </div>
           <button
+            type="button"
             onClick={() => setDrawerOpen(true)}
             className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 hover:border-emerald-400 hover:bg-emerald-50 rounded-xl text-sm font-medium text-gray-700 hover:text-emerald-700 transition-all shadow-sm"
           >
@@ -386,20 +399,23 @@ export default function CreateRFPPage() {
               return (
                 <div key={step.id} className="flex items-center flex-1 last:flex-none">
                   <button
+                    type="button"
                     onClick={() => setCurrentStep(step.id)}
                     className="flex items-center gap-2.5 group"
                   >
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shrink-0 ${
-                      active   ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200' :
-                      (visited && done) ? 'bg-emerald-100 text-emerald-700' :
-                      'bg-gray-100 text-gray-400'
+                      active                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200' :
+                      (visited && done)         ? 'bg-emerald-100 text-emerald-700' :
+                                                  'bg-gray-100 text-gray-400'
                     }`}>
                       {visited && done && !active
                         ? <CheckCircle2 className="w-4 h-4" />
                         : step.id}
                     </div>
                     <span className={`text-sm font-medium hidden sm:block transition-colors ${
-                      active ? 'text-emerald-700' : visited && done ? 'text-gray-700' : 'text-gray-400'
+                      active            ? 'text-emerald-700' :
+                      visited && done   ? 'text-gray-700'    :
+                                          'text-gray-400'
                     }`}>
                       {step.label}
                     </span>
@@ -419,9 +435,9 @@ export default function CreateRFPPage() {
         {/* ── Main Grid ────────────────────────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          {/* Form */}
+          {/* Form — NOTE: no onSubmit here; submission is handled via button onClick */}
           <div className="lg:col-span-2">
-            <form onSubmit={handleSubmit}>
+            <form>
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
 
                 {/* Step 1 — Project Details */}
@@ -513,17 +529,35 @@ export default function CreateRFPPage() {
                       </div>
 
                       <div className="md:col-span-2">
-                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">Expected Budget <span className="text-gray-400 font-normal">(optional)</span></label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                          Expected Budget <span className="text-gray-400 font-normal">(optional)</span>
+                        </label>
                         <div className="flex rounded-xl overflow-hidden border border-gray-200 focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all bg-gray-50">
-                          <select name="currency" value={formData.currency} onChange={handleChange}
-                            className="bg-gray-100 px-4 py-3 text-gray-700 border-r border-gray-200 focus:outline-none font-medium text-sm">
+                          <select
+                            name="currency"
+                            value={formData.currency}
+                            onChange={handleChange}
+                            className="bg-gray-100 px-4 py-3 text-gray-700 border-r border-gray-200 focus:outline-none font-medium text-sm"
+                          >
                             <option value="USD">USD $</option>
                             <option value="INR">INR ₹</option>
+                            <option value="EUR">EUR €</option>
+                            <option value="GBP">GBP £</option>
+                            <option value="CAD">CAD $</option>
+                            <option value="AED">AED د.إ</option>
+                            <option value="SAR">SAR ﷼</option>
                           </select>
                           <div className="relative flex-1">
                             <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                            <input name="budget" type="number" step="0.01" value={formData.budget} onChange={handleChange} placeholder="0.00"
-                              className="w-full pl-9 pr-4 py-3 bg-transparent text-gray-900 focus:outline-none" />
+                            <input
+                              name="budget"
+                              type="number"
+                              step="0.01"
+                              value={formData.budget}
+                              onChange={handleChange}
+                              placeholder="0.00"
+                              className="w-full pl-9 pr-4 py-3 bg-transparent text-gray-900 focus:outline-none"
+                            />
                           </div>
                         </div>
                       </div>
@@ -549,15 +583,30 @@ export default function CreateRFPPage() {
                       <label className="block text-sm font-semibold text-gray-700 mb-3">Visibility</label>
                       <div className="grid grid-cols-2 gap-4">
                         {[
-                          { value: 'public',  label: 'Public',  desc: 'Visible to all providers', icon: Unlock, color: 'emerald' },
-                          { value: 'private', label: 'Private', desc: 'Invite-only access',        icon: Lock,   color: 'amber'   },
-                        ].map(({ value, label, desc, icon: Icon, color }) => (
-                          <label key={value} className={`relative cursor-pointer rounded-xl border-2 p-4 transition-all ${
-                            formData.visibility === value
-                              ? color === 'emerald' ? 'border-emerald-500 bg-emerald-50' : 'border-amber-400 bg-amber-50'
-                              : 'border-gray-200 hover:border-gray-300 bg-white'
-                          }`}>
-                            <input type="radio" name="visibility" value={value} checked={formData.visibility === value} onChange={handleChange} className="sr-only" />
+                          { value: 'public',  label: 'Public',  desc: 'Visible to all providers', icon: Unlock, color: 'emerald', disabled: false },
+                          { value: 'private', label: 'Private', desc: 'Invite-only access',        icon: Lock,   color: 'amber',   disabled: true  },
+                        ].map(({ value, label, desc, icon: Icon, color, disabled }) => (
+                          <label
+                            key={value}
+                            className={`relative rounded-xl border-2 p-4 transition-all ${
+                              disabled
+                                ? 'opacity-45 cursor-not-allowed bg-gray-50 border-gray-200'
+                                : formData.visibility === value
+                                  ? color === 'emerald'
+                                    ? 'border-emerald-500 bg-emerald-50 cursor-pointer'
+                                    : 'border-amber-400 bg-amber-50 cursor-pointer'
+                                  : 'border-gray-200 hover:border-gray-300 bg-white cursor-pointer'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="visibility"
+                              value={value}
+                              checked={formData.visibility === value}
+                              onChange={handleChange}
+                              disabled={disabled}
+                              className="sr-only"
+                            />
                             <div className="flex items-center gap-3">
                               <Icon className={`w-5 h-5 ${color === 'emerald' ? 'text-emerald-600' : 'text-amber-500'}`} />
                               <div>
@@ -565,8 +614,15 @@ export default function CreateRFPPage() {
                                 <p className="text-xs text-gray-500">{desc}</p>
                               </div>
                             </div>
-                            {formData.visibility === value && (
+                            {/* Checkmark when selected */}
+                            {!disabled && formData.visibility === value && (
                               <CheckCircle2 className={`absolute top-3 right-3 w-4 h-4 ${color === 'emerald' ? 'text-emerald-600' : 'text-amber-500'}`} />
+                            )}
+                            {/* Coming soon badge when disabled */}
+                            {disabled && (
+                              <span className="absolute top-2.5 right-2.5 text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full leading-tight">
+                                Coming soon
+                              </span>
                             )}
                           </label>
                         ))}
@@ -580,8 +636,14 @@ export default function CreateRFPPage() {
                         </label>
                         <div className="relative">
                           <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                          <input name="contactPerson" value={formData.contactPerson} onChange={handleChange} required placeholder="Full name"
-                            className="w-full pl-10 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all" />
+                          <input
+                            name="contactPerson"
+                            value={formData.contactPerson}
+                            onChange={handleChange}
+                            required
+                            placeholder="Full name"
+                            className="w-full pl-10 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                          />
                         </div>
                       </div>
 
@@ -591,8 +653,15 @@ export default function CreateRFPPage() {
                         </label>
                         <div className="relative">
                           <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                          <input name="contactEmail" type="email" value={formData.contactEmail} onChange={handleChange} required placeholder="email@company.com"
-                            className="w-full pl-10 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all" />
+                          <input
+                            name="contactEmail"
+                            type="email"
+                            value={formData.contactEmail}
+                            onChange={handleChange}
+                            required
+                            placeholder="email@company.com"
+                            className="w-full pl-10 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                          />
                         </div>
                       </div>
                     </div>
@@ -638,8 +707,11 @@ export default function CreateRFPPage() {
                               <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
                               <p className="text-xs text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                             </div>
-                            <button type="button" onClick={() => removeAttachment(idx)}
-                              className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                            <button
+                              type="button"
+                              onClick={() => removeAttachment(idx)}
+                              className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                            >
                               <X className="w-4 h-4" />
                             </button>
                           </div>
@@ -653,15 +725,22 @@ export default function CreateRFPPage() {
                 <div className="px-8 py-5 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
                     {currentStep > 1 && (
-                      <button type="button" onClick={() => setCurrentStep(s => s - 1)}
-                        className="px-5 py-2.5 border border-gray-200 bg-white rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all">
+                      <button
+                        type="button"
+                        onClick={() => setCurrentStep(s => s - 1)}
+                        className="px-5 py-2.5 border border-gray-200 bg-white rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all"
+                      >
                         ← Back
                       </button>
                     )}
 
                     {/* Save Draft */}
-                    <button type="button" onClick={handleSaveDraft} disabled={savingDraft}
-                      className="flex items-center gap-2 px-5 py-2.5 border border-gray-200 bg-white hover:bg-gray-50 rounded-xl text-sm font-medium text-gray-700 transition-all disabled:opacity-50">
+                    <button
+                      type="button"
+                      onClick={handleSaveDraft}
+                      disabled={savingDraft}
+                      className="flex items-center gap-2 px-5 py-2.5 border border-gray-200 bg-white hover:bg-gray-50 rounded-xl text-sm font-medium text-gray-700 transition-all disabled:opacity-50"
+                    >
                       {savingDraft
                         ? <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
                         : <Save className="w-4 h-4" />}
@@ -671,13 +750,22 @@ export default function CreateRFPPage() {
 
                   <div className="flex items-center gap-3">
                     {currentStep < STEPS.length ? (
-                      <button type="button" onClick={() => setCurrentStep(s => s + 1)}
-                        className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-emerald-200 transition-all">
+                      // FIX: type="button" explicitly prevents any form submission
+                      <button
+                        type="button"
+                        onClick={() => setCurrentStep(s => s + 1)}
+                        className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-emerald-200 transition-all"
+                      >
                         Continue <ChevronRight className="w-4 h-4" />
                       </button>
                     ) : (
-                      <button type="submit" disabled={loading}
-                        className="flex items-center gap-2 px-8 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-sm shadow-emerald-200 transition-all">
+                      // FIX: type="button" + onClick instead of type="submit"
+                      <button
+                        type="button"
+                        onClick={handleSubmit}
+                        disabled={loading}
+                        className="flex items-center gap-2 px-8 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-sm shadow-emerald-200 transition-all"
+                      >
                         {loading
                           ? <><div className="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin" /> Publishing…</>
                           : <><Plus className="w-4 h-4" /> Publish RFP</>}

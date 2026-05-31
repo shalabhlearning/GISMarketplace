@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     const visibility = (formData.get('visibility') as string || 'public').trim();
     const contactPerson = (formData.get('contactPerson') as string || '').trim();
     const contactEmail = (formData.get('contactEmail') as string || '').trim();
-
+    const currency = (formData.get('currency') as string || 'USD').trim();
     const startDate = formData.get('startDate') as string || null;
     const endDate = formData.get('endDate') as string || null;
     const submissionDeadline = formData.get('submissionDeadline') as string || null;
@@ -77,16 +77,17 @@ export async function POST(req: NextRequest) {
 
     await db.query(
       `INSERT INTO projectrequest (
-        project_id, buyer_id, title, description, budget, status,
-        start_date, end_date, submission_deadline, visibility,
-        contact_person, contact_email, attachments
-      ) VALUES (?, ?, ?, ?, ?, 'in_review', ?, ?, ?, ?, ?, ?, ?)`,
+    project_id, buyer_id, title, description, budget, currency, status,
+    start_date, end_date, submission_deadline, visibility,
+    contact_person, contact_email, attachments
+  ) VALUES (?, ?, ?, ?, ?, ?, 'in_review', ?, ?, ?, ?, ?, ?, ?)`,
       [
         projectId,
         buyerId,
         title,
         description,
         budget,
+        currency,        // ← added
         startDate,
         endDate,
         submissionDeadline,
