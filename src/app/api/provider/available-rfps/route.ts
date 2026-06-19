@@ -22,6 +22,12 @@ export async function GET(req: NextRequest) {
       providerId = sessionRows[0]?.user_id || null;
     }
 
+    // No logged-in provider → no RFPs. Visibility is strictly checklist-gated,
+    // so there is no safe "show everything public" fallback anymore.
+    if (!providerId) {
+      return NextResponse.json({ success: true, rfps: [] });
+    }
+
     const params: any[] = [];
 
     let queryStr = `
@@ -41,42 +47,26 @@ export async function GET(req: NextRequest) {
         pr.ai_summary,
         bp.organization_name AS buyer_name,
         COALESCE(rpm.match_score, 0) AS match_score,
-        rpm.reason AS match_reason
+        rpm.reason AS match_reason,
+        rpm.checklist_added_at
       FROM projectrequest pr
       LEFT JOIN buyerprofile bp ON pr.buyer_id = bp.buyer_id
-    `;
-
-    if (providerId) {
-      // ✅ INNER JOIN — logged-in providers only see RFPs they were matched to
-      queryStr += `
       INNER JOIN rfp_provider_match rpm
         ON pr.project_id = rpm.project_id
-        AND rpm.provider_id = ?`;
-      params.push(providerId);
-    } else {
-      // Unauthenticated fallback: show all public open RFPs
-      queryStr += `
-      LEFT JOIN rfp_provider_match rpm ON pr.project_id = rpm.project_id`;
-    }
-
-    queryStr += `
+        AND rpm.provider_id = ?
+        AND rpm.is_checklist = TRUE
       WHERE pr.status = 'open'
         AND pr.visibility = 'public'
-    `;
-
-    if (providerId) {
-      // Exclude RFPs this provider already submitted a proposal for
-      queryStr += `
         AND NOT EXISTS (
           SELECT 1 FROM proposal
           WHERE project_id = pr.project_id
             AND provider_id = ?
             AND status = 'submitted'
-        )`;
-      params.push(providerId);
-    }
+        )
+      ORDER BY rpm.checklist_added_at DESC, match_score DESC, pr.created_at DESC
+    `;
 
-    queryStr += ` ORDER BY match_score DESC, pr.created_at DESC`;
+    params.push(providerId, providerId);
 
     // ✅ LIMIT inlined — MySQL prepared statements reject LIMIT as a bind param
     if (limit) {

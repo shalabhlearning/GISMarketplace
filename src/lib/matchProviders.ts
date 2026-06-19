@@ -27,21 +27,69 @@ function scoreProviderAgainstRfp(
 
 // ─────────────────────────────────────────────────────────────
 // Upsert a single match row  — PostgreSQL ON CONFLICT syntax
+// Returns whether this was a brand-new row (INSERT) vs an update,
+// so callers can decide whether to fire a "new match" notification.
 // ─────────────────────────────────────────────────────────────
 async function upsertMatch(
   project_id: string,
   provider_id: string,
   score: number,
   matchedSkills: string[]
-) {
-  await db.query(
+): Promise<{ isNew: boolean }> {
+  const rows = await db.query(
     `INSERT INTO rfp_provider_match (project_id, provider_id, match_score, reason)
      VALUES ($1, $2, $3, $4)
      ON CONFLICT (project_id, provider_id) DO UPDATE
        SET match_score = EXCLUDED.match_score,
-           reason      = EXCLUDED.reason`,
+           reason      = EXCLUDED.reason
+     RETURNING (xmax = 0) AS is_new`,
     [project_id, provider_id, score, JSON.stringify({ matched_skills: matchedSkills })]
   );
+
+  // xmax = 0 is a reliable PostgreSQL trick to detect INSERT vs UPDATE
+  // on an ON CONFLICT DO UPDATE statement.
+  const isNew = rows?.[0]?.is_new === true;
+  return { isNew };
+}
+
+// ─────────────────────────────────────────────────────────────
+// Create an admin notification when a NEW provider match appears
+// against an RFP that is already open (i.e. admin already reviewed
+// it and may have already sent out the checklist). Deduplicated via
+// the unique (project_id, provider_id) constraint on the table.
+// ─────────────────────────────────────────────────────────────
+async function notifyAdminOfNewMatch(
+  project_id: string,
+  provider_id: string,
+  score: number
+) {
+  try {
+    const [rfp] = await db.query(
+      `SELECT title FROM projectrequest WHERE project_id = $1`,
+      [project_id]
+    );
+    const [provider] = await db.query(
+      `SELECT organization_name FROM providerprofile WHERE provider_id = $1`,
+      [provider_id]
+    );
+
+    const rfpTitle = rfp?.title ?? 'an RFP';
+    const providerName = provider?.organization_name ?? 'A new provider';
+
+    await db.query(
+      `INSERT INTO admin_notifications (type, project_id, provider_id, match_score, message)
+       VALUES ('new_provider_match', $1, $2, $3, $4)
+       ON CONFLICT (project_id, provider_id) DO NOTHING`,
+      [
+        project_id,
+        provider_id,
+        score,
+        `${providerName} is a new match (${Math.round(score * 100)}%) for "${rfpTitle}".`,
+      ]
+    );
+  } catch (err: any) {
+    console.error('[notifyAdminOfNewMatch ERROR]', err.message);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -86,7 +134,6 @@ export async function matchProvidersForRfp(project_id: string): Promise<{
       return { success: false, total_matches: 0, error: 'No skills extracted from RFP' };
     }
 
-    // PostgreSQL: jsonb_array_length instead of JSON_LENGTH
     const providers = await db.query(
       `SELECT provider_id, skills
        FROM providerprofile
@@ -118,6 +165,14 @@ export async function matchProvidersForRfp(project_id: string): Promise<{
 // ─────────────────────────────────────────────────────────────
 // FUNCTION 2: New provider joins OR updates skills
 //             → match against ALL open RFPs
+//
+// If the RFP is already open (admin has already reviewed/possibly
+// already sent the checklist email), a brand-new match here means
+// "this provider wasn't visible to the admin before" — so we raise
+// an admin_notifications row instead of silently adding the match.
+// The provider does NOT get auto-checklisted or auto-emailed; the
+// admin must explicitly add them via the checklist UI, same as any
+// other matched provider.
 // ─────────────────────────────────────────────────────────────
 export async function matchRfpsForProvider(provider_id: string): Promise<{
   success: boolean;
@@ -159,8 +214,15 @@ export async function matchRfpsForProvider(provider_id: string): Promise<{
 
       const { score, matchedSkills } = scoreProviderAgainstRfp(providerSkills, rfpSkills);
       if (score >= 0.35) {
-        await upsertMatch(rfp.project_id, provider_id, score, matchedSkills);
+        const { isNew } = await upsertMatch(rfp.project_id, provider_id, score, matchedSkills);
         totalMatches++;
+
+        // Every open RFP has already been through admin review by definition,
+        // so any brand-new match against one is something the admin should
+        // be told about (a provider they couldn't have seen/checklisted yet).
+        if (isNew) {
+          await notifyAdminOfNewMatch(rfp.project_id, provider_id, score);
+        }
       }
     }
 
@@ -175,6 +237,11 @@ export async function matchRfpsForProvider(provider_id: string): Promise<{
 
 // ─────────────────────────────────────────────────────────────
 // FUNCTION 3: Full nightly re-match (cron job)
+//
+// Stale rows (RFP no longer open) are removed, EXCEPT we never want
+// to nuke checklist history for audit purposes. Only non-checklisted
+// rows get deleted, so a provider's checklist/notified history
+// survives even if the RFP later closes.
 // ─────────────────────────────────────────────────────────────
 export async function fullRematch(): Promise<{
   success: boolean;
@@ -186,16 +253,16 @@ export async function fullRematch(): Promise<{
   try {
     console.log('🔄 [FullRematch] Starting nightly re-match...');
 
-    // PostgreSQL: DELETE with JOIN uses a different syntax
     const staleResult = await db.query(
       `DELETE FROM rfp_provider_match
-       WHERE project_id IN (
-         SELECT project_id FROM projectrequest WHERE status != 'open'
-       )
+       WHERE is_checklist = FALSE
+         AND project_id IN (
+           SELECT project_id FROM projectrequest WHERE status != 'open'
+         )
        RETURNING id`
     );
     const staleRemoved = staleResult.length;
-    console.log(`🧹 [FullRematch] Removed ${staleRemoved} stale rows`);
+    console.log(`🧹 [FullRematch] Removed ${staleRemoved} stale (non-checklisted) rows`);
 
     const openRfps = await db.query(
       `SELECT project_id, ai_skills
@@ -226,8 +293,12 @@ export async function fullRematch(): Promise<{
 
         const { score, matchedSkills } = scoreProviderAgainstRfp(providerSkills, rfpSkills);
         if (score >= 0.35) {
-          await upsertMatch(rfp.project_id, provider.provider_id, score, matchedSkills);
+          const { isNew } = await upsertMatch(rfp.project_id, provider.provider_id, score, matchedSkills);
           totalMatches++;
+
+          if (isNew) {
+            await notifyAdminOfNewMatch(rfp.project_id, provider.provider_id, score);
+          }
         }
       }
     }

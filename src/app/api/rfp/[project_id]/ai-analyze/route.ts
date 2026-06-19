@@ -22,8 +22,8 @@ export async function POST(
       [sessionToken]
     );
 
-    if (!session || session.user_type !== 'provider') {
-      return NextResponse.json({ error: 'Only providers can use AI Analyzer' }, { status: 403 });
+    if (!session || (session.user_type !== 'provider' && session.user_type !== 'admin')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
     // Get RFP attachments
@@ -38,8 +38,8 @@ export async function POST(
 
     let attachments: string[] = [];
     try {
-      attachments = typeof rfp.attachments === 'string' 
-        ? JSON.parse(rfp.attachments) 
+      attachments = typeof rfp.attachments === 'string'
+        ? JSON.parse(rfp.attachments)
         : rfp.attachments;
     } catch {
       return NextResponse.json({ error: 'Invalid attachment data' }, { status: 400 });
@@ -69,9 +69,9 @@ export async function POST(
 
   } catch (error: any) {
     console.error('[AI ANALYZER ERROR]', error);
-    return NextResponse.json({ 
-      error: 'AI Analysis failed', 
-      message: error.message 
+    return NextResponse.json({
+      error: 'AI Analysis failed',
+      message: error.message
     }, { status: 500 });
   }
 }
