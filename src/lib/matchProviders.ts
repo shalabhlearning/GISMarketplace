@@ -26,9 +26,15 @@ function scoreProviderAgainstRfp(
 }
 
 // ─────────────────────────────────────────────────────────────
-// Upsert a single match row  — PostgreSQL ON CONFLICT syntax
-// Returns whether this was a brand-new row (INSERT) vs an update,
-// so callers can decide whether to fire a "new match" notification.
+// Upsert a single match row — PostgreSQL ON CONFLICT syntax
+//
+// CRITICAL FREEZE GUARD: the WHERE clause inside DO UPDATE means
+// Postgres physically refuses to touch a row once is_checklist = TRUE.
+// This is what makes it safe to call this function (via
+// matchProvidersForRfp) on EVERY admin page-open without any risk of
+// rescoring, reordering, or re-triggering an email for a provider
+// who's already been checklisted. The protection lives in the SQL
+// itself, not in any caller remembering to check first.
 // ─────────────────────────────────────────────────────────────
 async function upsertMatch(
   project_id: string,
@@ -42,21 +48,18 @@ async function upsertMatch(
      ON CONFLICT (project_id, provider_id) DO UPDATE
        SET match_score = EXCLUDED.match_score,
            reason      = EXCLUDED.reason
+       WHERE rfp_provider_match.is_checklist = FALSE
      RETURNING (xmax = 0) AS is_new`,
     [project_id, provider_id, score, JSON.stringify({ matched_skills: matchedSkills })]
   );
 
-  // xmax = 0 is a reliable PostgreSQL trick to detect INSERT vs UPDATE
-  // on an ON CONFLICT DO UPDATE statement.
   const isNew = rows?.[0]?.is_new === true;
   return { isNew };
 }
 
 // ─────────────────────────────────────────────────────────────
 // Create an admin notification when a NEW provider match appears
-// against an RFP that is already open (i.e. admin already reviewed
-// it and may have already sent out the checklist). Deduplicated via
-// the unique (project_id, provider_id) constraint on the table.
+// against an RFP that is already open.
 // ─────────────────────────────────────────────────────────────
 async function notifyAdminOfNewMatch(
   project_id: string,
@@ -112,7 +115,14 @@ function parseRfpSkills(raw: any): string[] {
 }
 
 // ─────────────────────────────────────────────────────────────
-// FUNCTION 1: RFP approved → match against ALL providers
+// FUNCTION 1: Match an RFP against ALL CURRENT providers
+//
+// This is the function the checklist GET route calls on every
+// admin page-open. It always queries the full providerprofile
+// table fresh — there is no caching, no "only check providers
+// added since X" logic — so a provider added 5 seconds ago, or
+// an RFP that had 0 matches the day it was approved, both get
+// fully reconsidered every single time this runs.
 // ─────────────────────────────────────────────────────────────
 export async function matchProvidersForRfp(project_id: string): Promise<{
   success: boolean;
@@ -153,7 +163,7 @@ export async function matchProvidersForRfp(project_id: string): Promise<{
       }
     }
 
-    console.log(`✅ [RFP→Providers] ${totalMatches} providers matched for RFP ${project_id}`);
+    console.log(`✅ [RFP→Providers] ${totalMatches} providers matched for RFP ${project_id} (${providers.length} candidates checked)`);
     return { success: true, total_matches: totalMatches };
 
   } catch (err: any) {
@@ -163,16 +173,8 @@ export async function matchProvidersForRfp(project_id: string): Promise<{
 }
 
 // ─────────────────────────────────────────────────────────────
-// FUNCTION 2: New provider joins OR updates skills
-//             → match against ALL open RFPs
-//
-// If the RFP is already open (admin has already reviewed/possibly
-// already sent the checklist email), a brand-new match here means
-// "this provider wasn't visible to the admin before" — so we raise
-// an admin_notifications row instead of silently adding the match.
-// The provider does NOT get auto-checklisted or auto-emailed; the
-// admin must explicitly add them via the checklist UI, same as any
-// other matched provider.
+// FUNCTION 2: New provider joins OR updates skills → match against
+// ALL open RFPs
 // ─────────────────────────────────────────────────────────────
 export async function matchRfpsForProvider(provider_id: string): Promise<{
   success: boolean;
@@ -217,9 +219,6 @@ export async function matchRfpsForProvider(provider_id: string): Promise<{
         const { isNew } = await upsertMatch(rfp.project_id, provider_id, score, matchedSkills);
         totalMatches++;
 
-        // Every open RFP has already been through admin review by definition,
-        // so any brand-new match against one is something the admin should
-        // be told about (a provider they couldn't have seen/checklisted yet).
         if (isNew) {
           await notifyAdminOfNewMatch(rfp.project_id, provider_id, score);
         }
@@ -237,11 +236,6 @@ export async function matchRfpsForProvider(provider_id: string): Promise<{
 
 // ─────────────────────────────────────────────────────────────
 // FUNCTION 3: Full nightly re-match (cron job)
-//
-// Stale rows (RFP no longer open) are removed, EXCEPT we never want
-// to nuke checklist history for audit purposes. Only non-checklisted
-// rows get deleted, so a provider's checklist/notified history
-// survives even if the RFP later closes.
 // ─────────────────────────────────────────────────────────────
 export async function fullRematch(): Promise<{
   success: boolean;
