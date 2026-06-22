@@ -25,17 +25,6 @@ function scoreProviderAgainstRfp(
   return { score: Number(score.toFixed(2)), matchedSkills: [...new Set(matchedSkills)] };
 }
 
-// ─────────────────────────────────────────────────────────────
-// Upsert a single match row — PostgreSQL ON CONFLICT syntax
-//
-// CRITICAL FREEZE GUARD: the WHERE clause inside DO UPDATE means
-// Postgres physically refuses to touch a row once is_checklist = TRUE.
-// This is what makes it safe to call this function (via
-// matchProvidersForRfp) on EVERY admin page-open without any risk of
-// rescoring, reordering, or re-triggering an email for a provider
-// who's already been checklisted. The protection lives in the SQL
-// itself, not in any caller remembering to check first.
-// ─────────────────────────────────────────────────────────────
 async function upsertMatch(
   project_id: string,
   provider_id: string,

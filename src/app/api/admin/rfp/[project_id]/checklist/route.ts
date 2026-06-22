@@ -19,7 +19,7 @@ import { query } from '@/lib/db';
 import { matchProvidersForRfp } from '@/lib/matchProviders';
 import nodemailer from 'nodemailer';
 
-export const dynamic   = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 
@@ -41,8 +41,8 @@ async function requireAdmin(req: NextRequest) {
 // ─── Nodemailer transport ─────────────────────────────────────────────────────
 function createTransport() {
   return nodemailer.createTransport({
-    host:   process.env.SMTP_HOST,
-    port:   Number(process.env.SMTP_PORT ?? 587),
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT ?? 587),
     secure: process.env.SMTP_SECURE === 'true',
     auth: {
       user: process.env.SMTP_USER,
@@ -67,8 +67,8 @@ function buildEmailHtml(rfp: any, analysis: any) {
   })();
 
   const metaParts: string[] = [];
-  if (rfp.budget)              metaParts.push(`Budget ₹${Number(rfp.budget).toLocaleString('en-IN')}`);
-  if (rfp.start_date)          metaParts.push(`Starts ${new Date(rfp.start_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`);
+  if (rfp.budget) metaParts.push(`Budget ₹${Number(rfp.budget).toLocaleString('en-IN')}`);
+  if (rfp.start_date) metaParts.push(`Starts ${new Date(rfp.start_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`);
   if (rfp.submission_deadline) metaParts.push(`Deadline ${new Date(rfp.submission_deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`);
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://gismarketplace.in';
@@ -150,9 +150,9 @@ async function tryExtractSkills(project_id: string): Promise<boolean> {
     const timeout = setTimeout(() => controller.abort(), 25_000);
 
     const res = await fetch(`${baseUrl}/api/rfp/${project_id}/ai-analyze`, {
-      method:  'POST',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      signal:  controller.signal,
+      signal: controller.signal,
     }).finally(() => clearTimeout(timeout));
 
     if (!res.ok) {
@@ -177,63 +177,63 @@ async function tryExtractSkills(project_id: string): Promise<boolean> {
 // path entirely. The skills are coarse but better than nothing — at minimum
 // they let geography/GIS-focused providers match.
 const GIS_KEYWORD_MAP: Record<string, string[]> = {
-  'GIS':               ['GIS', 'Geospatial Analysis'],
-  'mapping':           ['GIS', 'Cartography'],
-  'remote sensing':    ['Remote Sensing', 'Satellite Imagery'],
-  'LiDAR':             ['LiDAR', 'Point Cloud Processing'],
-  'drone':             ['UAV Survey', 'Drone Mapping'],
-  'survey':            ['Land Survey', 'Topographic Survey'],
-  'cadastral':         ['Cadastral Mapping', 'Land Records'],
-  'urban planning':    ['Urban Planning', 'Smart City'],
-  'smart city':        ['Smart City', 'IoT Integration'],
-  'utility':           ['Utility Mapping', 'Infrastructure GIS'],
-  'infrastructure':    ['Infrastructure GIS', 'Asset Management'],
-  'flood':             ['Flood Modeling', 'Hydrological Analysis'],
-  'environment':       ['Environmental Mapping', 'EIA'],
-  'forest':            ['Forest Cover Analysis', 'LULC'],
-  'land use':          ['Land Use Analysis', 'LULC Mapping'],
-  'satellite':         ['Satellite Imagery', 'Image Processing'],
-  'GPS':               ['GPS Survey', 'GNSS'],
-  'DGPS':              ['DGPS Survey', 'GPS Survey'],
-  'web GIS':           ['Web GIS Development', 'GIS Portal'],
-  'database':          ['Spatial Database', 'PostGIS'],
-  'mobile':            ['Mobile GIS', 'Field Data Collection'],
-  'photogrammetry':    ['Photogrammetry', 'Aerial Survey'],
-  'geospatial':        ['Geospatial Analysis', 'Spatial Data Management'],
-  'topology':          ['Topology Editing', 'GIS Quality Control'],
-  'open street':       ['OpenStreetMap', 'Web GIS'],
-  'qgis':              ['QGIS', 'Open Source GIS'],
-  'arcgis':            ['ArcGIS', 'Esri'],
-  'vegetation':        ['Vegetation Mapping', 'NDVI Analysis'],
-  'water':             ['Water Resource Mapping', 'Hydrological GIS'],
-  'road':              ['Road Network GIS', 'Transportation GIS'],
-  'pipeline':          ['Pipeline GIS', 'Utility Mapping'],
-  'power':             ['Power Grid Mapping', 'Utility GIS'],
-  'telecom':           ['Telecom GIS', 'Network Planning'],
-  'agriculture':       ['Agricultural GIS', 'Crop Monitoring'],
-  'disaster':          ['Disaster Management GIS', 'Risk Mapping'],
-  'heritage':          ['Cultural Heritage GIS', 'Archaeological Survey'],
-  'municipal':         ['Municipal GIS', 'Town Planning'],
-  'revenue':           ['Revenue Survey', 'Cadastral Mapping'],
-  'boundary':          ['Boundary Demarcation', 'Survey'],
-  'contour':           ['Contour Mapping', 'DTM/DEM'],
-  'DEM':               ['DEM/DTM', 'Terrain Analysis'],
-  'DTM':               ['DTM/DEM', 'Terrain Analysis'],
-  'elevation':         ['Elevation Model', 'DEM/DTM'],
-  '3D':                ['3D Modeling', '3D GIS'],
-  'BIM':               ['BIM Integration', 'Digital Twin'],
-  'planning':          ['Urban Planning', 'GIS Analysis'],
-  'portal':            ['Web GIS Development', 'GIS Portal'],
-  'dashboard':         ['GIS Dashboard', 'Web GIS'],
-  'integration':       ['GIS Integration', 'Spatial Data Management'],
-  'automation':        ['GIS Automation', 'Python GIS'],
-  'python':            ['Python GIS', 'GeoPandas'],
-  'API':               ['GIS API', 'Spatial Web Services'],
-  'training':          ['GIS Training', 'Capacity Building'],
-  'data collection':   ['Field Data Collection', 'Mobile GIS'],
-  'digitization':      ['Map Digitization', 'GIS Data Entry'],
-  'georeferencing':    ['Georeferencing', 'Map Registration'],
-  'classification':    ['Image Classification', 'Remote Sensing'],
+  'GIS': ['GIS', 'Geospatial Analysis'],
+  'mapping': ['GIS', 'Cartography'],
+  'remote sensing': ['Remote Sensing', 'Satellite Imagery'],
+  'LiDAR': ['LiDAR', 'Point Cloud Processing'],
+  'drone': ['UAV Survey', 'Drone Mapping'],
+  'survey': ['Land Survey', 'Topographic Survey'],
+  'cadastral': ['Cadastral Mapping', 'Land Records'],
+  'urban planning': ['Urban Planning', 'Smart City'],
+  'smart city': ['Smart City', 'IoT Integration'],
+  'utility': ['Utility Mapping', 'Infrastructure GIS'],
+  'infrastructure': ['Infrastructure GIS', 'Asset Management'],
+  'flood': ['Flood Modeling', 'Hydrological Analysis'],
+  'environment': ['Environmental Mapping', 'EIA'],
+  'forest': ['Forest Cover Analysis', 'LULC'],
+  'land use': ['Land Use Analysis', 'LULC Mapping'],
+  'satellite': ['Satellite Imagery', 'Image Processing'],
+  'GPS': ['GPS Survey', 'GNSS'],
+  'DGPS': ['DGPS Survey', 'GPS Survey'],
+  'web GIS': ['Web GIS Development', 'GIS Portal'],
+  'database': ['Spatial Database', 'PostGIS'],
+  'mobile': ['Mobile GIS', 'Field Data Collection'],
+  'photogrammetry': ['Photogrammetry', 'Aerial Survey'],
+  'geospatial': ['Geospatial Analysis', 'Spatial Data Management'],
+  'topology': ['Topology Editing', 'GIS Quality Control'],
+  'open street': ['OpenStreetMap', 'Web GIS'],
+  'qgis': ['QGIS', 'Open Source GIS'],
+  'arcgis': ['ArcGIS', 'Esri'],
+  'vegetation': ['Vegetation Mapping', 'NDVI Analysis'],
+  'water': ['Water Resource Mapping', 'Hydrological GIS'],
+  'road': ['Road Network GIS', 'Transportation GIS'],
+  'pipeline': ['Pipeline GIS', 'Utility Mapping'],
+  'power': ['Power Grid Mapping', 'Utility GIS'],
+  'telecom': ['Telecom GIS', 'Network Planning'],
+  'agriculture': ['Agricultural GIS', 'Crop Monitoring'],
+  'disaster': ['Disaster Management GIS', 'Risk Mapping'],
+  'heritage': ['Cultural Heritage GIS', 'Archaeological Survey'],
+  'municipal': ['Municipal GIS', 'Town Planning'],
+  'revenue': ['Revenue Survey', 'Cadastral Mapping'],
+  'boundary': ['Boundary Demarcation', 'Survey'],
+  'contour': ['Contour Mapping', 'DTM/DEM'],
+  'DEM': ['DEM/DTM', 'Terrain Analysis'],
+  'DTM': ['DTM/DEM', 'Terrain Analysis'],
+  'elevation': ['Elevation Model', 'DEM/DTM'],
+  '3D': ['3D Modeling', '3D GIS'],
+  'BIM': ['BIM Integration', 'Digital Twin'],
+  'planning': ['Urban Planning', 'GIS Analysis'],
+  'portal': ['Web GIS Development', 'GIS Portal'],
+  'dashboard': ['GIS Dashboard', 'Web GIS'],
+  'integration': ['GIS Integration', 'Spatial Data Management'],
+  'automation': ['GIS Automation', 'Python GIS'],
+  'python': ['Python GIS', 'GeoPandas'],
+  'API': ['GIS API', 'Spatial Web Services'],
+  'training': ['GIS Training', 'Capacity Building'],
+  'data collection': ['Field Data Collection', 'Mobile GIS'],
+  'digitization': ['Map Digitization', 'GIS Data Entry'],
+  'georeferencing': ['Georeferencing', 'Map Registration'],
+  'classification': ['Image Classification', 'Remote Sensing'],
 };
 
 async function synthesiseAndSaveSkills(project_id: string, title: string, description: string): Promise<boolean> {
@@ -254,7 +254,7 @@ async function synthesiseAndSaveSkills(project_id: string, title: string, descri
     const skillsArray = [...skillSet];
     const aiSkillsPayload = {
       required_services: skillsArray.slice(0, Math.ceil(skillsArray.length / 2)),
-      required_skills:   skillsArray.slice(Math.ceil(skillsArray.length / 2)),
+      required_skills: skillsArray.slice(Math.ceil(skillsArray.length / 2)),
     };
 
     await query(
@@ -376,7 +376,11 @@ export async function GET(
     // Step 4: Run live re-match against the FULL current provider database ────
     // This always runs for open RFPs — regardless of whether matches already
     // exist — so new providers registered after RFP approval are never missed.
-    let matchResult = { success: false, total_matches: 0, error: 'No skills available' };
+    let matchResult: Awaited<ReturnType<typeof matchProvidersForRfp>> = {
+      success: false,
+      total_matches: 0,
+      error: 'No skills available'
+    };
 
     if (hasSkills) {
       matchResult = await matchProvidersForRfp(project_id);
@@ -404,11 +408,11 @@ export async function GET(
     const providers = await fetchMatchedProviders(project_id);
 
     return NextResponse.json({
-      success:       true,
-      providers:     providers ?? [],
-      match_status:  matchResult.success ? 'refreshed' : 'partial',
+      success: true,
+      providers: providers ?? [],
+      match_status: matchResult.success ? 'refreshed' : 'partial',
       total_matches: matchResult.total_matches,
-      skill_source:  skillSource,
+      skill_source: skillSource,
       // Let the UI know when matching ran without skills — so it can show
       // a more specific warning than "0 providers found".
       skills_missing: !hasSkills,
@@ -476,7 +480,7 @@ export async function POST(
     if (toAdd.length === 0) {
       return NextResponse.json({
         success: true,
-        added:   0,
+        added: 0,
         emailed: 0,
         message: 'All selected providers are already on the checklist — nothing to do.',
       });
@@ -508,7 +512,7 @@ export async function POST(
       );
 
       const transport = createTransport();
-      const html      = buildEmailHtml(rfp, analysis);
+      const html = buildEmailHtml(rfp, analysis);
 
       // Mark all as notified in one UPDATE, then send emails — this way a
       // transient SMTP failure doesn't leave the row in an inconsistent state
@@ -527,8 +531,8 @@ export async function POST(
       for (const provider of emailRows) {
         try {
           await transport.sendMail({
-            from:    `"GIS Marketplace" <${process.env.SMTP_FROM ?? process.env.SMTP_USER}>`,
-            to:      provider.email,
+            from: `"GIS Marketplace" <${process.env.SMTP_FROM ?? process.env.SMTP_USER}>`,
+            to: provider.email,
             subject: `New RFP Opportunity: ${rfp.title}`,
             html,
           });
@@ -542,11 +546,11 @@ export async function POST(
     }
 
     return NextResponse.json({
-      success:      true,
-      added:        toAdd.length,
+      success: true,
+      added: toAdd.length,
       emailed,
       email_errors: emailErrors.length > 0 ? emailErrors : undefined,
-      message:      `${toAdd.length} provider(s) added to checklist. ${emailed} email(s) sent.`,
+      message: `${toAdd.length} provider(s) added to checklist. ${emailed} email(s) sent.`,
     });
 
   } catch (err: any) {
