@@ -34,3 +34,20 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+Run this in order to copy database for postgres
+$env:PGPASSWORD="<your-postgres-superuser-password>"
+psql -U postgres -h localhost -c "CREATE DATABASE gismarketplace;"
+psql -U postgres -h localhost -c "CREATE USER dev WITH PASSWORD 'devpass';"
+psql -U postgres -h localhost -c "GRANT ALL PRIVILEGES ON DATABASE gismarketplace TO dev;"
+psql -U postgres -h localhost -d gismarketplace -c "GRANT ALL ON SCHEMA public TO dev;"
+psql -U postgres -h localhost -d gismarketplace -c "ALTER SCHEMA public OWNER TO dev;"
+psql -U postgres -h localhost -d gismarketplace -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+
+pg_dump "<your-neon-connection-string>" --no-owner --no-privileges -f src/db/neon_export.sql
+
+$env:PGPASSWORD="devpass"
+psql -U dev -h localhost -d gismarketplace -f src/db/neon_export.sql
+
+psql -U dev -h localhost -d gismarketplace -c "\dt"
+
