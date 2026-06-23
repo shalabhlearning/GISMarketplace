@@ -51,3 +51,4 @@ psql -U dev -h localhost -d gismarketplace -f src/db/neon_export.sql
 
 psql -U dev -h localhost -d gismarketplace -c "\dt"
 
+#DATABASE_URL=postgresql://dev:devpass@localhost:5432/gismarketplace  - use this line to shift to local postgres
