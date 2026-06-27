@@ -134,14 +134,6 @@ function buildEmailHtml(rfp: any, analysis: any) {
 
 
 // ─── Attempt to trigger AI skill extraction for an RFP that has none ─────────
-// This is the recovery path: an RFP was approved before AI analysis finished,
-// so ai_skills is null. We hit the same ai-analyze endpoint the ReviewPanel
-// uses, which writes ai_skills back to the DB. After that, matchProvidersForRfp
-// can run with real data.
-//
-// We do this inline (awaited, not fire-and-forget) so that the GET response
-// always returns the most complete data possible. Timeout is 25 s — enough for
-// most PDFs, short enough not to hang Vercel's 30 s function limit.
 async function tryExtractSkills(project_id: string): Promise<boolean> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://gismarketplace.in';
@@ -164,7 +156,6 @@ async function tryExtractSkills(project_id: string): Promise<boolean> {
     console.log(`✅ [CHECKLIST GET] AI skill extraction succeeded for ${project_id}`);
     return true;
   } catch (err: any) {
-    // AbortError = timeout; log but don't crash — fall through to keyword fallback
     console.warn(`[CHECKLIST GET] ai-analyze failed for ${project_id}: ${err.message}`);
     return false;
   }
@@ -172,10 +163,12 @@ async function tryExtractSkills(project_id: string): Promise<boolean> {
 
 
 // ─── Keyword fallback: synthesise ai_skills from the RFP title + description ─
-// Used when: the RFP has no attachments OR ai-analyze timed out / failed.
-// We write the synthesised skills back to the DB so future calls skip this
-// path entirely. The skills are coarse but better than nothing — at minimum
-// they let geography/GIS-focused providers match.
+//
+// IMPORTANT: We do NOT inject a GIS baseline here. If the RFP text contains no
+// GIS-related keywords, we produce zero skills — the caller will set
+// skills_missing=true and the UI will show the zero-match banner instead of
+// falsely matching every provider at ~50%.
+//
 const GIS_KEYWORD_MAP: Record<string, string[]> = {
   'GIS': ['GIS', 'Geospatial Analysis'],
   'mapping': ['GIS', 'Cartography'],
@@ -247,9 +240,15 @@ async function synthesiseAndSaveSkills(project_id: string, title: string, descri
       }
     }
 
-    // Always include generic GIS as a baseline so at least some match runs
-    skillSet.add('GIS');
-    skillSet.add('Geospatial Analysis');
+    // ── No forced GIS baseline ──────────────────────────────────────────────
+    // Previously we always added 'GIS' + 'Geospatial Analysis' here, which
+    // caused every provider (who all list GIS as a skill) to show a ~50% match
+    // even for completely unrelated RFPs (e.g. "catering service").
+    // Now we only save skills when at least one keyword actually matched.
+    if (skillSet.size === 0) {
+      console.log(`ℹ️ [CHECKLIST GET] No GIS keywords found in RFP ${project_id} — skipping skill synthesis`);
+      return false; // caller will set skills_missing=true
+    }
 
     const skillsArray = [...skillSet];
     const aiSkillsPayload = {
@@ -295,6 +294,19 @@ async function fetchMatchedProviders(project_id: string) {
   );
 }
 
+// ─── Fetch ALL providers (for "show all" fallback when 0 matches) ─────────────
+async function fetchAllProviders() {
+  return query(
+    `SELECT
+       pp.provider_id,
+       pp.organization_name,
+       u.email
+     FROM providerprofile pp
+     JOIN "user" u ON pp.provider_id = u.user_id
+     ORDER BY pp.organization_name ASC`
+  );
+}
+
 
 // ─── GET: guaranteed live re-match for every open RFP ─────────────────────────
 export async function GET(
@@ -320,7 +332,6 @@ export async function GET(
     }
 
     if (rfp.status !== 'open') {
-      // Non-open RFPs: just return whatever matched rows exist, skip re-matching
       const providers = await fetchMatchedProviders(project_id);
       return NextResponse.json({ success: true, providers: providers ?? [], match_status: 'skipped_not_open' });
     }
@@ -329,10 +340,8 @@ export async function GET(
     let skillSource: 'existing' | 'ai_extracted' | 'keyword_synthesised' | 'none' = 'none';
     const t0 = Date.now();
 
-    // Step 1: Does the RFP already have ai_skills in the DB?
     let hasSkills = !!rfp.ai_skills;
 
-    // Step 2: If not, try AI extraction (recovery path for 0-match RFPs) ─────
     if (!hasSkills) {
       const attachments: string[] = (() => {
         try {
@@ -344,7 +353,11 @@ export async function GET(
       })();
 
       const hasPdfs = attachments.some(
-        (a: string) => typeof a === 'string' && a.toLowerCase().endsWith('.pdf')
+        (a: string) => typeof a === 'string' && (
+          a.toLowerCase().endsWith('.pdf') ||
+          a.toLowerCase().endsWith('.docx') ||
+          a.toLowerCase().endsWith('.doc')
+        )
       );
 
       if (hasPdfs) {
@@ -352,11 +365,10 @@ export async function GET(
         const extracted = await tryExtractSkills(project_id);
         if (extracted) {
           skillSource = 'ai_extracted';
-          hasSkills = true; // ai-analyze wrote skills to DB; matchProvidersForRfp will re-read
+          hasSkills = true;
         }
       }
 
-      // Step 3: Still no skills? Synthesise from title + description ──────────
       if (!hasSkills) {
         console.log(`🔄 [CHECKLIST GET] Falling back to keyword synthesis for RFP ${project_id}`);
         const synthesised = await synthesiseAndSaveSkills(
@@ -368,14 +380,13 @@ export async function GET(
           skillSource = 'keyword_synthesised';
           hasSkills = true;
         }
+        // If synthesised=false (non-GIS RFP), hasSkills stays false and
+        // skills_missing=true is returned to the UI.
       }
     } else {
       skillSource = 'existing';
     }
 
-    // Step 4: Run live re-match against the FULL current provider database ────
-    // This always runs for open RFPs — regardless of whether matches already
-    // exist — so new providers registered after RFP approval are never missed.
     let matchResult: Awaited<ReturnType<typeof matchProvidersForRfp>> = {
       success: false,
       total_matches: 0,
@@ -392,7 +403,6 @@ export async function GET(
           `${matchResult.total_matches} matches in ${ms}ms (skills source: ${skillSource})`
         );
       } else {
-        // Non-fatal: log and fall through — admin still sees existing rows
         console.warn(
           `⚠️ [CHECKLIST GET] re-match returned an error for ${project_id}: ${matchResult.error}`
         );
@@ -404,17 +414,22 @@ export async function GET(
       );
     }
 
-    // Step 5: Return matched providers (includes any that existed before) ─────
     const providers = await fetchMatchedProviders(project_id);
+
+    // ── When 0 providers matched, also return the full provider list so the
+    //    UI can offer "show all providers" without a second round-trip.
+    let allProviders: any[] | undefined;
+    if (providers.length === 0) {
+      allProviders = await fetchAllProviders();
+    }
 
     return NextResponse.json({
       success: true,
       providers: providers ?? [],
+      all_providers: allProviders,        // only present when providers.length === 0
       match_status: matchResult.success ? 'refreshed' : 'partial',
       total_matches: matchResult.total_matches,
       skill_source: skillSource,
-      // Let the UI know when matching ran without skills — so it can show
-      // a more specific warning than "0 providers found".
       skills_missing: !hasSkills,
     });
 
@@ -465,13 +480,11 @@ export async function POST(
     );
     const existingMap = new Map(existingRows.map((r: any) => [r.provider_id, r]));
 
-    // Only process providers not yet checklisted
     const toAdd = provider_ids.filter(id => {
       const row = existingMap.get(id);
       return !row || row.is_checklist === false;
     });
 
-    // Only email providers not yet notified
     const toEmail = toAdd.filter(id => {
       const row = existingMap.get(id);
       return !row || row.notified === false;
@@ -486,7 +499,6 @@ export async function POST(
       });
     }
 
-    // Bulk UPDATE is safer than individual updates — single round-trip, atomic
     const addPlaceholders = toAdd.map((_, i) => `$${i + 2}`).join(',');
     await query(
       `UPDATE rfp_provider_match
@@ -494,7 +506,7 @@ export async function POST(
        WHERE project_id = $1
          AND provider_id IN (${addPlaceholders})
          AND is_checklist = FALSE`,
-      [project_id, ...toAdd]  // $1 = project_id, $3.. = provider ids
+      [project_id, ...toAdd]  // $1 = project_id, $2.. = provider ids
     );
 
     let emailed = 0;
@@ -514,9 +526,6 @@ export async function POST(
       const transport = createTransport();
       const html = buildEmailHtml(rfp, analysis);
 
-      // Mark all as notified in one UPDATE, then send emails — this way a
-      // transient SMTP failure doesn't leave the row in an inconsistent state
-      // where the admin retries and double-emails the provider.
       const notifyPlaceholders = emailRows.map((_: any, i: number) => `$${i + 2}`).join(',');
       if (emailRows.length > 0) {
         await query(

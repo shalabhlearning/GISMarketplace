@@ -1,66 +1,95 @@
 // src/lib/vector-store.ts
 import PDFParser from 'pdf2json';
+import mammoth from 'mammoth';
 import { ChatGroq } from '@langchain/groq';
 import { query } from '@/lib/db';
 
 const llm = new ChatGroq({ model: 'llama-3.3-70b-versatile', temperature: 0.1 });
 
 // ─────────────────────────────────────────────────────────────
-// Shared: extract text from PDF attachments
-// Supports both Vercel Blob URLs (https://) and legacy local paths
+// Helpers: fetch a remote file into a Buffer
 // ─────────────────────────────────────────────────────────────
-async function extractPdfText(attachmentPaths: string[]): Promise<string> {
-  const pdfPaths = attachmentPaths.filter(p =>
-    typeof p === 'string' && p.toLowerCase().endsWith('.pdf')
+async function fetchBuffer(url: string): Promise<Buffer> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch file: ${response.status} ${response.statusText} — ${url}`);
+  }
+  return Buffer.from(await response.arrayBuffer());
+}
+
+async function readLocalBuffer(filePath: string): Promise<Buffer> {
+  const { default: fs }   = await import('fs/promises');
+  const { default: path } = await import('path');
+  return fs.readFile(path.join(process.cwd(), 'public', filePath));
+}
+
+// ─────────────────────────────────────────────────────────────
+// Extract text from a single PDF buffer
+// ─────────────────────────────────────────────────────────────
+async function extractPdfBuffer(buffer: Buffer): Promise<string> {
+  const pdfParser = new PDFParser();
+  return new Promise<string>((resolve, reject) => {
+    pdfParser.on('pdfParser_dataReady', (pdfData: any) => {
+      let text = '';
+      for (const page of pdfData.Pages) {
+        for (const item of page.Texts) {
+          try { text += decodeURIComponent(item.R?.[0]?.T ?? '') + ' '; } catch { text += ' '; }
+        }
+        text += '\n\n';
+      }
+      resolve(text);
+    });
+    pdfParser.on('pdfParser_dataError', reject);
+    pdfParser.parseBuffer(buffer);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// Extract text from a single DOCX buffer
+// ─────────────────────────────────────────────────────────────
+async function extractDocxBuffer(buffer: Buffer): Promise<string> {
+  const result = await mammoth.extractRawText({ buffer });
+  if (result.messages?.length) {
+    console.warn('[DOCX warnings]', result.messages.map((m: any) => m.message).join(', '));
+  }
+  return result.value;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Shared: extract text from any supported attachment
+// Supports PDF and DOCX/DOC, both remote (Blob URLs) and local
+// ─────────────────────────────────────────────────────────────
+async function extractDocumentText(attachmentPaths: string[]): Promise<string> {
+  const supported = attachmentPaths.filter(p =>
+    typeof p === 'string' && (
+      p.toLowerCase().endsWith('.pdf')  ||
+      p.toLowerCase().endsWith('.docx') ||
+      p.toLowerCase().endsWith('.doc')
+    )
   );
 
-  if (pdfPaths.length === 0) {
-    throw new Error(`No PDF attachments found. Got: ${attachmentPaths.join(', ')}`);
+  if (supported.length === 0) {
+    throw new Error(`No supported attachments found (PDF/DOCX). Got: ${attachmentPaths.join(', ')}`);
   }
 
   let fullText = '';
 
-  for (const filePath of pdfPaths) {
-    let buffer: Buffer;
+  for (const filePath of supported) {
+    const isRemote = filePath.startsWith('http://') || filePath.startsWith('https://');
+    const buffer   = isRemote ? await fetchBuffer(filePath) : await readLocalBuffer(filePath);
 
-    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
-      // ✅ Vercel Blob URL — fetch remotely
-      const response = await fetch(filePath);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch PDF from Blob: ${response.status} ${response.statusText} — ${filePath}`);
-      }
-      buffer = Buffer.from(await response.arrayBuffer());
-    } else {
-      // Legacy local path fallback (for local dev with old uploads)
-      const { default: fs } = await import('fs/promises');
-      const { default: path } = await import('path');
-      const fullPath = path.join(process.cwd(), 'public', filePath);
-      buffer = await fs.readFile(fullPath);
+    const ext = filePath.toLowerCase().split('.').pop();
+
+    if (ext === 'pdf') {
+      fullText += await extractPdfBuffer(buffer) + '\n\n';
+    } else if (ext === 'docx' || ext === 'doc') {
+      fullText += await extractDocxBuffer(buffer) + '\n\n';
     }
-
-    const pdfParser = new PDFParser();
-
-    const pageText = await new Promise<string>((resolve, reject) => {
-      pdfParser.on('pdfParser_dataReady', (pdfData: any) => {
-        let text = '';
-        for (const page of pdfData.Pages) {
-          for (const item of page.Texts) {
-            try { text += decodeURIComponent(item.R?.[0]?.T ?? '') + ' '; } catch { text += ' '; }
-          }
-          text += '\n\n';
-        }
-        resolve(text);
-      });
-      pdfParser.on('pdfParser_dataError', reject);
-      pdfParser.parseBuffer(buffer);
-    });
-
-    fullText += pageText + '\n\n';
   }
 
-  if (!fullText.trim()) throw new Error('Could not extract text from PDF(s)');
+  if (!fullText.trim()) throw new Error('Could not extract text from attachment(s)');
 
-  console.log(`✅ Extracted ${fullText.length} chars from ${pdfPaths.length} PDF(s)`);
+  console.log(`✅ Extracted ${fullText.length} chars from ${supported.length} file(s)`);
   return fullText;
 }
 
@@ -82,8 +111,6 @@ async function callLlm(prompt: string): Promise<any> {
 
 // ─────────────────────────────────────────────────────────────
 // Shared: fetch all distinct skills from providerprofile
-// Fixed: uses PostgreSQL jsonb_array_elements_text instead of
-// MySQL JSON_TABLE which is not supported on Neon/PostgreSQL
 // ─────────────────────────────────────────────────────────────
 async function fetchPlatformSkills(): Promise<string[]> {
   try {
@@ -102,11 +129,10 @@ async function fetchPlatformSkills(): Promise<string[]> {
 }
 
 // ─────────────────────────────────────────────────────────────
-// EXPORT 1: Full AI analysis for provider "AI Analyzer" button
-// Returns rich structured data displayed in RfpDetailsModal
+// EXPORT 1: Full AI analysis for the ReviewPanel summary
 // ─────────────────────────────────────────────────────────────
 export async function analyzeRfpWithRAG(projectId: string, attachmentPaths: string[]) {
-  const fullText = await extractPdfText(attachmentPaths);
+  const fullText = await extractDocumentText(attachmentPaths);
 
   const result = await callLlm(`
 You are an expert GIS and RFP analyst.
@@ -134,13 +160,11 @@ ${fullText.slice(0, 40000)}
 }
 
 // ─────────────────────────────────────────────────────────────
-// EXPORT 2: Skill extraction for matching at approval time
-// Maps RFP requirements → platform's actual skill vocabulary
-// so string matching works against real provider skills
+// EXPORT 2: Skill extraction for provider matching
 // ─────────────────────────────────────────────────────────────
 export async function extractRequiredSkills(projectId: string, attachmentPaths: string[]) {
   const [fullText, platformSkills] = await Promise.all([
-    extractPdfText(attachmentPaths),
+    extractDocumentText(attachmentPaths),
     fetchPlatformSkills(),
   ]);
 
@@ -165,7 +189,6 @@ Document excerpt:
 ${fullText.slice(0, 35000)}
 `);
 
-  // Safety fallback
   if (!result?.required_services && !result?.required_skills) {
     console.warn('LLM returned bad format, using fallback');
     return {
