@@ -487,7 +487,7 @@ export async function POST(
     }
 
     // Bulk UPDATE is safer than individual updates — single round-trip, atomic
-    const addPlaceholders = toAdd.map((_, i) => `$${i + 3}`).join(',');
+    const addPlaceholders = toAdd.map((_, i) => `$${i + 2}`).join(',');
     await query(
       `UPDATE rfp_provider_match
        SET is_checklist = TRUE, checklist_added_at = NOW()
@@ -517,7 +517,7 @@ export async function POST(
       // Mark all as notified in one UPDATE, then send emails — this way a
       // transient SMTP failure doesn't leave the row in an inconsistent state
       // where the admin retries and double-emails the provider.
-      const notifyPlaceholders = emailRows.map((_: any, i: number) => `$${i + 3}`).join(',');
+      const notifyPlaceholders = emailRows.map((_: any, i: number) => `$${i + 2}`).join(',');
       if (emailRows.length > 0) {
         await query(
           `UPDATE rfp_provider_match
