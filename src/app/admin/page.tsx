@@ -2,8 +2,8 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
-import ReviewPanel from '@/components/admin/ReviewPanel';
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
@@ -84,14 +84,14 @@ const categoryIcon = (title: string) => {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function AdminDashboardPage() {
+  const router = useRouter();
+
   const [stats, setStats] = useState<Stats>({
     totalPending: 0, totalApproved: 0, totalRejected: 0, topBuyer: '—',
   });
   const [recentRfps, setRecentRfps] = useState<Rfp[]>([]);
   const [allRfps, setAllRfps] = useState<Rfp[]>([]);
   const [weeklyData, setWeeklyData] = useState<WeeklyPoint[]>([]);
-  const [selectedRfp, setSelectedRfp] = useState<any>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [authorized, setAuthorized] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -162,24 +162,11 @@ export default function AdminDashboardPage() {
       const id = setInterval(fetchAll, 15000);
       return () => clearInterval(id);
     }
-  }, [authorized, fetchAll, refreshKey]);
+  }, [authorized, fetchAll]);
 
-  // ── Action handler ───────────────────────────────────────────────────────────
-  const handleAction = async (projectId: string, action: string) => {
-    try {
-      const res = await fetch('/api/admin/rfp/update-status', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId, action }),
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Failed to update');
-      const data = await res.json();
-      setSelectedRfp((prev: any) => prev ? { ...prev, status: data.status } : null);
-      setRefreshKey(k => k + 1);
-    } catch {
-      alert('Failed to update RFP status');
-    }
+  // ── Navigate to detail page ─────────────────────────────────────────────────
+  const goToRfp = (projectId: string) => {
+    router.push(`/admin/rfp-review/${projectId}`);
   };
 
   if (loading || !authorized) {
@@ -218,7 +205,7 @@ export default function AdminDashboardPage() {
             ↻ Refresh
           </button>
           <a
-            href="/admin"
+            href="/admin/rfp-review"
             className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors"
           >
             ☰ Open Approval Queue
@@ -359,7 +346,7 @@ export default function AdminDashboardPage() {
       <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-6 py-5 border-b border-border">
           <h3 className="font-semibold text-foreground">Recent RFP Submissions</h3>
-          <a href="/admin" className="text-sm text-primary font-medium hover:underline">
+          <a href="/admin/rfp-review" className="text-sm text-primary font-medium hover:underline">
             View All →
           </a>
         </div>
@@ -384,7 +371,11 @@ export default function AdminDashboardPage() {
               </tr>
             ) : (
               recentRfps.map(rfp => (
-                <tr key={rfp.project_id} className="hover:bg-muted/50 transition-colors">
+                <tr
+                  key={rfp.project_id}
+                  className="hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => goToRfp(rfp.project_id)}
+                >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{categoryIcon(rfp.title)}</span>
@@ -413,9 +404,9 @@ export default function AdminDashboardPage() {
                   <td className="px-6 py-4">
                     {statusBadge(rfp.status)}
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
                     <button
-                      onClick={() => setSelectedRfp(rfp)}
+                      onClick={() => goToRfp(rfp.project_id)}
                       className="text-primary hover:text-primary/80 font-medium text-sm"
                     >
                       {rfp.status === 'in_review' ? 'Review →' : 'View →'}
@@ -427,15 +418,6 @@ export default function AdminDashboardPage() {
           </tbody>
         </table>
       </div>
-
-      {/* ── Review Panel ── */}
-      {selectedRfp && (
-        <ReviewPanel
-          rfp={selectedRfp}
-          onClose={() => setSelectedRfp(null)}
-          onAction={handleAction}
-        />
-      )}
     </AdminLayout>
   );
 }

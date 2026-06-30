@@ -2,8 +2,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
-import ReviewPanel from '@/components/admin/ReviewPanel';
 import { Search, RefreshCw } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -65,13 +65,14 @@ const statusConfig: Record<string, { label: string; pill: string; dot: string }>
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 export default function AdminRfpQueuePage() {
+  const router = useRouter();
+
   const [rfps, setRfps] = useState<Rfp[]>([]);
   const [filtered, setFiltered] = useState<Rfp[]>([]);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedRfp, setSelectedRfp] = useState<any>(null);
   const [authorized, setAuthorized] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -126,22 +127,9 @@ export default function AdminRfpQueuePage() {
     );
   }, [searchQuery, rfps]);
 
-  // ── Action handler ─────────────────────────────────────────────────────────
-  const handleAction = async (projectId: string, action: string) => {
-    try {
-      const res = await fetch('/api/admin/rfp/update-status', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId, action }),
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Failed');
-      const data = await res.json();
-      setSelectedRfp((prev: any) => (prev ? { ...prev, status: data.status } : null));
-      setRefreshKey(k => k + 1);
-    } catch {
-      alert('Failed to update RFP status');
-    }
+  // ── Navigate to detail page ─────────────────────────────────────────────────
+  const goToRfp = (projectId: string) => {
+    router.push(`/admin/rfp-review/${projectId}`);
   };
 
   // ── Tab counts ─────────────────────────────────────────────────────────────
@@ -274,7 +262,7 @@ export default function AdminRfpQueuePage() {
                   <tr
                     key={rfp.project_id}
                     className="hover:bg-muted/50 transition-colors cursor-pointer"
-                    onClick={() => setSelectedRfp(rfp)}
+                    onClick={() => goToRfp(rfp.project_id)}
                   >
                     {/* Title + ID */}
                     <td className="px-6 py-4">
@@ -324,7 +312,7 @@ export default function AdminRfpQueuePage() {
                     {/* Action */}
                     <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
                       <button
-                        onClick={() => setSelectedRfp(rfp)}
+                        onClick={() => goToRfp(rfp.project_id)}
                         className={`text-sm font-semibold px-5 py-2 rounded-xl transition-colors ${
                           rfp.status === 'in_review'
                             ? 'bg-primary text-primary-foreground hover:bg-primary/90'
@@ -349,15 +337,6 @@ export default function AdminRfpQueuePage() {
           </div>
         )}
       </div>
-
-      {/* ── Review Panel ── */}
-      {selectedRfp && (
-        <ReviewPanel
-          rfp={selectedRfp}
-          onClose={() => setSelectedRfp(null)}
-          onAction={handleAction}
-        />
-      )}
     </AdminLayout>
   );
 }

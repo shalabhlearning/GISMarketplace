@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 
 type FilterType = 'all' | 'in_review' | 'open' | 'closed';
 
@@ -9,9 +10,10 @@ export default function RfpTable({
   onSelect,
   refreshKey = 0,
 }: {
-  onSelect: (rfp: any) => void;
+  onSelect?: (rfp: any) => void;
   refreshKey?: number;
 }) {
+  const router = useRouter();
   const [rfps, setRfps] = useState<any[]>([]);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [loading, setLoading] = useState(true);
@@ -35,6 +37,13 @@ export default function RfpTable({
   }, [activeFilter, refreshKey]);
 
   const filteredRfps = useMemo(() => rfps, [rfps]);
+
+  // Navigate to the full detail page. Falls back to the onSelect callback
+  // if a parent still relies on it for something else.
+  const openRfp = (rfp: any) => {
+    router.push(`/admin/rfp-review/${rfp.project_id}`);
+    onSelect?.(rfp);
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -95,7 +104,11 @@ export default function RfpTable({
           </thead>
           <tbody className="divide-y text-sm">
             {filteredRfps.map((rfp: any) => (
-              <tr key={rfp.project_id} className="hover:bg-gray-50 transition-colors">
+              <tr
+                key={rfp.project_id}
+                className="hover:bg-gray-50 transition-colors cursor-pointer"
+                onClick={() => openRfp(rfp)}
+              >
                 <td className="p-5 font-mono text-gray-600">{rfp.project_id?.slice(0, 8)}...</td>
                 <td className="p-5">
                   <div className="font-medium text-gray-900">{rfp.title}</div>
@@ -108,9 +121,9 @@ export default function RfpTable({
                   })}
                 </td>
                 <td className="p-5">{getStatusBadge(rfp.status)}</td>
-                <td className="p-5 text-right pr-10">
+                <td className="p-5 text-right pr-10" onClick={(e) => e.stopPropagation()}>
                   <button
-                    onClick={() => onSelect(rfp)}
+                    onClick={() => openRfp(rfp)}
                     className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 ml-auto"
                   >
                     {rfp.status === 'in_review' ? 'Review →' : 'View →'}
